@@ -120,6 +120,11 @@ Q_SIGNALS:
 
     void nodeContextMenu(AprochNode &n, const QPointF &pos);
 
+private Q_SLOTS:
+    void setupConnectionSignals(const AprochConnection &c);
+    void sendConnectionCreatedToNodes(const AprochConnection &c);
+    void sendConnectionDeletedToNodes(const AprochConnection &c);
+
 private:
     using SharedConnection = std::shared_ptr<AprochConnection>;
     using UniqueNode = std::unique_ptr<AprochNode>;
@@ -127,11 +132,6 @@ private:
     std::unordered_map<QUuid, SharedConnection> mConnections;
     std::unordered_map<QUuid, UniqueNode> mNodes;
     std::shared_ptr<AprochDataModelRegistry> mRegistry;
-
-private Q_SLOTS:
-    void setupConnectionSignals(const AprochConnection &c);
-    void sendConnectionCreatedToNodes(const AprochConnection &c);
-    void sendConnectionDeletedToNodes(const AprochConnection &c);
 };
 
 APROCH_NAMESPACE_END

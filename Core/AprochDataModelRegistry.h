@@ -1,12 +1,12 @@
 #ifndef APROCHDATAMODELREGISTRY_H
 #define APROCHDATAMODELREGISTRY_H
 
-#include "Aproch.h"
 #include "AprochNodeDataModel.h"
 #include "Utilities.h"
 
 #include <QSet>
-#include <unordered_map>
+#include <QMap>
+//#include <unordered_map>
 
 APROCH_NAMESPACE_BEGIN
 
@@ -16,8 +16,8 @@ class APROCH_EXPORT AprochDataModelRegistry
 public:
     using RegistryItemPtr = std::unique_ptr<INodeDataModel>;
     using RegistryItemCreator = std::function<RegistryItemPtr()>;
-    using RegisteredModelCreatorsMap = std::unordered_map<QString, RegistryItemCreator>;
-    using RegisteredModelsCategoryMap = std::unordered_map<QString, QString>;
+    using RegisteredModelCreatorsMap = QMap<QString, RegistryItemCreator>;
+    using RegisteredModelsCategoryMap = QMap<QString, QString>;
     using CategoriesSet = QSet<QString>;
 
     using RegisteredTypeConvertersMap = std::map<TypeConverterId, TypeConverter>;
@@ -57,7 +57,7 @@ public:
         mRegisteredTypeConverters[id] = std::move(typeConverter);
     }
 
-    std::unique_ptr<INodeDataModel>create(const QString  &modelName);
+    std::unique_ptr<INodeDataModel> create(const QString  &modelName);
 
     inline RegisteredModelCreatorsMap const &getRegisteredModelCreators() const
     {

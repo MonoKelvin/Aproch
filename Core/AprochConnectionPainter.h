@@ -41,7 +41,7 @@ public:
         LeadLine
     };
 
-    static void Paint(QPainter *painter, const AprochConnection &connection, EConnectionShape shape);
+    static void Paint(QPainter *painter, const AprochConnection &connection, EConnectionShape shape = EConnectionShape::Cubic);
     static QPainterPath GetPainterStroke(const AprochConnection &connection);
 
 private:

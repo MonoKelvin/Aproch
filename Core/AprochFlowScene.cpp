@@ -4,6 +4,7 @@
 #include "AprochNodeGraphicsObject.h"
 #include "AprochConnection.h"
 #include "AprochConnectionGraphicsObject.h"
+#include "AprochDataModelRegistry.h"
 
 #include <QSet>
 #include <QFileDialog>
@@ -12,32 +13,32 @@
 
 APROCH_NAMESPACE_BEGIN
 
-AprochNode* AprochFlowScene::LocateNodeAt(QPointF scenePoint, AprochFlowScene& scene, const QTransform& viewTransform)
+AprochNode *AprochFlowScene::LocateNodeAt(QPointF scenePoint, AprochFlowScene &scene, const QTransform &viewTransform)
 {
     // items under cursor
     auto items = scene.items(scenePoint, Qt::IntersectsItemShape, Qt::DescendingOrder, viewTransform);
 
     // items convertable to AprochNodeGraphicsObject
-    QVector<QGraphicsItem*> filteredItems;
+    QVector<QGraphicsItem *> filteredItems;
 
     std::copy_if(items.begin(), items.end(), std::back_inserter(filteredItems), [](QGraphicsItem * item)
     {
-        return (dynamic_cast<AprochNodeGraphicsObject*>(item) != nullptr);
+        return (dynamic_cast<AprochNodeGraphicsObject *>(item) != nullptr);
     });
 
-    AprochNode* resultNode = nullptr;
+    AprochNode *resultNode = nullptr;
 
     if (!filteredItems.empty())
     {
         auto graphicsItem = filteredItems.front();
-        auto ngo = dynamic_cast<AprochNodeGraphicsObject*>(graphicsItem);
+        auto ngo = dynamic_cast<AprochNodeGraphicsObject *>(graphicsItem);
         resultNode = &ngo->node();
     }
 
     return resultNode;
 }
 
-AprochFlowScene::AprochFlowScene(std::shared_ptr<AprochDataModelRegistry> registry, QObject* parent)
+AprochFlowScene::AprochFlowScene(std::shared_ptr<AprochDataModelRegistry> registry, QObject *parent)
     : QGraphicsScene(parent)
     , mRegistry(std::move(registry))
 {
@@ -49,7 +50,7 @@ AprochFlowScene::AprochFlowScene(std::shared_ptr<AprochDataModelRegistry> regist
     connect(this, &AprochFlowScene::connectionDeleted, this, &AprochFlowScene::sendConnectionDeletedToNodes);
 }
 
-AprochFlowScene::AprochFlowScene(QObject* parent)
+AprochFlowScene::AprochFlowScene(QObject *parent)
     : AprochFlowScene(std::shared_ptr<AprochDataModelRegistry>(), parent)
 {
 }
@@ -61,13 +62,11 @@ AprochFlowScene::~AprochFlowScene()
 
 //------------------------------------------------------------------------------
 
-std::shared_ptr<AprochConnection> AprochFlowScene::createConnection(EPortType connectedPort,
-                                                                    AprochNode& node,
-                                                                    PortIndex portIndex)
+std::shared_ptr<AprochConnection> AprochFlowScene::createConnection(EPortType connectedPort, AprochNode &node, PortIndex portIndex)
 {
     auto connection = std::make_shared<AprochConnection>(connectedPort, node, portIndex);
 
-    auto cgo = make_unique<AprochConnectionGraphicsObject>(*this, *connection);
+    auto cgo = std::make_unique<AprochConnectionGraphicsObject>(*this, *connection);
 
     // after this function connection points are set to node port
     connection->setGraphicsObject(std::move(cgo));
@@ -77,8 +76,7 @@ std::shared_ptr<AprochConnection> AprochFlowScene::createConnection(EPortType co
     // Note: this connection isn't truly created yet. It's only partially created.
     // Thus, don't send the connectionCreated(...) signal.
 
-    connect(connection.get(), &AprochConnection::connectionCompleted,
-            this, [this](const AprochConnection & c)
+    connect(connection.get(), &AprochConnection::connectionCompleted, this, [this](const AprochConnection & c)
     {
         connectionCreated(c);
     });
@@ -86,11 +84,11 @@ std::shared_ptr<AprochConnection> AprochFlowScene::createConnection(EPortType co
     return connection;
 }
 
-std::shared_ptr<AprochConnection> AprochFlowScene::createConnection(AprochNode& nodeIn, PortIndex portIndexIn, AprochNode& nodeOut, PortIndex portIndexOut, TypeConverter const& converter)
+std::shared_ptr<AprochConnection> AprochFlowScene::createConnection(AprochNode &nodeIn, PortIndex portIndexIn, AprochNode &nodeOut, PortIndex portIndexOut, TypeConverter const &converter)
 {
     auto connection = std::make_shared<AprochConnection>(nodeIn, portIndexIn, nodeOut, portIndexOut, converter);
 
-    auto cgo = make_unique<AprochConnectionGraphicsObject>(*this, *connection);
+    auto cgo = std::make_unique<AprochConnectionGraphicsObject>(*this, *connection);
 
     nodeIn.setConnection(EPortType::Input, portIndexIn, *connection);
     nodeOut.setConnection(EPortType::Output, portIndexOut, *connection);
@@ -108,7 +106,7 @@ std::shared_ptr<AprochConnection> AprochFlowScene::createConnection(AprochNode& 
     return connection;
 }
 
-std::shared_ptr<AprochConnection> AprochFlowScene::restoreConnection(QJsonObject const& connectionJson)
+std::shared_ptr<AprochConnection> AprochFlowScene::restoreConnection(const QJsonObject &connectionJson)
 {
     QUuid nodeInId = QUuid(connectionJson["in_id"].toString());
     QUuid nodeOutId = QUuid(connectionJson["out_id"].toString());
@@ -151,7 +149,7 @@ std::shared_ptr<AprochConnection> AprochFlowScene::restoreConnection(QJsonObject
     return connection;
 }
 
-void AprochFlowScene::deleteConnection(AprochConnection& connection)
+void AprochFlowScene::deleteConnection(AprochConnection &connection)
 {
     auto it = mConnections.find(connection.getId());
     if (it != mConnections.end())
@@ -161,10 +159,10 @@ void AprochFlowScene::deleteConnection(AprochConnection& connection)
     }
 }
 
-AprochNode& AprochFlowScene::createNode(std::unique_ptr<INodeDataModel>&& dataModel)
+AprochNode &AprochFlowScene::createNode(std::unique_ptr<INodeDataModel> &&dataModel)
 {
-    auto node = make_unique<AprochNode>(std::move(dataModel));
-    auto ngo = make_unique<AprochNodeGraphicsObject>(*this, *node);
+    auto node = std::make_unique<AprochNode>(std::move(dataModel));
+    auto ngo = std::make_unique<AprochNodeGraphicsObject>(*this, *node);
 
     node->setNodeGraphicsObject(std::move(ngo));
 
@@ -175,7 +173,7 @@ AprochNode& AprochFlowScene::createNode(std::unique_ptr<INodeDataModel>&& dataMo
     return *nodePtr;
 }
 
-AprochNode& AprochFlowScene::restoreNode(QJsonObject const& nodeJson)
+AprochNode &AprochFlowScene::restoreNode(const QJsonObject &nodeJson)
 {
     QString modelName = nodeJson["model"].toObject()["name"].toString();
 
@@ -186,32 +184,32 @@ AprochNode& AprochFlowScene::restoreNode(QJsonObject const& nodeJson)
         throw std::logic_error(std::string("No registered model with name ") + modelName.toLocal8Bit().data());
     }
 
-    auto node = make_unique<AprochNode>(std::move(dataModel));
-    auto ngo = make_unique<AprochNodeGraphicsObject>(*this, *node);
-    node->setGraphicsObject(std::move(ngo));
+    auto node = std::make_unique<AprochNode>(std::move(dataModel));
+    auto ngo = std::make_unique<AprochNodeGraphicsObject>(*this, *node);
+    node->setNodeGraphicsObject(std::move(ngo));
 
     node->restore(nodeJson);
 
     auto nodePtr = node.get();
-    mNodes[node->id()] = std::move(node);
+    mNodes[node->getId()] = std::move(node);
 
     nodePlaced(*nodePtr);
     nodeCreated(*nodePtr);
     return *nodePtr;
 }
 
-void AprochFlowScene::removeNode(AprochNode& node)
+void AprochFlowScene::removeNode(AprochNode &node)
 {
     // call signal
     nodeDeleted(node);
 
     for (auto portType : {EPortType::Input, EPortType::Output})
     {
-        auto const& nodeEntries = node.getEntries(portType);
+        auto const &nodeEntries = node.getEntries(portType);
 
-        for (auto& connections : nodeEntries)
+        for (auto &connections : nodeEntries)
         {
-            for (auto const& pair : connections)
+            for (auto const &pair : connections)
             {
                 deleteConnection(*pair.second);
             }
@@ -221,7 +219,7 @@ void AprochFlowScene::removeNode(AprochNode& node)
     mNodes.erase(node.getId());
 }
 
-AprochDataModelRegistry& AprochFlowScene::registry() const
+AprochDataModelRegistry &AprochFlowScene::registry() const
 {
     return *mRegistry;
 }
@@ -231,23 +229,23 @@ void AprochFlowScene::setRegistry(std::shared_ptr<AprochDataModelRegistry> regis
     mRegistry = std::move(registry);
 }
 
-void AprochFlowScene::iterateOverNodes(const std::function<void(AprochNode*)>& visitor)
+void AprochFlowScene::iterateOverNodes(const std::function<void(AprochNode *)> &visitor)
 {
-    for (const auto& _node : mNodes)
+    for (const auto &_node : mNodes)
     {
         visitor(_node.second.get());
     }
 }
 
-void AprochFlowScene::iterateOverNodeData(const std::function<void(INodeDataModel*)>& visitor)
+void AprochFlowScene::iterateOverNodeData(const std::function<void(INodeDataModel *)> &visitor)
 {
-    for (const auto& _node : mNodes)
+    for (const auto &_node : mNodes)
     {
         visitor(_node.second->getNodeDataModel());
     }
 }
 
-void AprochFlowScene::iterateOverNodeDataDependentOrder(const std::function<void(INodeDataModel*)>& visitor)
+void AprochFlowScene::iterateOverNodeDataDependentOrder(const std::function<void(INodeDataModel *)> &visitor)
 {
     QSet<QUuid> visitedNodesSet;
 
@@ -256,7 +254,7 @@ void AprochFlowScene::iterateOverNodeDataDependentOrder(const std::function<void
     {
         for (unsigned int i = 0; i < model.nPorts(EPortType::Input); ++i)
         {
-            auto connections = node.connections(EPortType::Input, i);
+            auto connections = node.getConnections(EPortType::Input, i);
             if (!connections.empty())
             {
                 return false;
@@ -267,9 +265,9 @@ void AprochFlowScene::iterateOverNodeDataDependentOrder(const std::function<void
     };
 
     //Iterate over "leaf" nodes
-    for (auto const& _node : mNodes)
+    for (auto const &_node : mNodes)
     {
-        auto const& node = _node.second;
+        auto const &node = _node.second;
         auto model = node->getNodeDataModel();
 
         if (isNodeLeaf(*node, *model))
@@ -283,9 +281,9 @@ void AprochFlowScene::iterateOverNodeDataDependentOrder(const std::function<void
     {
         for (unsigned int i = 0; i < model.nPorts(EPortType::Input); ++i)
         {
-            auto connections = node.connections(EPortType::Input, i);
+            auto connections = node.getConnections(EPortType::Input, i);
 
-            for (auto& conn : connections)
+            for (auto &conn : connections)
             {
                 if (visitedNodesSet.find(conn.second->getNode(EPortType::Output)->getId()) == visitedNodesSet.end())
                 {
@@ -300,9 +298,9 @@ void AprochFlowScene::iterateOverNodeDataDependentOrder(const std::function<void
     //Iterate over dependent nodes
     while (int(mNodes.size()) != visitedNodesSet.size())
     {
-        for (auto const& _node : mNodes)
+        for (auto const &_node : mNodes)
         {
-            auto const& node = _node.second;
+            auto const &node = _node.second;
             if (visitedNodesSet.find(node->getId()) != visitedNodesSet.end())
             {
                 continue;
@@ -319,25 +317,25 @@ void AprochFlowScene::iterateOverNodeDataDependentOrder(const std::function<void
     }
 }
 
-QPointF AprochFlowScene::getNodePosition(const AprochNode& node) const
+QPointF AprochFlowScene::getNodePosition(const AprochNode &node) const
 {
     return node.getNodeGraphicsObject().pos();
 }
 
-void AprochFlowScene::setNodePosition(AprochNode& node, const QPointF& pos) const
+void AprochFlowScene::setNodePosition(AprochNode &node, const QPointF &pos) const
 {
     node.getNodeGraphicsObject().setPos(pos);
     node.getNodeGraphicsObject().moveConnections();
 }
 
-QSizeF AprochFlowScene::getNodeSize(const AprochNode& node) const
+QSizeF AprochFlowScene::getNodeSize(const AprochNode &node) const
 {
     return QSizeF(node.getWidth(), node.getHeight());
 }
 
-QVector<AprochNode*> AprochFlowScene::allNodes() const
+QVector<AprochNode *> AprochFlowScene::allNodes() const
 {
-    QVector<AprochNode*> nodes;
+    QVector<AprochNode *> nodes;
 
     std::transform(mNodes.begin(), mNodes.end(), std::back_inserter(nodes),
                    [](std::pair<QUuid const, std::unique_ptr<AprochNode>> const & p)
@@ -348,16 +346,16 @@ QVector<AprochNode*> AprochFlowScene::allNodes() const
     return nodes;
 }
 
-QVector<AprochNode*> AprochFlowScene::selectedNodes() const
+QVector<AprochNode *> AprochFlowScene::selectedNodes() const
 {
-    QList<QGraphicsItem*> graphicsItems = selectedItems();
+    QList<QGraphicsItem *> graphicsItems = selectedItems();
 
-    QVector<AprochNode*> ret;
+    QVector<AprochNode *> ret;
     ret.reserve(graphicsItems.size());
 
-    for (QGraphicsItem* item : graphicsItems)
+    for (QGraphicsItem *item : graphicsItems)
     {
-        auto ngo = qgraphicsitem_cast<AprochNodeGraphicsObject*>(item);
+        auto ngo = qgraphicsitem_cast<AprochNodeGraphicsObject *>(item);
 
         if (ngo != nullptr)
         {
@@ -436,9 +434,9 @@ QByteArray AprochFlowScene::saveToMemory() const
 
     QJsonArray nodesJsonArray;
 
-    for (auto const& pair : mNodes)
+    for (auto const &pair : mNodes)
     {
-        auto const& node = pair.second;
+        auto const &node = pair.second;
 
         nodesJsonArray.append(node->save());
     }
@@ -446,9 +444,9 @@ QByteArray AprochFlowScene::saveToMemory() const
     sceneJson["nodes"] = nodesJsonArray;
 
     QJsonArray connectionJsonArray;
-    for (auto const& pair : mConnections)
+    for (auto const &pair : mConnections)
     {
-        auto const& connection = pair.second;
+        auto const &connection = pair.second;
 
         QJsonObject connectionJson = connection->save();
 
@@ -465,7 +463,7 @@ QByteArray AprochFlowScene::saveToMemory() const
     return document.toJson();
 }
 
-void AprochFlowScene::loadFromMemory(const QByteArray& data)
+void AprochFlowScene::loadFromMemory(const QByteArray &data)
 {
     QJsonObject const jsonDocument = QJsonDocument::fromJson(data).object();
 
@@ -484,15 +482,15 @@ void AprochFlowScene::loadFromMemory(const QByteArray& data)
     }
 }
 
-void AprochFlowScene::setupConnectionSignals(AprochConnection const& c)
+void AprochFlowScene::setupConnectionSignals(AprochConnection const &c)
 {
     connect(&c, &AprochConnection::connectionMadeIncomplete, this, &AprochFlowScene::connectionDeleted, Qt::UniqueConnection);
 }
 
-void AprochFlowScene::sendConnectionCreatedToNodes(const AprochConnection& c)
+void AprochFlowScene::sendConnectionCreatedToNodes(const AprochConnection &c)
 {
-    AprochNode* from = c.getNode(EPortType::Output);
-    AprochNode* to = c.getNode(EPortType::Input);
+    AprochNode *from = c.getNode(EPortType::Output);
+    AprochNode *to = c.getNode(EPortType::Input);
 
     Q_ASSERT(from != nullptr);
     Q_ASSERT(to != nullptr);
@@ -501,10 +499,10 @@ void AprochFlowScene::sendConnectionCreatedToNodes(const AprochConnection& c)
     to->getNodeDataModel()->inputConnectionCreated(c);
 }
 
-void AprochFlowScene::sendConnectionDeletedToNodes(const AprochConnection& c)
+void AprochFlowScene::sendConnectionDeletedToNodes(const AprochConnection &c)
 {
-    AprochNode* from = c.getNode(EPortType::Output);
-    AprochNode* to = c.getNode(EPortType::Input);
+    AprochNode *from = c.getNode(EPortType::Output);
+    AprochNode *to = c.getNode(EPortType::Input);
 
     Q_ASSERT(from != nullptr);
     Q_ASSERT(to != nullptr);

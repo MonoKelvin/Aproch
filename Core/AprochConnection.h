@@ -112,7 +112,6 @@ Q_SIGNALS:
 private:
     QUuid mUuid;
 
-    // local object coordinates
     QPointF mInPoint;
     QPointF mOutPoint;
 

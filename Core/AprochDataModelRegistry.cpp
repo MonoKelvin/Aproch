@@ -7,9 +7,9 @@ APROCH_NAMESPACE_BEGIN
 
 std::unique_ptr<INodeDataModel> AprochDataModelRegistry::create(const QString &modelName)
 {
-    auto it = _registeredItemCreators.find(modelName);
+    auto it = mRegisteredItemCreators.find(modelName);
 
-    if (it != _registeredItemCreators.end())
+    if (it != mRegisteredItemCreators.end())
     {
         return it->second();
     }
@@ -21,9 +21,9 @@ TypeConverter AprochDataModelRegistry::getTypeConverter(const SNodeDataType &d1,
 {
     TypeConverterId converterId = std::make_pair(d1, d2);
 
-    auto it = _registeredTypeConverters.find(converterId);
+    auto it = mRegisteredTypeConverters.find(converterId);
 
-    if (it != _registeredTypeConverters.end())
+    if (it != mRegisteredTypeConverters.end())
     {
         return it->second;
     }

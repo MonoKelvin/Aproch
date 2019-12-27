@@ -5,7 +5,7 @@
 
 #include <QUuid>
 #include <QFontMetrics>
-
+#include <QTransform>
 #include <memory>
 #include <unordered_map>
 
@@ -14,7 +14,7 @@ APROCH_NAMESPACE_BEGIN
 class AprochConnection;
 class AprochNodeGraphicsObject;
 
-using ConnectionPtrSet = std::unordered_map<QUuid, AprochConnection*>;
+using ConnectionPtrSet = std::unordered_map<QUuid, AprochConnection *>;
 
 struct SNodeState
 {
@@ -41,19 +41,24 @@ class APROCH_EXPORT AprochNode : public QObject, public ISerializable
 
     friend class AprochNodeGraphicsObject;
 public:
-    AprochNode(std::unique_ptr<INodeDataModel>&& dataModel);
+    AprochNode(std::unique_ptr<INodeDataModel> &&dataModel);
     virtual ~AprochNode(void) override = default;
 
 public:
     QJsonObject save(void) const override;
-    void restore(const QJsonObject& json) override;
+    void restore(const QJsonObject &json) override;
 
     QRectF boundingRect(void) const;
 
-    QPointF getPortScenePosition(PortIndex index, EPortType portType, const QTransform& transform) const;
+    QPointF getPortScenePosition(PortIndex index, EPortType portType, const QTransform &transform = QTransform()) const;
+
+    PortIndex checkHitScenePoint(EPortType portType, QPointF scenePoint, const QTransform &sceneTransform = QTransform()) const;
 
     int captionHeight(void) const;
     int captionWidth(void) const;
+
+    int validationHeight() const;
+    int validationWidth() const;
 
     inline QUuid getId(void) const { return mUuid; }
     inline int getWidth(void) const { return mWidth; }
@@ -62,28 +67,28 @@ public:
     inline void setHeight(int height) { mHeight = height; }
     inline bool isHovered(void) const { return mHovered; }
 
-    inline AprochNodeGraphicsObject const& getNodeGraphicsObject(void) const {return *mNodeGraphicsObject.get(); }
-    inline AprochNodeGraphicsObject& getNodeGraphicsObject(void) {return *mNodeGraphicsObject.get(); }
-    inline INodeDataModel* getNodeDataModel(void) const { return mNodeDataModel.get(); }
+    inline AprochNodeGraphicsObject const &getNodeGraphicsObject(void) const {return *mNodeGraphicsObject.get(); }
+    inline AprochNodeGraphicsObject &getNodeGraphicsObject(void) {return *mNodeGraphicsObject.get(); }
+    inline INodeDataModel *getNodeDataModel(void) const { return mNodeDataModel.get(); }
 
-    inline void setNodeGraphicsObject(std::unique_ptr<AprochNodeGraphicsObject>&& graphicsObj)
+    inline void setNodeGraphicsObject(std::unique_ptr<AprochNodeGraphicsObject> &&graphicsObj)
     {
         mNodeGraphicsObject = std::move(graphicsObj);
         resize();
     }
 
     // Returns vector of connections ID. Some of them can be empty (null)
-    QVector<ConnectionPtrSet> const& getEntries(EPortType) const;
-    QVector<ConnectionPtrSet>& getEntries(EPortType);
+    QVector<ConnectionPtrSet> const &getEntries(EPortType) const;
+    QVector<ConnectionPtrSet> &getEntries(EPortType);
 
-    inline ConnectionPtrSet connections(EPortType portType, PortIndex portIndex) const;
+    inline ConnectionPtrSet getConnections(EPortType portType, PortIndex portIndex) const;
 
-    void setConnection(EPortType portType, PortIndex portIndex, AprochConnection& connection);
+    void setConnection(EPortType portType, PortIndex portIndex, AprochConnection &connection);
     void eraseConnection(EPortType portType, PortIndex portIndex, QUuid id);
 
     SNodeState::EReactToConnectionState reaction() const;
 
-    void reactToPossibleConnection(EPortType reactingPortType, const SNodeDataType& reactingDataType, const QPointF& scenePoint);
+    void reactToPossibleConnection(EPortType reactingPortType, const SNodeDataType &reactingDataType, const QPointF &scenePoint);
 
     EPortType reactingPortType(void) const;
     SNodeDataType reactingDataType(void) const;
@@ -98,14 +103,14 @@ public:
 
     bool resizing(void) const;
 
-    SNodeState const& getNodeState(void) const {return mNodeState;}
+    SNodeState const &getNodeState(void) const {return mNodeState;}
 
     QPoint getWidgetPosition();
 
     void resetReactionToConnection();
 
-    inline QPointF const& getDraggingPos() const { return mDraggingPos; }
-    inline void setDraggingPosition(QPointF const& pos) { mDraggingPos = pos; }
+    inline QPointF const &getDraggingPos() const { return mDraggingPos; }
+    inline void setDraggingPosition(QPointF const &pos) { mDraggingPos = pos; }
 
 public Q_SLOTS:
 
@@ -138,7 +143,7 @@ private:
 
     SNodeState mNodeState;
 
-    std::unique_ptr<INodeDataModel> const& mNodeDataModel;
+    std::unique_ptr<INodeDataModel> const &mNodeDataModel;
     std::unique_ptr<AprochNodeGraphicsObject> mNodeGraphicsObject;
 };
 
