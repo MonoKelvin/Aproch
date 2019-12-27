@@ -1,4 +1,4 @@
-#ifndef APROCHNODE_H
+﻿#ifndef APROCHNODE_H
 #define APROCHNODE_H
 
 #include "AprochNodeDataModel.h"
@@ -13,16 +13,15 @@ APROCH_NAMESPACE_BEGIN
 class AprochConnection;
 class AprochNodeGraphicsObject;
 
-using ConnectionPtrSet = std::unordered_map<QUuid, AprochConnection*>;
+using ConnectionPtrSet = std::unordered_map<QUuid, AprochConnection *>;
 
-enum EReactToConnectionState
-{
-    REACTING,
-    NOT_REACTING
-};
+struct SNodeState {
 
-struct SNodeState
-{
+    enum EReactToConnectionState {
+        REACTING,
+        NOT_REACTING
+    };
+
     QVector<ConnectionPtrSet> InConnections;
     QVector<ConnectionPtrSet> OutConnections;
 
@@ -33,13 +32,12 @@ struct SNodeState
     bool IsResizing;
 };
 
-class APROCH_EXPORT AprochNode : public QObject, public ISerializable
-{
+class APROCH_EXPORT AprochNode : public QObject, public ISerializable {
     Q_OBJECT
 
     friend class AprochNodeGraphicsObject;
 public:
-    AprochNode(QScopedPointer<INodeDataModel> && dataModel);
+    AprochNode(QScopedPointer<INodeDataModel> &&dataModel);
     virtual ~AprochNode(void) override = default;
 
 public:
@@ -48,7 +46,7 @@ public:
 
     QRectF boundingRect(void) const;
 
-    QPointF getPortScenePosition(PortIndex index, EPortType portType,const QTransform &transform) const;
+    QPointF getPortScenePosition(PortIndex index, EPortType portType, const QTransform &transform) const;
 
     int captionHeight(void) const;
     int captionWidth(void) const;
@@ -61,11 +59,10 @@ public:
     inline bool isHovered(void) const { return mHovered; }
 
     inline AprochNodeGraphicsObject const &getNodeGraphicsObject(void) const {return *mNodeGraphicsObject.get(); }
-    inline AprochNodeGraphicsObject & getNodeGraphicsObject(void) {return *mNodeGraphicsObject.get(); }
+    inline AprochNodeGraphicsObject &getNodeGraphicsObject(void) {return *mNodeGraphicsObject.get(); }
     inline INodeDataModel *getNodeDataModel(void) const { return mNodeDataModel.get(); }
 
-    inline void setNodeGraphicsObject(QScopedPointer<AprochNodeGraphicsObject>&& graphicsObj)
-    {
+    inline void setNodeGraphicsObject(QScopedPointer<AprochNodeGraphicsObject> &&graphicsObj) {
         mNodeGraphicsObject.reset(graphicsObj.take());
         resize();
     }
@@ -76,16 +73,22 @@ public:
 
     inline ConnectionPtrSet connections(EPortType portType, PortIndex portIndex) const;
 
-    void setConnection(EPortType portType, PortIndex portIndex, AprochConnection& connection);
+    void setConnection(EPortType portType, PortIndex portIndex, AprochConnection &connection);
     void eraseConnection(EPortType portType, PortIndex portIndex, QUuid id);
 
-    EReactToConnectionState reaction() const;
+    SNodeState::EReactToConnectionState reaction() const;
+
+    void reactToPossibleConnection(EPortType reactingPortType,
+                                   const SNodeDataType &reactingDataType,
+                                   const QPointF &scenePoint);
 
     EPortType reactingPortType(void) const;
 
     SNodeDataType reactingDataType(void) const;
 
-    void setReaction(EReactToConnectionState reaction, EPortType reactingPortType = EPortType::None, SNodeDataType reactingDataType = SNodeDataType());
+    void setReaction(SNodeState::EReactToConnectionState reaction,
+                     EPortType reactingPortType = EPortType::None,
+                     SNodeDataType reactingDataType = SNodeDataType());
 
 //    bool isReacting(void) const { return mNodeState.IsResizing;}
 
@@ -93,21 +96,26 @@ public:
 
     bool resizing(void) const;
 
-    SNodeState const &getNodeState(void) const{return mNodeState;}
+    SNodeState const &getNodeState(void) const {return mNodeState;}
 
     QPoint getWidgetPosition();
 
+    void resetReactionToConnection();
+
+    inline QPointF const &getDraggingPos() const { return mDraggingPos; }
+    inline void setDraggingPosition(QPointF const &pos) { mDraggingPos = pos; }
+
 public Q_SLOTS:
 
-  /// Propagates incoming data to the underlying model.
-  void propagateData(QSharedPointer<INodeData> nodeData, PortIndex inPortIndex) const;
+    /// Propagates incoming data to the underlying model.
+    void propagateData(QSharedPointer<INodeData> nodeData, PortIndex inPortIndex) const;
 
-  /// Fetches data from model's OUT #index port
-  /// and propagates it to the connection
-  void onDataUpdated(PortIndex index);
+    /// Fetches data from model's OUT #index port
+    /// and propagates it to the connection
+    void onDataUpdated(PortIndex index);
 
-  /// update the graphic part if the size of the embeddedwidget changes
-  void onNodeSizeUpdated();
+    /// update the graphic part if the size of the embeddedwidget changes
+    void onNodeSizeUpdated();
 
 private:
     void resize(void) const;

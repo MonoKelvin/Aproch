@@ -1,12 +1,11 @@
-#ifndef APROCHPORT_H
+﻿#ifndef APROCHPORT_H
 #define APROCHPORT_H
 
 #include "Aproch.h"
 
 APROCH_NAMESPACE_BEGIN
 
-enum class EPortType
-{
+enum class EPortType {
     None,
     Input,
     Output
@@ -14,8 +13,7 @@ enum class EPortType
 
 using PortIndex = unsigned int;
 
-class AprochPort
-{
+class AprochPort {
 public:
     AprochPort()
         : Type(EPortType::None)
@@ -31,14 +29,11 @@ public:
 
     inline bool portTypeIsValid() { return Type != EPortType::None; }
 
-    inline static EPortType OppositePort(const EPortType &port)
-    {
-        if(EPortType::Input == port)
-        {
+    inline static EPortType OppositePort(const EPortType &port) {
+        if (EPortType::Input == port) {
             return EPortType::Output;
         }
-        if(EPortType::Output == port)
-        {
+        if (EPortType::Output == port) {
             return EPortType::Input;
         }
         return EPortType::None;

@@ -1,14 +1,13 @@
-#ifndef APROCHCONNECTION_H
+﻿#ifndef APROCHCONNECTION_H
 #define APROCHCONNECTION_H
 
 #include "Utilities.h"
 #include "AprochPort.h"
 #include "ISerializable.h"
 
-#include <QtCore/QUuid>
-#include <QtCore/QVariant>
-
-class QPointF;
+#include <QUuid>
+#include <QVariant>
+#include <QPointF>
 
 APROCH_NAMESPACE_BEGIN
 
@@ -16,13 +15,12 @@ class AprochNode;
 class INodeData;
 class AprochConnectionGraphicsObject;
 
-struct SConnectionState
-{
-
+struct SConnectionState {
+    EPortType RequiredPort;
+    AprochNode *LastHoveredNode{nullptr};
 };
 
-class APROCH_EXPORT AprochConnection : public QObject, public ISerializable
-{
+class APROCH_EXPORT AprochConnection : public QObject, public ISerializable {
     Q_OBJECT
 public:
     /**
@@ -43,15 +41,16 @@ public:
     QJsonObject save() const;
 
 public:
-    QUuid getId() const{ return mUuid; }
+    QUuid getId() const { return mUuid; }
 
     // Remembers the end being dragged.
     // Invalidates Node address.
     // Grabs mouse.
     void setRequiredPort(EPortType portType);
-    inline EPortType getRequiredPort() const { return mRequiredPort; }
+    inline EPortType getRequiredPort() const { return mConnectionState.RequiredPort; }
 
-    inline void setNoRequiredPort() { mRequiredPort = EPortType::None; }
+    inline void setNoRequiredPort() { mConnectionState.RequiredPort = EPortType::None; }
+    inline bool isRequirePort() const { return mConnectionState.RequiredPort != EPortType::None; }
 
     void setGraphicsObject(QScopedPointer<AprochConnectionGraphicsObject> &&graphics);
 
@@ -60,6 +59,20 @@ public:
     void setNodeToPort(AprochNode &node, EPortType portType, PortIndex portIndex);
 
     void removeFromNodes() const;
+
+    QPointF const &getEndPoint(EPortType portType) const;
+    void setEndPoint(EPortType portType, QPointF const &point);
+    void moveEndPoint(EPortType portType, QPointF const &offset);
+
+    QRectF boundingRect() const;
+
+    QPair<QPointF, QPointF> pointsC1C2() const;
+
+    inline QPointF source() const { return _out; }
+    inline QPointF sink() const { return _in; }
+    inline double lineWidth() const { return _lineWidth; }
+    inline bool hovered() const { return _hovered; }
+    inline void setHovered(bool hovered) { _hovered = hovered; }
 
 public:
     AprochConnectionGraphicsObject &getConnectionGraphicsObject() const;
@@ -78,10 +91,17 @@ public:
 
     void setTypeConverter(TypeConverter converter);
 
-    inline bool complete() const {return mInNode != nullptr && mOutNode != nullptr;}
+    inline bool complete() const { return mInNode != nullptr && mOutNode != nullptr; }
 
     void propagateData(QSharedPointer<INodeData> nodeData) const;
     void propagateEmptyData() const;
+
+    void interactWithNode(AprochNode *node);
+
+    inline void setLastHoveredNode(AprochNode *node) { mConnectionState.LastHoveredNode = node; }
+    inline AprochNode *getLastHoveredNode() const { return mConnectionState.LastHoveredNode; }
+
+    void resetLastHoveredNode();
 
 Q_SIGNALS:
     void connectionCompleted(const AprochConnection &) const;
@@ -90,6 +110,14 @@ Q_SIGNALS:
 
 private:
     QUuid mUuid;
+
+    // local object coordinates
+    QPointF _in;
+    QPointF _out;
+
+    double _lineWidth;
+
+    bool _hovered;
 
     AprochNode *mOutNode = nullptr;
     AprochNode *mInNode = nullptr;
@@ -102,10 +130,6 @@ private:
     QScopedPointer<AprochConnectionGraphicsObject> mConnectionGraphicsObject;
 
     TypeConverter mTypeConverter;
-
-    EPortType mRequiredPort;
-
-    AprochNode* mLastHoveredNode{nullptr};
 };
 
 APROCH_NAMESPACE_END

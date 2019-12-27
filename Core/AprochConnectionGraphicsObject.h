@@ -1,24 +1,21 @@
-#ifndef APROCHCONNECTIONGRAPHICSOBJECT_H
+﻿#ifndef APROCHCONNECTIONGRAPHICSOBJECT_H
 #define APROCHCONNECTIONGRAPHICSOBJECT_H
 
 #include "Aproch.h"
 
-#include <QtCore/QUuid>
 #include <QGraphicsObject>
-
-class QGraphicsSceneMouseEvent;
+#include <QtCore/QUuid>
 
 APROCH_NAMESPACE_BEGIN
 
-class FlowScene;
-class Connection;
-class ConnectionGeometry;
-class Node;
+class AprochFlowScene;
+class AprochConnection;
+class AprochNode;
 
 class AprochConnectionGraphicsObject : public QGraphicsObject {
     Q_OBJECT
 public:
-    AprochConnectionGraphicsObject(FlowScene &scene, Connection &connection);
+    AprochConnectionGraphicsObject(AprochFlowScene &scene, AprochConnection &connection);
 
     virtual ~AprochConnectionGraphicsObject() override;
 
@@ -28,8 +25,7 @@ public:
     }
 
 public:
-
-    Connection &connection();
+    inline AprochConnection &connection() { return _connection; }
 
     QRectF boundingRect() const override;
 
@@ -37,16 +33,13 @@ public:
 
     void setGeometryChanged();
 
-    /// Updates the position of both ends
+    // Updates the position of both ends
     void move();
 
     void lock(bool locked);
 
 protected:
-
-    void paint(QPainter *painter,
-               QStyleOptionGraphicsItem const *option,
-               QWidget *widget = 0) override;
+    void paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWidget *widget = nullptr) override;
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
@@ -59,14 +52,12 @@ protected:
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
 private:
-
     void addGraphicsEffect();
 
 private:
+    AprochFlowScene &_scene;
 
-    FlowScene &_scene;
-
-    Connection &_connection;
+    AprochConnection &_connection;
 };
 
 APROCH_NAMESPACE_END

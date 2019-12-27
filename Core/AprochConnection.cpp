@@ -1,71 +1,61 @@
-#include "AprochConnection.h"
+﻿#include "AprochConnection.h"
 
 #include "AprochNode.h"
 #include "AprochNodeGraphicsObject.h"
 
+#include <QPair>
+
 APROCH_NAMESPACE_BEGIN
 
-
-AprochConnection::AprochConnection(EPortType portType, AprochNode& node, PortIndex portIndex)
+AprochConnection::AprochConnection(EPortType portType, AprochNode &node, PortIndex portIndex)
     : mUuid(QUuid::createUuid())
     , mOutPortIndex(INVALID_PORT_INDEX)
     , mInPortIndex(INVALID_PORT_INDEX)
     , mConnectionState()
-{
+    , _in(0, 0)
+    , _out(0, 0)
+    , _lineWidth(3.0)
+    , _hovered(false) {
     setNodeToPort(node, portType, portIndex);
     setRequiredPort(AprochPort::OppositePort(portType));
 }
 
-AprochConnection::AprochConnection(AprochNode& nodeIn, PortIndex portIndexIn, AprochNode& nodeOut, PortIndex portIndexOut, TypeConverter typeConverter)
-    : mUuid(QUuid::createUuid())
-    , mOutNode(&nodeOut)
-    , mInNode(&nodeIn)
-    , mOutPortIndex(portIndexOut)
-    , mInPortIndex(portIndexIn)
-    , mConnectionState()
-    , mTypeConverter(std::move(typeConverter))
-{
+AprochConnection::AprochConnection(AprochNode &nodeIn, PortIndex portIndexIn, AprochNode &nodeOut, PortIndex portIndexOut, TypeConverter typeConverter)
+    : mUuid(QUuid::createUuid()), mOutNode(&nodeOut), mInNode(&nodeIn), mOutPortIndex(portIndexOut), mInPortIndex(portIndexIn), mConnectionState(), mTypeConverter(std::move(typeConverter)) {
     setNodeToPort(nodeIn, EPortType::Input, portIndexIn);
     setNodeToPort(nodeOut, EPortType::Output, portIndexOut);
 }
 
-AprochConnection::~AprochConnection()
-{
-    if (complete())
-    {
+AprochConnection::~AprochConnection() {
+    if (complete()) {
         connectionMadeIncomplete(*this);
     }
 
     propagateEmptyData();
 
-    if (mInNode)
-    {
+    if (mInNode) {
         mInNode->getNodeGraphicsObject().update();
     }
 
-    if (mOutNode)
-    {
+    if (mOutNode) {
         mOutNode->getNodeGraphicsObject().update();
     }
+
+    resetLastHoveredNode();
 }
 
-
-QJsonObject AprochConnection::save() const
-{
+QJsonObject AprochConnection::save() const {
     QJsonObject connectionJson;
 
-    if (mInNode && mOutNode)
-    {
+    if (mInNode && mOutNode) {
         connectionJson["in_id"] = mInNode->getId().toString();
         connectionJson["in_index"] = int(mInPortIndex);
 
         connectionJson["out_id"] = mOutNode->getId().toString();
         connectionJson["out_index"] = int(mOutPortIndex);
 
-        if (mTypeConverter)
-        {
-            auto getTypeJson = [this](EPortType type)
-            {
+        if (mTypeConverter) {
+            auto getTypeJson = [this](EPortType type) {
                 QJsonObject typeJson;
                 SNodeDataType nodeType = this->dataType(type);
                 typeJson["id"] = nodeType.id;
@@ -85,12 +75,10 @@ QJsonObject AprochConnection::save() const
     return connectionJson;
 }
 
-void AprochConnection::setRequiredPort(EPortType dragging)
-{
+void AprochConnection::setRequiredPort(EPortType dragging) {
     mRequiredPort = dragging;
 
-    switch (dragging)
-    {
+    switch (dragging) {
     case EPortType::Output:
         mOutNode = nullptr;
         mOutPortIndex = INVALID_PORT_INDEX;
@@ -106,8 +94,7 @@ void AprochConnection::setRequiredPort(EPortType dragging)
     }
 }
 
-void AprochConnection::setGraphicsObject(QScopedPointer<AprochConnectionGraphicsObject>&& graphics)
-{
+void AprochConnection::setGraphicsObject(QScopedPointer<AprochConnectionGraphicsObject> &&graphics) {
     mConnectionGraphicsObject.reset(graphics.take());
 
     // This function is only called when the ConnectionGraphicsObject
@@ -117,8 +104,7 @@ void AprochConnection::setGraphicsObject(QScopedPointer<AprochConnectionGraphics
     // By moving the whole object to the Node Port position
     // we position both connection ends correctly.
 
-    if (getRequiredPort() != EPortType::None)
-    {
+    if (getRequiredPort() != EPortType::None) {
 
         EPortType attachedPort = AprochPort::OppositePort(getRequiredPort());
 
@@ -127,7 +113,7 @@ void AprochConnection::setGraphicsObject(QScopedPointer<AprochConnectionGraphics
         auto node = getNode(attachedPort);
 
         QTransform nodeSceneTransform =
-        node->getNodeGraphicsObject().sceneTransform();
+            node->getNodeGraphicsObject().sceneTransform();
 
         QPointF pos = node->getPortScenePosition(attachedPortIndex, attachedPort, nodeSceneTransform);
 
@@ -137,12 +123,10 @@ void AprochConnection::setGraphicsObject(QScopedPointer<AprochConnectionGraphics
     mConnectionGraphicsObject.take();
 }
 
-PortIndex AprochConnection::getPortIndex(EPortType portType) const
-{
+PortIndex AprochConnection::getPortIndex(EPortType portType) const {
     PortIndex result = INVALID_PORT_INDEX;
 
-    switch (portType)
-    {
+    switch (portType) {
     case EPortType::Input:
         result = mInPortIndex;
         break;
@@ -156,22 +140,16 @@ PortIndex AprochConnection::getPortIndex(EPortType portType) const
     return result;
 }
 
-
-void
-AprochConnection::setNodeToPort(AprochNode& node, EPortType portType, PortIndex portIndex)
-{
+void AprochConnection::setNodeToPort(AprochNode &node, EPortType portType, PortIndex portIndex) {
     bool wasIncomplete = !complete();
 
-    auto& nodeWeak = getNode(portType);
+    auto &nodeWeak = getNode(portType);
 
     nodeWeak = &node;
 
-    if (portType == EPortType::Output)
-    {
+    if (portType == EPortType::Output) {
         mOutPortIndex = portIndex;
-    }
-    else
-    {
+    } else {
         mInPortIndex = portIndex;
     }
 
@@ -179,35 +157,112 @@ AprochConnection::setNodeToPort(AprochNode& node, EPortType portType, PortIndex 
 
     updated(*this);
 
-    if (complete() && wasIncomplete)
-    {
+    if (complete() && wasIncomplete) {
         connectionCompleted(*this);
     }
 }
 
-
-void AprochConnection::removeFromNodes() const
-{
-    if (mInNode)
-    {
+void AprochConnection::removeFromNodes() const {
+    if (mInNode) {
         mInNode->eraseConnection(EPortType::Input, mInPortIndex, getId());
     }
-    if (mOutNode)
-    {
+    if (mOutNode) {
         mOutNode->eraseConnection(EPortType::Output, mOutPortIndex, getId());
     }
 }
 
+QPointF const &AprochConnection::getEndPoint(EPortType portType) const {
+    Q_ASSERT(portType != EPortType::None);
 
-AprochConnectionGraphicsObject &AprochConnection::getConnectionGraphicsObject() const
-{
+    return (portType == EPortType::Output ? _out : _in);
+}
+
+void AprochConnection::setEndPoint(EPortType portType, QPointF const &point) {
+    switch (portType) {
+    case EPortType::Output:
+        _out = point;
+        break;
+
+    case EPortType::Input:
+        _in = point;
+        break;
+
+    default:
+        break;
+    }
+}
+
+void AprochConnection::moveEndPoint(EPortType portType, QPointF const &offset) {
+    switch (portType) {
+    case EPortType::Output:
+        _out += offset;
+        break;
+
+    case EPortType::Input:
+        _in += offset;
+        break;
+
+    default:
+        break;
+    }
+}
+
+QRectF AprochConnection::boundingRect() const {
+    auto points = pointsC1C2();
+
+    QRectF basicRect = QRectF(_out, _in).normalized();
+
+    QRectF c1c2Rect = QRectF(points.first, points.second).normalized();
+
+    auto const &connectionStyle = AprochStyle::GetConnectionStyle();
+
+    double const diam = double(connectionStyle.PointDiameter);
+
+    QRectF commonRect = basicRect.united(c1c2Rect);
+
+    QPointF const cornerOffset(diam, diam);
+
+    commonRect.setTopLeft(commonRect.topLeft() - cornerOffset);
+    commonRect.setBottomRight(commonRect.bottomRight() + 2 * cornerOffset);
+
+    return commonRect;
+}
+
+QPair<QPointF, QPointF> AprochConnection::pointsC1C2() const {
+    const double defaultOffset = 200;
+
+    double xDistance = _in.x() - _out.x();
+
+    double horizontalOffset = qMin(defaultOffset, std::abs(xDistance));
+
+    double verticalOffset = 0;
+
+    double ratioX = 0.5;
+
+    if (xDistance <= 0) {
+        double yDistance = _in.y() - _out.y() + 20;
+
+        double vector = yDistance < 0 ? -1.0 : 1.0;
+
+        verticalOffset = qMin(defaultOffset, std::abs(yDistance)) * vector;
+
+        ratioX = 1.0;
+    }
+
+    horizontalOffset *= ratioX;
+
+    QPointF c1(_out.x() + horizontalOffset, _out.y() + verticalOffset);
+    QPointF c2(_in.x() - horizontalOffset, _in.y() - verticalOffset);
+
+    return QPair<QPointF, QPointF>(c1, c2);
+}
+
+AprochConnectionGraphicsObject &AprochConnection::getConnectionGraphicsObject() const {
     return *mConnectionGraphicsObject;
 }
 
-AprochNode *AprochConnection::getNode(EPortType portType) const
-{
-    switch (portType)
-    {
+AprochNode *AprochConnection::getNode(EPortType portType) const {
+    switch (portType) {
     case EPortType::Input:
         return mInNode;
         break;
@@ -221,11 +276,8 @@ AprochNode *AprochConnection::getNode(EPortType portType) const
     return nullptr;
 }
 
-
-AprochNode *&AprochConnection::getNode(EPortType portType)
-{
-    switch (portType)
-    {
+AprochNode *&AprochConnection::getNode(EPortType portType) {
+    switch (portType) {
     case EPortType::Input:
         return mInNode;
         break;
@@ -233,63 +285,47 @@ AprochNode *&AprochConnection::getNode(EPortType portType)
         return mOutNode;
         break;
     default:
-      // not possible
-      break;
+        // not possible
+        break;
     }
 
     Q_UNREACHABLE();
 }
 
-
-void
-AprochConnection::
-clearNode(EPortType portType)
-{
-    if (complete())
-    {
+void AprochConnection::
+clearNode(EPortType portType) {
+    if (complete()) {
         connectionMadeIncomplete(*this);
     }
 
     getNode(portType) = nullptr;
 
-    if (portType == EPortType::Input)
-    {
+    if (portType == EPortType::Input) {
         mInPortIndex = INVALID_PORT_INDEX;
-    }
-    else
-    {
+    } else {
         mOutPortIndex = INVALID_PORT_INDEX;
     }
 }
 
-
-SNodeDataType AprochConnection::dataType(EPortType portType) const
-{
-    if (mInNode && mOutNode)
-    {
-        auto const & model = (portType == EPortType::Input) ? mInNode->getNodeDataModel() : mOutNode->getNodeDataModel();
+SNodeDataType AprochConnection::dataType(EPortType portType) const {
+    if (mInNode && mOutNode) {
+        auto const &model = (portType == EPortType::Input) ? mInNode->getNodeDataModel() : mOutNode->getNodeDataModel();
         PortIndex index = (portType == EPortType::Input) ? mInPortIndex : mOutPortIndex;
 
         return model->dataType(portType, index);
-    }
-    else
-    {
-        AprochNode* validNode;
+    } else {
+        AprochNode *validNode;
         PortIndex index = INVALID_PORT_INDEX;
 
-        if ((validNode = mInNode))
-        {
+        if ((validNode = mInNode)) {
             index = mInPortIndex;
             portType = EPortType::Input;
-        }
-        else if ((validNode = mOutNode))
-        {
+        } else if ((validNode = mOutNode)) {
             index = mOutPortIndex;
             portType = EPortType::Output;
         }
 
-        if (validNode)
-        {
+        if (validNode) {
             auto const &model = validNode->getNodeDataModel();
             return model->dataType(portType, index);
         }
@@ -298,19 +334,13 @@ SNodeDataType AprochConnection::dataType(EPortType portType) const
     Q_UNREACHABLE();
 }
 
-
-void AprochConnection::setTypeConverter(TypeConverter converter)
-{
+void AprochConnection::setTypeConverter(TypeConverter converter) {
     mTypeConverter = std::move(converter);
 }
 
-
-void AprochConnection::propagateData(QSharedPointer<INodeData> nodeData) const
-{
-    if (mInNode)
-    {
-        if (mTypeConverter)
-        {
+void AprochConnection::propagateData(QSharedPointer<INodeData> nodeData) const {
+    if (mInNode) {
+        if (mTypeConverter) {
             nodeData = mTypeConverter(nodeData);
         }
 
@@ -318,11 +348,26 @@ void AprochConnection::propagateData(QSharedPointer<INodeData> nodeData) const
     }
 }
 
-
-void AprochConnection::propagateEmptyData() const
-{
+void AprochConnection::propagateEmptyData() const {
     QSharedPointer<INodeData> emptyData;
     propagateData(emptyData);
+}
+
+
+void AprochConnection::interactWithNode(AprochNode *node) {
+    if (node) {
+        mConnectionState.LastHoveredNode = node;
+    } else {
+        resetLastHoveredNode();
+    }
+}
+
+void AprochConnection::resetLastHoveredNode() {
+    if (mConnectionState.LastHoveredNode) {
+        mConnectionState.LastHoveredNode->resetReactionToConnection();
+    }
+
+    mConnectionState.LastHoveredNode = nullptr;
 }
 
 
