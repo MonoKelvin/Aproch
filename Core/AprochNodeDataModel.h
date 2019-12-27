@@ -6,16 +6,19 @@
 #include "ISerializable.h"
 
 #include <QObject>
+#include <memory>
 
 APROCH_NAMESPACE_BEGIN
 
-enum class ENodeValidationState {
+enum class ENodeValidationState
+{
     Valid,
     Warning,
     Error
 };
 
-struct SNodeDataType {
+struct SNodeDataType
+{
     QString id;
     QString name;
 };
@@ -25,20 +28,20 @@ class AprochConnection;
 // Class represents data transferred between nodes.
 // @param type is used for comparing the types
 // The actual data is stored in subtypes
-class APROCH_EXPORT INodeData {
+class APROCH_EXPORT INodeData
+{
 public:
 
     virtual ~INodeData() = default;
 
-    virtual bool isSameType(const INodeData &nodeData) const {
-        return (this->type().id == nodeData.type().id);
-    }
+    virtual bool isSameType(const INodeData& nodeData) const;
 
     // Type for inner use
     virtual SNodeDataType type() const = 0;
 };
 
-class APROCH_EXPORT INodeDataModel : public QObject, public ISerializable {
+class APROCH_EXPORT INodeDataModel : public QObject, public ISerializable
+{
     Q_OBJECT
 public:
 
@@ -71,26 +74,28 @@ public:
 
 public:
 
-    enum class EConnectionPolicy {
+    enum class EConnectionPolicy
+    {
         One,
         Many,
     };
 
-    virtual EConnectionPolicy portOutConnectionPolicy(PortIndex) const {
+    virtual EConnectionPolicy portOutConnectionPolicy(PortIndex) const
+    {
         return EConnectionPolicy::Many;
     }
 
-    inline void setNodeStyle(const SNodeStyle &style) { mNodeStyle = style; }
-    inline SNodeStyle const &getNodeStyle(void) const { return mNodeStyle; }
+    inline void setNodeStyle(const SNodeStyle& style) { mNodeStyle = style; }
+    inline SNodeStyle const& getNodeStyle(void) const { return mNodeStyle; }
 
 public:
 
     // Triggers the algorithm
-    virtual void setInputData(QSharedPointer<INodeData> nodeData, PortIndex port) = 0;
+    virtual void setInputData(std::shared_ptr<INodeData> nodeData, PortIndex port) = 0;
 
-    virtual QSharedPointer<INodeData> getOutputData(PortIndex port) = 0;
+    virtual std::shared_ptr<INodeData> getOutputData(PortIndex port) = 0;
 
-    virtual QWidget *embeddedWidget() = 0;
+    virtual QWidget* embeddedWidget() = 0;
 
     virtual bool resizable() const { return false; }
 
@@ -102,16 +107,20 @@ public:
 
 public Q_SLOTS:
 
-    virtual void inputConnectionCreated(const AprochConnection &) {
+    virtual void inputConnectionCreated(const AprochConnection&)
+    {
     }
 
-    virtual void inputConnectionDeleted(const AprochConnection &) {
+    virtual void inputConnectionDeleted(const AprochConnection&)
+    {
     }
 
-    virtual void outputConnectionCreated(const AprochConnection &) {
+    virtual void outputConnectionCreated(const AprochConnection&)
+    {
     }
 
-    virtual void outputConnectionDeleted(const AprochConnection &) {
+    virtual void outputConnectionDeleted(const AprochConnection&)
+    {
     }
 
 Q_SIGNALS:

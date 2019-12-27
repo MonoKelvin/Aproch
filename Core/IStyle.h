@@ -9,10 +9,10 @@ APROCH_NAMESPACE_BEGIN
 class APROCH_EXPORT IStyle
 {
 public:
-    virtual ~IStyle() = default;
+    virtual ~IStyle();
 
 protected:
-    virtual void setStyle(const QJsonObject &obj) = 0;
+    virtual void setStyle(const QJsonObject& obj) = 0;
 };
 
 APROCH_NAMESPACE_END

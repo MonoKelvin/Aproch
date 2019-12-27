@@ -4,7 +4,6 @@
 #include "Aproch.h"
 
 #include <QGraphicsObject>
-
 #include <unordered_map>
 
 class QGraphicsProxyWidget;
@@ -19,7 +18,7 @@ class APROCH_EXPORT AprochNodeGraphicsObject : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    AprochNodeGraphicsObject(AprochFlowScene &scene, AprochNode &node);
+    AprochNodeGraphicsObject(AprochFlowScene& scene, AprochNode& node);
 
     virtual ~AprochNodeGraphicsObject() override;
 
@@ -38,30 +37,31 @@ public:
 
     QRectF boundingRect() const override;
 
+    void moveConnections() const;
+
 protected:
-    void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget *widget = nullptr) override;
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+    void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
-    void hoverMoveEvent(QGraphicsSceneHoverEvent *) override;
+    void hoverMoveEvent(QGraphicsSceneHoverEvent*) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
 private:
     void embedQWidget();
-    void moveConnections() const;
 
 private:
-    AprochFlowScene  &mScene;
-    AprochNode &mNode;
+    AprochFlowScene&  mScene;
+    AprochNode& mNode;
 
     bool mIsLocked;
 
     // either nullptr or owned by parent QGraphicsItem
-    QGraphicsProxyWidget *mProxyWidget;
+    QGraphicsProxyWidget* mProxyWidget;
 
 };
 

@@ -2,9 +2,9 @@
 
 APROCH_NAMESPACE_BEGIN
 
-AprochNodeDataModel::AprochNodeDataModel(QObject *parent) : QObject(parent)
+bool INodeData::isSameType(const INodeData& nodeData) const
 {
-
+    return (this->type().id == nodeData.type().id);
 }
 
 APROCH_NAMESPACE_END

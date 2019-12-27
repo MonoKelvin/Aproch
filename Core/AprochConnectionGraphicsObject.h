@@ -12,20 +12,22 @@ class AprochFlowScene;
 class AprochConnection;
 class AprochNode;
 
-class AprochConnectionGraphicsObject : public QGraphicsObject {
+class AprochConnectionGraphicsObject : public QGraphicsObject
+{
     Q_OBJECT
 public:
-    AprochConnectionGraphicsObject(AprochFlowScene &scene, AprochConnection &connection);
+    AprochConnectionGraphicsObject(AprochFlowScene& scene, AprochConnection& connection);
 
     virtual ~AprochConnectionGraphicsObject() override;
 
     enum { Type = UserType + 2 };
-    int type() const override {
+    int type() const override
+    {
         return Type;
     }
 
 public:
-    inline AprochConnection &connection() { return _connection; }
+    inline AprochConnection& connection() { return _connection; }
 
     QRectF boundingRect() const override;
 
@@ -39,25 +41,25 @@ public:
     void lock(bool locked);
 
 protected:
-    void paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWidget *widget = nullptr) override;
+    void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
 
-    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
 
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
 
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
 
 private:
     void addGraphicsEffect();
 
 private:
-    AprochFlowScene &_scene;
+    AprochFlowScene& _scene;
 
-    AprochConnection &_connection;
+    AprochConnection& _connection;
 };
 
 APROCH_NAMESPACE_END

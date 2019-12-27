@@ -7,7 +7,7 @@
 
 APROCH_NAMESPACE_BEGIN
 
-AprochNode::AprochNode(QScopedPointer<INodeDataModel> &&dataModel)
+AprochNode::AprochNode(std::unique_ptr<INodeDataModel> &&dataModel)
     : mWidth(100)
     , mHeight(150)
     , mPortWidth(30)
@@ -172,7 +172,7 @@ void AprochNode::resetReactionToConnection() {
     mNodeGraphicsObject->update();
 }
 
-void AprochNode::propagateData(QSharedPointer<INodeData> nodeData, PortIndex inPortIndex) const {
+void AprochNode::propagateData(std::shared_ptr<INodeData> nodeData, PortIndex inPortIndex) const {
     mNodeDataModel->setInputData(nodeData, inPortIndex);
 
     //Recalculate the nodes visuals. A data change can result in the node taking more space than before, so this forces a recalculate+repaint on the affected node
