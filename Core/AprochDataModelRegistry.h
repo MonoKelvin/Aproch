@@ -5,8 +5,8 @@
 #include "Utilities.h"
 
 #include <QSet>
-#include <QMap>
-//#include <unordered_map>
+#include <QString>
+#include <unordered_map>
 
 APROCH_NAMESPACE_BEGIN
 
@@ -16,8 +16,8 @@ class APROCH_EXPORT AprochDataModelRegistry
 public:
     using RegistryItemPtr = std::unique_ptr<INodeDataModel>;
     using RegistryItemCreator = std::function<RegistryItemPtr()>;
-    using RegisteredModelCreatorsMap = QMap<QString, RegistryItemCreator>;
-    using RegisteredModelsCategoryMap = QMap<QString, QString>;
+    using RegisteredModelCreatorsMap = std::unordered_map<QString, RegistryItemCreator>;
+    using RegisteredModelsCategoryMap = std::unordered_map<QString, QString>;
     using CategoriesSet = QSet<QString>;
 
     using RegisteredTypeConvertersMap = std::map<TypeConverterId, TypeConverter>;
