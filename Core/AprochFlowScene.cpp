@@ -39,7 +39,7 @@ AprochNode* AprochFlowScene::LocateNodeAt(QPointF scenePoint, AprochFlowScene& s
 
 AprochFlowScene::AprochFlowScene(std::shared_ptr<AprochDataModelRegistry> registry, QObject* parent)
     : QGraphicsScene(parent)
-    , _registry(std::move(registry))
+    , mRegistry(std::move(registry))
 {
     setItemIndexMethod(QGraphicsScene::NoIndex);
 
@@ -72,7 +72,7 @@ std::shared_ptr<AprochConnection> AprochFlowScene::createConnection(EPortType co
     // after this function connection points are set to node port
     connection->setGraphicsObject(std::move(cgo));
 
-    _connections[connection->getId()] = connection;
+    mConnections[connection->getId()] = connection;
 
     // Note: this connection isn't truly created yet. It's only partially created.
     // Thus, don't send the connectionCreated(...) signal.
@@ -101,7 +101,7 @@ std::shared_ptr<AprochConnection> AprochFlowScene::createConnection(AprochNode& 
     // trigger data propagation
     nodeOut.onDataUpdated(portIndexOut);
 
-    _connections[connection->getId()] = connection;
+    mConnections[connection->getId()] = connection;
 
     connectionCreated(*connection);
 
@@ -116,8 +116,8 @@ std::shared_ptr<AprochConnection> AprochFlowScene::restoreConnection(QJsonObject
     PortIndex portIndexIn = unsigned(connectionJson["in_index"].toInt());
     PortIndex portIndexOut = unsigned(connectionJson["out_index"].toInt());
 
-    auto nodeIn = _nodes[nodeInId].get();
-    auto nodeOut = _nodes[nodeOutId].get();
+    auto nodeIn = mNodes[nodeInId].get();
+    auto nodeOut = mNodes[nodeOutId].get();
 
     auto getConverter = [&]()
     {
@@ -153,11 +153,11 @@ std::shared_ptr<AprochConnection> AprochFlowScene::restoreConnection(QJsonObject
 
 void AprochFlowScene::deleteConnection(AprochConnection& connection)
 {
-    auto it = _connections.find(connection.getId());
-    if (it != _connections.end())
+    auto it = mConnections.find(connection.getId());
+    if (it != mConnections.end())
     {
         connection.removeFromNodes();
-        _connections.erase(it);
+        mConnections.erase(it);
     }
 }
 
@@ -169,7 +169,7 @@ AprochNode& AprochFlowScene::createNode(std::unique_ptr<INodeDataModel>&& dataMo
     node->setNodeGraphicsObject(std::move(ngo));
 
     auto nodePtr = node.get();
-    _nodes[node->getId()] = std::move(node);
+    mNodes[node->getId()] = std::move(node);
 
     nodeCreated(*nodePtr);
     return *nodePtr;
@@ -193,7 +193,7 @@ AprochNode& AprochFlowScene::restoreNode(QJsonObject const& nodeJson)
     node->restore(nodeJson);
 
     auto nodePtr = node.get();
-    _nodes[node->id()] = std::move(node);
+    mNodes[node->id()] = std::move(node);
 
     nodePlaced(*nodePtr);
     nodeCreated(*nodePtr);
@@ -218,22 +218,22 @@ void AprochFlowScene::removeNode(AprochNode& node)
         }
     }
 
-    _nodes.erase(node.getId());
+    mNodes.erase(node.getId());
 }
 
 AprochDataModelRegistry& AprochFlowScene::registry() const
 {
-    return *_registry;
+    return *mRegistry;
 }
 
 void AprochFlowScene::setRegistry(std::shared_ptr<AprochDataModelRegistry> registry)
 {
-    _registry = std::move(registry);
+    mRegistry = std::move(registry);
 }
 
 void AprochFlowScene::iterateOverNodes(const std::function<void(AprochNode*)>& visitor)
 {
-    for (const auto& _node : _nodes)
+    for (const auto& _node : mNodes)
     {
         visitor(_node.second.get());
     }
@@ -241,7 +241,7 @@ void AprochFlowScene::iterateOverNodes(const std::function<void(AprochNode*)>& v
 
 void AprochFlowScene::iterateOverNodeData(const std::function<void(INodeDataModel*)>& visitor)
 {
-    for (const auto& _node : _nodes)
+    for (const auto& _node : mNodes)
     {
         visitor(_node.second->getNodeDataModel());
     }
@@ -267,7 +267,7 @@ void AprochFlowScene::iterateOverNodeDataDependentOrder(const std::function<void
     };
 
     //Iterate over "leaf" nodes
-    for (auto const& _node : _nodes)
+    for (auto const& _node : mNodes)
     {
         auto const& node = _node.second;
         auto model = node->getNodeDataModel();
@@ -298,9 +298,9 @@ void AprochFlowScene::iterateOverNodeDataDependentOrder(const std::function<void
     };
 
     //Iterate over dependent nodes
-    while (int(_nodes.size()) != visitedNodesSet.size())
+    while (int(mNodes.size()) != visitedNodesSet.size())
     {
-        for (auto const& _node : _nodes)
+        for (auto const& _node : mNodes)
         {
             auto const& node = _node.second;
             if (visitedNodesSet.find(node->getId()) != visitedNodesSet.end())
@@ -339,7 +339,7 @@ QVector<AprochNode*> AprochFlowScene::allNodes() const
 {
     QVector<AprochNode*> nodes;
 
-    std::transform(_nodes.begin(), _nodes.end(), std::back_inserter(nodes),
+    std::transform(mNodes.begin(), mNodes.end(), std::back_inserter(nodes),
                    [](std::pair<QUuid const, std::unique_ptr<AprochNode>> const & p)
     {
         return p.second.get();
@@ -375,14 +375,14 @@ void AprochFlowScene::clearScene()
     //Manual node cleanup. Simply clearing the holding datastructures doesn't work, the code crashes when
     // there are both nodes and connections in the scene. (The data propagation internal logic tries to propagate
     // data through already freed connections.)
-    while (_connections.size() > 0)
+    while (mConnections.size() > 0)
     {
-        deleteConnection(*_connections.begin()->second);
+        deleteConnection(*mConnections.begin()->second);
     }
 
-    while (_nodes.size() > 0)
+    while (mNodes.size() > 0)
     {
-        removeNode(*_nodes.begin()->second);
+        removeNode(*mNodes.begin()->second);
     }
 }
 
@@ -436,7 +436,7 @@ QByteArray AprochFlowScene::saveToMemory() const
 
     QJsonArray nodesJsonArray;
 
-    for (auto const& pair : _nodes)
+    for (auto const& pair : mNodes)
     {
         auto const& node = pair.second;
 
@@ -446,7 +446,7 @@ QByteArray AprochFlowScene::saveToMemory() const
     sceneJson["nodes"] = nodesJsonArray;
 
     QJsonArray connectionJsonArray;
-    for (auto const& pair : _connections)
+    for (auto const& pair : mConnections)
     {
         auto const& connection = pair.second;
 

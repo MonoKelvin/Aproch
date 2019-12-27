@@ -16,8 +16,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Core/AprochConnectionPainter.cpp \
     Core/AprochConnectionGraphicsObject.cpp \
     Core/AprochConnection.cpp \
+    Core/AprochDataModelRegistry.cpp \
     Core/AprochFlowScene.cpp \
     Core/AprochFlowView.cpp \
     Core/AprochNode.cpp \
@@ -29,9 +31,11 @@ SOURCES += \
     Editor/AprochMainWindow.cpp
 
 HEADERS += \
+    Core/AprochConnectionPainter.h \
     Core/AprochConnectionGraphicsObject.h \
     Core/Aproch.h \
     Core/AprochConnection.h \
+    Core/AprochDataModelRegistry.h \
     Core/AprochFlowScene.h \
     Core/AprochFlowView.h \
     Core/AprochNode.h \

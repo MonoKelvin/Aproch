@@ -7,10 +7,10 @@ APROCH_NAMESPACE_BEGIN
 
 AprochConnection::AprochConnection(EPortType portType, AprochNode& node, PortIndex portIndex)
     : mUuid(QUuid::createUuid())
-    , _in(0, 0)
-    , _out(0, 0)
-    , _lineWidth(3.0)
-    , _hovered(false)
+    , mInPoint(0, 0)
+    , mOutPoint(0, 0)
+    , mLineWidth(3.0)
+    , mIsHovered(false)
     , mOutPortIndex(INVALID_PORT_INDEX)
     , mInPortIndex(INVALID_PORT_INDEX)
     , mConnectionState()
@@ -197,7 +197,7 @@ QPointF const& AprochConnection::getEndPoint(EPortType portType) const
 {
     Q_ASSERT(portType != EPortType::None);
 
-    return (portType == EPortType::Output ? _out : _in);
+    return (portType == EPortType::Output ? mOutPoint : mInPoint);
 }
 
 void AprochConnection::setEndPoint(EPortType portType, QPointF const& point)
@@ -205,11 +205,11 @@ void AprochConnection::setEndPoint(EPortType portType, QPointF const& point)
     switch (portType)
     {
     case EPortType::Output:
-        _out = point;
+        mOutPoint = point;
         break;
 
     case EPortType::Input:
-        _in = point;
+        mInPoint = point;
         break;
 
     default:
@@ -222,11 +222,11 @@ void AprochConnection::moveEndPoint(EPortType portType, QPointF const& offset)
     switch (portType)
     {
     case EPortType::Output:
-        _out += offset;
+        mOutPoint += offset;
         break;
 
     case EPortType::Input:
-        _in += offset;
+        mInPoint += offset;
         break;
 
     default:
@@ -238,7 +238,7 @@ QRectF AprochConnection::boundingRect() const
 {
     auto points = pointsC1C2();
 
-    QRectF basicRect = QRectF(_out, _in).normalized();
+    QRectF basicRect = QRectF(mOutPoint, mInPoint).normalized();
 
     QRectF c1c2Rect = QRectF(points.first, points.second).normalized();
 
@@ -260,7 +260,7 @@ std::pair<QPointF, QPointF> AprochConnection::pointsC1C2() const
 {
     const double defaultOffset = 200;
 
-    double xDistance = _in.x() - _out.x();
+    double xDistance = mInPoint.x() - mOutPoint.x();
 
     double horizontalOffset = qMin(defaultOffset, std::abs(xDistance));
 
@@ -270,7 +270,7 @@ std::pair<QPointF, QPointF> AprochConnection::pointsC1C2() const
 
     if (xDistance <= 0)
     {
-        double yDistance = _in.y() - _out.y() + 20;
+        double yDistance = mInPoint.y() - mOutPoint.y() + 20;
 
         double vector = yDistance < 0 ? -1.0 : 1.0;
 
@@ -281,8 +281,8 @@ std::pair<QPointF, QPointF> AprochConnection::pointsC1C2() const
 
     horizontalOffset *= ratioX;
 
-    QPointF c1(_out.x() + horizontalOffset, _out.y() + verticalOffset);
-    QPointF c2(_in.x() - horizontalOffset, _in.y() - verticalOffset);
+    QPointF c1(mOutPoint.x() + horizontalOffset, mOutPoint.y() + verticalOffset);
+    QPointF c2(mInPoint.x() - horizontalOffset, mInPoint.y() - verticalOffset);
 
     return std::pair<QPointF, QPointF>(c1, c2);
 }

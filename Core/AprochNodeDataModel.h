@@ -21,6 +21,11 @@ struct SNodeDataType
 {
     QString id;
     QString name;
+
+    friend inline bool operator<(const SNodeDataType &d1, const SNodeDataType &d2)
+    {
+        return d1.id < d2.id;
+    }
 };
 
 class AprochConnection;
@@ -34,7 +39,7 @@ public:
 
     virtual ~INodeData() = default;
 
-    virtual bool isSameType(const INodeData& nodeData) const;
+    virtual bool isSameType(const INodeData &nodeData) const;
 
     // Type for inner use
     virtual SNodeDataType type() const = 0;
@@ -85,8 +90,8 @@ public:
         return EConnectionPolicy::Many;
     }
 
-    inline void setNodeStyle(const SNodeStyle& style) { mNodeStyle = style; }
-    inline SNodeStyle const& getNodeStyle(void) const { return mNodeStyle; }
+    inline void setNodeStyle(const SNodeStyle &style) { mNodeStyle = style; }
+    inline SNodeStyle const &getNodeStyle(void) const { return mNodeStyle; }
 
 public:
 
@@ -95,7 +100,7 @@ public:
 
     virtual std::shared_ptr<INodeData> getOutputData(PortIndex port) = 0;
 
-    virtual QWidget* embeddedWidget() = 0;
+    virtual QWidget *embeddedWidget() = 0;
 
     virtual bool resizable() const { return false; }
 
@@ -107,19 +112,19 @@ public:
 
 public Q_SLOTS:
 
-    virtual void inputConnectionCreated(const AprochConnection&)
+    virtual void inputConnectionCreated(const AprochConnection &)
     {
     }
 
-    virtual void inputConnectionDeleted(const AprochConnection&)
+    virtual void inputConnectionDeleted(const AprochConnection &)
     {
     }
 
-    virtual void outputConnectionCreated(const AprochConnection&)
+    virtual void outputConnectionCreated(const AprochConnection &)
     {
     }
 
-    virtual void outputConnectionDeleted(const AprochConnection&)
+    virtual void outputConnectionDeleted(const AprochConnection &)
     {
     }
 
