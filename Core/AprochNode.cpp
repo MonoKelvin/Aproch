@@ -4,6 +4,7 @@
 
 #include <QWidget>
 #include <QVector>
+#include <QDebug>
 
 APROCH_NAMESPACE_BEGIN
 
@@ -77,6 +78,7 @@ QRect AprochNode::resizeRect() const
     const int rectSize = 7;
     return QRect(mWidth - rectSize, mHeight - rectSize, rectSize, rectSize);
 }
+
 
 void AprochNode::recalculateSize() const
 {

@@ -7,13 +7,9 @@
 
 APROCH_NAMESPACE_BEGIN
 
-AprochNodePainter::AprochNodePainter()
+void AprochNodePainter::Paint(QPainter *painter, AprochNode &node, const AprochFlowScene &scene)
 {
-}
-
-void AprochNodePainter::Paint(QPainter *painter, AprochNode *node, const AprochFlowScene &scene)
-{
-    node->recalculateSize(painter->font());
+    node.recalculateSize(painter->font());
 
     DrawNodeRect(painter, node);
     DrawModelName(painter, node);
@@ -22,13 +18,13 @@ void AprochNodePainter::Paint(QPainter *painter, AprochNode *node, const AprochF
     DrawConnectedPort(painter, node);
 }
 
-void AprochNodePainter::DrawNodeRect(QPainter *painter, AprochNode *node)
+void AprochNodePainter::DrawNodeRect(QPainter *painter, AprochNode &node)
 {
     SNodeStyle const &nodeStyle = AprochStyle::GetNodeStyle();
 
-    auto color = node->getNodeGraphicsObject().isSelected() ? nodeStyle.SelectedBoundaryColor : nodeStyle.NormalBoundaryColor;
+    auto color = node.getNodeGraphicsObject().isSelected() ? nodeStyle.SelectedBoundaryColor : nodeStyle.NormalBoundaryColor;
 
-    if (node->isHovered())
+    if (node.isHovered())
     {
         QPen p(color, nodeStyle.HoveredPenWidth);
         painter->setPen(p);
@@ -43,14 +39,14 @@ void AprochNodePainter::DrawNodeRect(QPainter *painter, AprochNode *node)
 
     double diam = double(nodeStyle.ConnectionPointDiameter);
 
-    QRectF boundary(-diam, -diam, 2.0 * diam + node->getWidth(), 2.0 * diam + node->getHeight());
+    QRectF boundary(-diam, -diam, 2.0 * diam + node.getWidth(), 2.0 * diam + node.getHeight());
 
     painter->drawRoundedRect(boundary, NODE_BORDER_RADIUS, NODE_BORDER_RADIUS);
 }
 
-void AprochNodePainter::DrawModelName(QPainter *painter, AprochNode *node)
+void AprochNodePainter::DrawModelName(QPainter *painter, AprochNode &node)
 {
-    auto const &model = node->getNodeDataModel();
+    auto const &model = node.getNodeDataModel();
     auto const &nodeStyle = model->getNodeStyle();
 
     if (!model->isCaptionVisible())
@@ -68,7 +64,7 @@ void AprochNodePainter::DrawModelName(QPainter *painter, AprochNode *node)
 
     auto rect = metrics.boundingRect(name);
 
-    QPointF position((node->getWidth() - rect.width()) / 2.0, node->getSpacing() / 3.0);
+    QPointF position((node.getWidth() - rect.width()) / 2.0, node.getSpacing() / 3.0);
 
     painter->setFont(f);
     painter->setPen(nodeStyle.FontColor);
@@ -78,20 +74,20 @@ void AprochNodePainter::DrawModelName(QPainter *painter, AprochNode *node)
     painter->setFont(f);
 }
 
-void AprochNodePainter::DrawPortLabel(QPainter *painter, AprochNode *node)
+void AprochNodePainter::DrawPortLabel(QPainter *painter, AprochNode &node)
 {
     QFontMetrics const &metrics = painter->fontMetrics();
 
     for (EPortType portType : {EPortType::Output, EPortType::Input})
     {
-        auto const &model = node->getNodeDataModel();
+        auto const &model = node.getNodeDataModel();
         auto const &nodeStyle = model->getNodeStyle();
-        auto &entries = node->getEntries(portType);
+        auto &entries = node.getEntries(portType);
 
         int n = entries.size();
         for (int i = 0; i < n; ++i)
         {
-            QPointF p = node->getPortScenePosition(i, portType);
+            QPointF p = node.getPortScenePosition(i, portType);
 
             if (entries[i].empty())
             {
@@ -124,7 +120,7 @@ void AprochNodePainter::DrawPortLabel(QPainter *painter, AprochNode *node)
                 break;
 
             case EPortType::Output:
-                p.setX(node->getWidth() - 5.0 - rect.width());
+                p.setX(node.getWidth() - 5.0 - rect.width());
                 break;
 
             default:
@@ -136,9 +132,9 @@ void AprochNodePainter::DrawPortLabel(QPainter *painter, AprochNode *node)
     }
 }
 
-void AprochNodePainter::DrawPort(QPainter *painter, AprochNode *node, const AprochFlowScene &scene)
+void AprochNodePainter::DrawPort(QPainter *painter, AprochNode &node, const AprochFlowScene &scene)
 {
-    auto const &model = node->getNodeDataModel();
+    auto const &model = node.getNodeDataModel();
     auto const &nodeStyle = model->getNodeStyle();
 
     float diameter = nodeStyle.ConnectionPointDiameter;
@@ -146,36 +142,36 @@ void AprochNodePainter::DrawPort(QPainter *painter, AprochNode *node, const Apro
 
     for (EPortType portType : {EPortType::Output, EPortType::Input})
     {
-        size_t n = node->getEntries(portType).size();
+        size_t n = node.getEntries(portType).size();
 
         for (unsigned int i = 0; i < n; ++i)
         {
-            QPointF p = node->getPortScenePosition(i, portType);
+            QPointF p = node.getPortScenePosition(i, portType);
 
             auto const &dataType = model->dataType(portType, i);
 
-            bool canConnect = (node->getEntries(portType)[i].empty() || (portType == EPortType::Output &&
+            bool canConnect = (node.getEntries(portType)[i].empty() || (portType == EPortType::Output &&
                                 model->portOutConnectionPolicy(i) == INodeDataModel::EConnectionPolicy::Many));
 
             double r = 1.0;
-            if (node->isReacting() && canConnect && portType == node->getReactingPortType())
+            if (node.isReacting() && canConnect && portType == node.getReactingPortType())
             {
-                auto diff = node->getDraggingPos() - p;
+                auto diff = node.getDraggingPos() - p;
                 double distSqrt = QPointF::dotProduct(diff, diff);
                 bool typeConvertable = false;
 
                 {
                     if (portType == EPortType::Input)
                     {
-                        typeConvertable = scene.registry().getTypeConverter(node->getReactingDataType(), dataType) != nullptr;
+                        typeConvertable = scene.registry().getTypeConverter(node.getReactingDataType(), dataType) != nullptr;
                     }
                     else
                     {
-                        typeConvertable = scene.registry().getTypeConverter(dataType, node->getReactingDataType()) != nullptr;
+                        typeConvertable = scene.registry().getTypeConverter(dataType, node.getReactingDataType()) != nullptr;
                     }
                 }
 
-                if (node->getReactingDataType().id == dataType.id || typeConvertable)
+                if (node.getReactingDataType().id == dataType.id || typeConvertable)
                 {
                     double const thres = 1600.0;
                     r = (distSqrt < thres) ? (2.0 - distSqrt / thres) : 1.0;
@@ -193,21 +189,21 @@ void AprochNodePainter::DrawPort(QPainter *painter, AprochNode *node, const Apro
     }
 }
 
-void AprochNodePainter::DrawConnectedPort(QPainter *painter, AprochNode *node)
+void AprochNodePainter::DrawConnectedPort(QPainter *painter, AprochNode &node)
 {
-    auto const &model = node->getNodeDataModel();
+    auto const &model = node.getNodeDataModel();
     auto const &nodeStyle = model->getNodeStyle();
     auto diameter = nodeStyle.ConnectionPointDiameter;
 
     for (EPortType portType : {EPortType::Output, EPortType::Input})
     {
-        size_t n = node->getEntries(portType).size();
+        size_t n = node.getEntries(portType).size();
 
         for (size_t i = 0; i < n; ++i)
         {
-            QPointF p = node->getPortScenePosition(i, portType);
+            QPointF p = node.getPortScenePosition(i, portType);
 
-            if (!node->getEntries(portType)[i].empty())
+            if (!node.getEntries(portType)[i].empty())
             {
                 painter->setPen(nodeStyle.FilledConnectionPointColor);
                 painter->setBrush(nodeStyle.FilledConnectionPointColor);

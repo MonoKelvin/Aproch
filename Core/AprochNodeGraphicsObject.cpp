@@ -129,6 +129,13 @@ void AprochNodeGraphicsObject::moveConnections() const
     }
 }
 
+void AprochNodeGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(widget);
+
+    painter->setClipRect(option->exposedRect);
+    AprochNodePainter::Paint(painter, mNode, mScene);
+}
 
 void AprochNodeGraphicsObject::lock(bool locked)
 {
@@ -137,13 +144,6 @@ void AprochNodeGraphicsObject::lock(bool locked)
     setFlag(QGraphicsItem::ItemIsMovable, !locked);
     setFlag(QGraphicsItem::ItemIsFocusable, !locked);
     setFlag(QGraphicsItem::ItemIsSelectable, !locked);
-}
-
-
-void AprochNodeGraphicsObject::paint(QPainter *painter, QStyleOptionGraphicsItem const* option, QWidget* )
-{
-    painter->setClipRect(option->exposedRect);
-    AprochNodePainter::Paint(painter, &mNode, mScene);
 }
 
 
