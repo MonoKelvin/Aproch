@@ -1,18 +1,15 @@
 ﻿#ifndef APROCHNODE_H
 #define APROCHNODE_H
 
+#include "AprochNodeGraphicsObject.h"
 #include "AprochNodeDataModel.h"
+#include "AprochConnection.h"
 
 #include <QUuid>
 #include <QFontMetrics>
 #include <QTransform>
-#include <memory>
-#include <unordered_map>
 
 APROCH_NAMESPACE_BEGIN
-
-class AprochConnection;
-class AprochNodeGraphicsObject;
 
 using ConnectionPtrSet = std::unordered_map<QUuid, AprochConnection *>;
 
@@ -60,12 +57,18 @@ public:
     int validationHeight() const;
     int validationWidth() const;
 
+    // Returns the maximum height a widget can be without causing the node to grow.
+    int equivalentWidgetHeight() const;
+
+    QPointF getWidgetPosition() const;
+
     inline QUuid getId(void) const { return mUuid; }
     inline int getWidth(void) const { return mWidth; }
     inline void setWidth(int width) { mWidth = width; }
     inline int getHeight(void) const { return mHeight; }
     inline void setHeight(int height) { mHeight = height; }
-    inline bool isHovered(void) const { return mHovered; }
+    inline bool isHovered(void) const { return mIsHovered; }
+    inline void setHovered(bool isHovered) { mIsHovered = isHovered; }
 
     inline AprochNodeGraphicsObject const &getNodeGraphicsObject(void) const {return *mNodeGraphicsObject.get(); }
     inline AprochNodeGraphicsObject &getNodeGraphicsObject(void) {return *mNodeGraphicsObject.get(); }
@@ -81,7 +84,7 @@ public:
     QVector<ConnectionPtrSet> const &getEntries(EPortType) const;
     QVector<ConnectionPtrSet> &getEntries(EPortType);
 
-    inline ConnectionPtrSet getConnections(EPortType portType, PortIndex portIndex) const;
+    ConnectionPtrSet getConnections(EPortType portType, PortIndex portIndex) const;
 
     void setConnection(EPortType portType, PortIndex portIndex, AprochConnection &connection);
     void eraseConnection(EPortType portType, PortIndex portIndex, QUuid id);
@@ -112,6 +115,8 @@ public:
     inline QPointF const &getDraggingPos() const { return mDraggingPos; }
     inline void setDraggingPosition(QPointF const &pos) { mDraggingPos = pos; }
 
+    QRect resizeRect() const;
+
 public Q_SLOTS:
 
     /// Propagates incoming data to the underlying model.
@@ -127,6 +132,8 @@ public Q_SLOTS:
 private:
     void resize(void) const;
 
+    int getPortWidth(EPortType portType) const;
+
 private:
     mutable int mWidth;
     mutable int mHeight;
@@ -136,7 +143,7 @@ private:
     mutable QFontMetrics mFontMetrics;
     mutable QFontMetrics mBoldFontMetrics;
 
-    bool mHovered;
+    bool mIsHovered;
     QPointF mDraggingPos;
 
     QUuid mUuid;

@@ -1,8 +1,11 @@
 #include "AprochNodeGraphicsObject.h"
 
 #include "AprochNode.h"
+#include "AprochConnection.h"
+#include "AprochConnectionGraphicsObject.h"
 #include "AprochFlowScene.h"
 #include "AprochNodePainter.h"
+#include "AprochNCInteraction.h"
 
 #include <QGraphicsProxyWidget>
 #include <QGraphicsDropShadowEffect>
@@ -88,7 +91,7 @@ void AprochNodeGraphicsObject::embedQWidget()
             mProxyWidget->setMinimumHeight(mNode.equivalentWidgetHeight());
         }
 
-        mProxyWidget->setPos(mNode.widgetPosition());
+        mProxyWidget->setPos(mNode.getWidgetPosition());
 
         update();
 
@@ -112,8 +115,6 @@ void AprochNodeGraphicsObject::setGeometryChanged()
 
 void AprochNodeGraphicsObject::moveConnections() const
 {
-    SNodeState const & nodeState = mNode.mNodeState;
-
     for (EPortType portType: {EPortType::Input, EPortType::Output})
     {
         auto const & connectionEntries = mNode.getEntries(portType);
@@ -189,16 +190,14 @@ void AprochNodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
 
         if (portIndex != INVALID_PORT_INDEX)
         {
-            SNodeState const &nodeState = mNode.mNodeState;
-
-            ConnectionPtrSet connections = mNode.connections(portToCheck, portIndex);
+            ConnectionPtrSet connections = mNode.getConnections(portToCheck, portIndex);
 
             // start dragging existing connection
             if (!connections.empty() && portToCheck == EPortType::Input)
             {
                 auto con = connections.begin()->second;
 
-//                NodeConnectionInteraction interaction(mNode, *con, mScene);
+                AprochNCInteraction interaction(mNode, *con, mScene);
 
                 interaction.disconnect(portToCheck);
             }
@@ -207,7 +206,7 @@ void AprochNodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
                 if (portToCheck == EPortType::Output)
                 {
                     auto const outPolicy = mNode.mNodeDataModel->portOutConnectionPolicy(portIndex);
-                    if (!connections.empty() && outPolicy == AprochNodeDataModel::ConnectionPolicy::One)
+                    if (!connections.empty() && outPolicy == INodeDataModel::EConnectionPolicy::One)
                     {
                         mScene.deleteConnection( *connections.begin()->second );
                     }
@@ -216,7 +215,7 @@ void AprochNodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
                 // todo add to FlowScene
                 auto connection = mScene.createConnection(portToCheck, mNode, portIndex);
 
-                mNode.mNodeState.setConnection(portToCheck, portIndex, *connection);
+                mNode.setConnection(portToCheck, portIndex, *connection);
 
                 connection->getConnectionGraphicsObject().grabMouse();
             }
@@ -227,14 +226,14 @@ void AprochNodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
 
     if (mNode.mNodeDataModel->resizable() && mNode.resizeRect().contains(QPoint(pos.x(), pos.y())))
     {
-        mNode.mNodeState.setResizing(true);
+        mNode.setResizing(true);
     }
 }
 
 
 void AprochNodeGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
-    if (mNode.mNodeState.resizing())
+    if (mNode.resizing())
     {
         auto diff = event->pos() - event->lastPos();
 
@@ -313,7 +312,7 @@ void AprochNodeGraphicsObject::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {
     auto pos = event->pos();
 
-    if (mNode.getNodeDataModel()->resizable() && geom.resizeRect().contains(QPoint(pos.x(), pos.y())))
+    if (mNode.getNodeDataModel()->resizable() && mNode.resizeRect().contains(QPoint(pos.x(), pos.y())))
     {
         setCursor(QCursor(Qt::SizeFDiagCursor));
     }

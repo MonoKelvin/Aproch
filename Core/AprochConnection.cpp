@@ -1,7 +1,7 @@
 ﻿#include "AprochConnection.h"
 
 #include "AprochNode.h"
-#include "AprochNodeGraphicsObject.h"
+#include "AprochConnectionGraphicsObject.h"
 
 APROCH_NAMESPACE_BEGIN
 

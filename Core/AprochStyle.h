@@ -6,24 +6,18 @@
 
 APROCH_NAMESPACE_BEGIN
 
-class APROCH_EXPORT SFlowViewStyle : public IStyle
+struct APROCH_EXPORT SFlowViewStyle : public IStyle
 {
-public:
-    void setStyle(const QJsonObject &obj) override;
-
-public:
     QColor BackgroundColor;
     QColor FineGridColor;
     QColor CoarseGridColor;
     QColor CentralGridColor;
+
+    void setStyle(const QJsonObject &obj);
 };
 
-class APROCH_EXPORT SNodeStyle : public IStyle
+struct APROCH_EXPORT SNodeStyle : public IStyle
 {
-public:
-    void setStyle(const QJsonObject &obj) override;
-
-public:
     QColor BackgroundColor;
     QColor NormalBoundaryColor;
     QColor SelectedBoundaryColor;
@@ -43,14 +37,12 @@ public:
     float Opacity;
 
     bool UseCustomColors;
+
+    void setStyle(const QJsonObject &obj);
 };
 
-class APROCH_EXPORT SConnectionStyle : public IStyle
+struct APROCH_EXPORT SConnectionStyle : public IStyle
 {
-public:
-    void setStyle(const QJsonObject &obj) override;
-
-public:
     QColor ConstructionColor;
     QColor NormalColor;
     QColor SelectedColor;
@@ -60,6 +52,8 @@ public:
     float LineWidth;
     float ConstructionLineWidth;
     float PointDiameter;
+
+    void setStyle(const QJsonObject &obj);
 };
 
 class APROCH_EXPORT AprochStyle

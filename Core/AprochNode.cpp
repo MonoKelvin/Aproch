@@ -1,24 +1,13 @@
 ﻿#include "AprochNode.h"
 
-#include "AprochConnection.h"
 #include "AprochConnectionGraphicsObject.h"
-#include "AprochNodeGraphicsObject.h"
 
 #include <QWidget>
-#include <cmath>
 
 APROCH_NAMESPACE_BEGIN
 
 AprochNode::AprochNode(std::unique_ptr<INodeDataModel> &&dataModel)
-    : mWidth(100)
-    , mHeight(150)
-    , mPortWidth(30)
-    , mSpacing(20)
-    , mFontMetrics(QFont())
-    , mBoldFontMetrics(QFont())
-    , mHovered(false)
-    , mDraggingPos(-1000, -1000)
-    , mNodeDataModel(dataModel)
+    : mWidth(100), mHeight(150), mPortWidth(30), mSpacing(20), mFontMetrics(QFont()), mBoldFontMetrics(QFont()), mIsHovered(false), mDraggingPos(-1000, -1000), mNodeDataModel(dataModel)
 {
     mNodeState.InConnections.resize(int(mNodeDataModel->nPorts(EPortType::Input)));
     mNodeState.OutConnections.resize(int(mNodeDataModel->nPorts(EPortType::Output)));
@@ -48,7 +37,7 @@ void AprochNode::resize(void) const
 
     mHeight += captionHeight();
 
-    mWidth = (mPortWidth +  mSpacing) * 2;
+    mWidth = (mPortWidth + mSpacing) * 2;
 
     if (auto w = mNodeDataModel->embeddedWidget())
     {
@@ -63,6 +52,37 @@ void AprochNode::resize(void) const
         mHeight += validationHeight() + mSpacing;
     }
 }
+
+QRect AprochNode::resizeRect() const
+{
+    const int rectSize = 7;
+    return QRect(mWidth - rectSize, mHeight - rectSize, rectSize, rectSize);
+}
+
+int AprochNode::getPortWidth(EPortType portType) const
+{
+    int width = 0;
+
+    for (auto i = 0u; i < mNodeDataModel->nPorts(portType); ++i)
+    {
+        QString name;
+
+        if (mNodeDataModel->isPortCaptionVisible(portType, i))
+        {
+            name = mNodeDataModel->portCaption(portType, i);
+        }
+        else
+        {
+            name = mNodeDataModel->dataType(portType, i).name;
+        }
+
+        // width(name) is deprecated, so use horizontalAdvance(name).
+        width = AMax(mFontMetrics.horizontalAdvance(name), width);
+    }
+
+    return width;
+}
+
 
 QPointF AprochNode::getPortScenePosition(PortIndex index, EPortType portType, const QTransform &transform) const
 {
@@ -112,9 +132,9 @@ PortIndex AprochNode::checkHitScenePoint(EPortType portType, QPointF scenePoint,
         auto pp = getPortScenePosition(i, portType, sceneTransform);
 
         QPointF p = pp - scenePoint;
-        auto distance = std::sqrt(QPointF::dotProduct(p, p));
+        double distanceSqrt = QPointF::dotProduct(p, p);
 
-        if (distance < double(tolerance))
+        if (distanceSqrt < double(tolerance * tolerance))
         {
             result = PortIndex(i);
             break;
@@ -156,6 +176,38 @@ int AprochNode::validationHeight() const
 int AprochNode::validationWidth() const
 {
     return mBoldFontMetrics.boundingRect(mNodeDataModel->validationMessage()).width();
+}
+
+int AprochNode::equivalentWidgetHeight() const
+{
+    if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
+    {
+        return getHeight() - captionHeight() + validationHeight();
+    }
+
+    return getHeight() - captionHeight();
+}
+
+QPointF AprochNode::getWidgetPosition() const
+{
+    if (auto w = mNodeDataModel->embeddedWidget())
+    {
+        if (w->sizePolicy().verticalPolicy() & QSizePolicy::ExpandFlag)
+        {
+            // If the widget wants to use as much vertical space as possible, place it immediately after the caption.
+            return QPointF(mSpacing + getPortWidth(EPortType::Input), captionHeight());
+        }
+        else
+        {
+            if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
+            {
+                return QPointF(mSpacing + getPortWidth(EPortType::Input), (captionHeight() + mHeight - validationHeight() - mSpacing - w->height()) / 2.0);
+            }
+
+            return QPointF(mSpacing + getPortWidth(EPortType::Input), (captionHeight() + mHeight - w->height()) / 2.0);
+        }
+    }
+    return QPointF();
 }
 
 QJsonObject AprochNode::save(void) const
@@ -234,8 +286,6 @@ void AprochNode::setReaction(SNodeState::EReactToConnectionState reaction,
     mNodeState.ReactingDataType = std::move(reactingDataType);
 }
 
-
-
 void AprochNode::resetReactionToConnection()
 {
     setReaction(SNodeState::NOT_REACTING);
@@ -252,7 +302,6 @@ void AprochNode::propagateData(std::shared_ptr<INodeData> nodeData, PortIndex in
     mNodeGraphicsObject->update();
     mNodeGraphicsObject->moveConnections();
 }
-
 
 void AprochNode::onDataUpdated(PortIndex index)
 {

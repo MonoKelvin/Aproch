@@ -22,6 +22,7 @@ SOURCES += \
     Core/AprochDataModelRegistry.cpp \
     Core/AprochFlowScene.cpp \
     Core/AprochFlowView.cpp \
+    Core/AprochNCInteraction.cpp \
     Core/AprochNode.cpp \
     Core/AprochNodeDataModel.cpp \
     Core/AprochNodeGraphicsObject.cpp \
@@ -38,6 +39,7 @@ HEADERS += \
     Core/AprochDataModelRegistry.h \
     Core/AprochFlowScene.h \
     Core/AprochFlowView.h \
+    Core/AprochNCInteraction.h \
     Core/AprochNode.h \
     Core/AprochNodeDataModel.h \
     Core/AprochNodeGraphicsObject.h \

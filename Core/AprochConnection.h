@@ -23,6 +23,8 @@ struct SConnectionState
 class APROCH_EXPORT AprochConnection : public QObject, public ISerializable
 {
     Q_OBJECT
+
+    friend class AprochConnectionGraphicsObject;
 public:
     /**
      * New Connection is attached to the port of the given Node.

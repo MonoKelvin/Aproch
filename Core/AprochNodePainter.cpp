@@ -2,6 +2,7 @@
 
 #include "AprochStyle.h"
 #include "AprochNode.h"
+#include "AprochNodeGraphicsObject.h"
 
 APROCH_NAMESPACE_BEGIN
 
@@ -23,9 +24,7 @@ void AprochNodePainter::DrawNodeRect(QPainter *painter, AprochNode *node)
 {
     SNodeStyle const& nodeStyle = AprochStyle::GetNodeStyle();
 
-    auto color = node->getNodeGraphicsObject().isSelected()
-            ? nodeStyle.SelectedBoundaryColor
-            : nodeStyle.NormalBoundaryColor;
+    auto color = node->getNodeGraphicsObject().isSelected() ? nodeStyle.SelectedBoundaryColor : nodeStyle.NormalBoundaryColor;
 
     if (node->isHovered())
     {

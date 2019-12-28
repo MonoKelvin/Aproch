@@ -8,10 +8,6 @@ APROCH_NAMESPACE_BEGIN
 
 class APROCH_EXPORT IStyle
 {
-public:
-    virtual ~IStyle();
-
-protected:
     virtual void setStyle(const QJsonObject& obj) = 0;
 };
 
