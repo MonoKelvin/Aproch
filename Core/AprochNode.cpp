@@ -3,12 +3,25 @@
 #include "AprochConnectionGraphicsObject.h"
 
 #include <QWidget>
+#include <QVector>
 
 APROCH_NAMESPACE_BEGIN
 
 AprochNode::AprochNode(std::unique_ptr<INodeDataModel> &&dataModel)
-    : mWidth(100), mHeight(150), mPortWidth(30), mSpacing(20), mFontMetrics(QFont()), mBoldFontMetrics(QFont()), mIsHovered(false), mDraggingPos(-1000, -1000), mNodeDataModel(dataModel)
+    : mUuid(QUuid::createUuid())
+    , mWidth(100)
+    , mHeight(150)
+    , mPortWidth(30)
+    , mSpacing(20)
+    , mFontMetrics(QFont())
+    , mBoldFontMetrics(QFont())
+    , mIsHovered(false)
+    , mDraggingPos(-1000, -1000)
+    , mNodeDataModel(std::move(dataModel))
 {
+    mSources = dataModel->nPorts(EPortType::Output);
+    mSinks = dataModel->nPorts(EPortType::Input);
+
     mNodeState.InConnections.resize(int(mNodeDataModel->nPorts(EPortType::Input)));
     mNodeState.OutConnections.resize(int(mNodeDataModel->nPorts(EPortType::Output)));
     mNodeState.Reaction = SNodeState::EReactToConnectionState::NOT_REACTING;
@@ -19,6 +32,12 @@ AprochNode::AprochNode(std::unique_ptr<INodeDataModel> &&dataModel)
     f.setBold(true);
 
     mBoldFontMetrics = QFontMetrics(f);
+
+    recalculateSize();
+
+    // propagate data: model => node
+    connect(mNodeDataModel.get(), &INodeDataModel::dataUpdated, this, &AprochNode::onDataUpdated);
+    connect(mNodeDataModel.get(), &INodeDataModel::embeddedWidgetSizeUpdated, this, &AprochNode::onNodeSizeUpdated );
 }
 
 QRectF AprochNode::boundingRect(void) const
@@ -30,7 +49,7 @@ QRectF AprochNode::boundingRect(void) const
 
 void AprochNode::resize(void) const
 {
-    if (auto w = mNodeDataModel->embeddedWidget())
+    if (auto w = mNodeDataModel->getEmbeddedWidget())
     {
         mHeight = AMax(mHeight, w->height());
     }
@@ -39,7 +58,7 @@ void AprochNode::resize(void) const
 
     mWidth = (mPortWidth + mSpacing) * 2;
 
-    if (auto w = mNodeDataModel->embeddedWidget())
+    if (auto w = mNodeDataModel->getEmbeddedWidget())
     {
         mWidth += w->width();
     }
@@ -48,8 +67,8 @@ void AprochNode::resize(void) const
 
     if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
     {
-        mWidth = AMax(mWidth, validationWidth());
-        mHeight += validationHeight() + mSpacing;
+        mWidth = AMax(mWidth, getValidationWidth());
+        mHeight += getValidationHeight() + mSpacing;
     }
 }
 
@@ -57,6 +76,53 @@ QRect AprochNode::resizeRect() const
 {
     const int rectSize = 7;
     return QRect(mWidth - rectSize, mHeight - rectSize, rectSize, rectSize);
+}
+
+void AprochNode::recalculateSize() const
+{
+    mHeight = mSpacing * AMax(mSinks, mSources);
+
+    if (auto w = mNodeDataModel->getEmbeddedWidget())
+    {
+        mHeight = AMax(mHeight, w->height());
+    }
+
+    mHeight += captionHeight();
+
+    mPortWidth = getPortWidth(EPortType::Input);
+
+    mWidth = (mPortWidth + mSpacing) * 2;
+
+    if (auto w = mNodeDataModel->getEmbeddedWidget())
+    {
+        mWidth += w->width();
+    }
+
+    mWidth = AMax(mWidth, captionWidth());
+
+    if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
+    {
+        mWidth = AMax(mWidth, getValidationWidth());
+        mHeight += getValidationHeight() + mSpacing;
+    }
+}
+
+void AprochNode::recalculateSize(QFont const &font) const
+{
+    QFontMetrics fontMetrics(font);
+    QFont boldFont = font;
+
+    boldFont.setBold(true);
+
+    QFontMetrics boldFontMetrics(boldFont);
+
+    if (mBoldFontMetrics != boldFontMetrics)
+    {
+        mFontMetrics = fontMetrics;
+        mBoldFontMetrics = boldFontMetrics;
+
+        recalculateSize();
+    }
 }
 
 int AprochNode::getPortWidth(EPortType portType) const
@@ -82,7 +148,6 @@ int AprochNode::getPortWidth(EPortType portType) const
 
     return width;
 }
-
 
 QPointF AprochNode::getPortScenePosition(PortIndex index, EPortType portType, const QTransform &transform) const
 {
@@ -168,12 +233,12 @@ int AprochNode::captionWidth(void) const
     return mBoldFontMetrics.boundingRect(name).width();
 }
 
-int AprochNode::validationHeight() const
+int AprochNode::getValidationHeight() const
 {
     return mBoldFontMetrics.boundingRect(mNodeDataModel->validationMessage()).height();
 }
 
-int AprochNode::validationWidth() const
+int AprochNode::getValidationWidth() const
 {
     return mBoldFontMetrics.boundingRect(mNodeDataModel->validationMessage()).width();
 }
@@ -182,7 +247,7 @@ int AprochNode::equivalentWidgetHeight() const
 {
     if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
     {
-        return getHeight() - captionHeight() + validationHeight();
+        return getHeight() - captionHeight() + getValidationHeight();
     }
 
     return getHeight() - captionHeight();
@@ -190,7 +255,7 @@ int AprochNode::equivalentWidgetHeight() const
 
 QPointF AprochNode::getWidgetPosition() const
 {
-    if (auto w = mNodeDataModel->embeddedWidget())
+    if (auto w = mNodeDataModel->getEmbeddedWidget())
     {
         if (w->sizePolicy().verticalPolicy() & QSizePolicy::ExpandFlag)
         {
@@ -201,7 +266,7 @@ QPointF AprochNode::getWidgetPosition() const
         {
             if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
             {
-                return QPointF(mSpacing + getPortWidth(EPortType::Input), (captionHeight() + mHeight - validationHeight() - mSpacing - w->height()) / 2.0);
+                return QPointF(mSpacing + getPortWidth(EPortType::Input), (captionHeight() + mHeight - getValidationHeight() - mSpacing - w->height()) / 2.0);
             }
 
             return QPointF(mSpacing + getPortWidth(EPortType::Input), (captionHeight() + mHeight - w->height()) / 2.0);
@@ -264,6 +329,17 @@ ConnectionPtrSet AprochNode::getConnections(EPortType portType, PortIndex portIn
     return getEntries(portType)[int(portIndex)];
 }
 
+void AprochNode::setConnection(EPortType portType, PortIndex portIndex, AprochConnection &connection)
+{
+    auto &connections = getEntries(portType);
+    connections[portIndex].insert(std::make_pair(connection.getId(), &connection));
+}
+
+void AprochNode::eraseConnection(EPortType portType, PortIndex portIndex, QUuid id)
+{
+    getEntries(portType)[portIndex].erase(id);
+}
+
 void AprochNode::reactToPossibleConnection(EPortType reactingPortType, const SNodeDataType &reactingDataType, const QPointF &scenePoint)
 {
     QTransform const t = mNodeGraphicsObject->sceneTransform();
@@ -277,13 +353,34 @@ void AprochNode::reactToPossibleConnection(EPortType reactingPortType, const SNo
     setReaction(SNodeState::REACTING, reactingPortType, reactingDataType);
 }
 
-void AprochNode::setReaction(SNodeState::EReactToConnectionState reaction,
-                             EPortType reactingPortType,
-                             SNodeDataType reactingDataType)
+void AprochNode::setReaction(SNodeState::EReactToConnectionState reaction, EPortType reactingPortType, SNodeDataType reactingDataType)
 {
     mNodeState.Reaction = reaction;
     mNodeState.ReactingPortType = reactingPortType;
     mNodeState.ReactingDataType = std::move(reactingDataType);
+}
+
+QPointF AprochNode::getWidgetPosition()
+{
+    if (auto w = mNodeDataModel->getEmbeddedWidget())
+    {
+        if (w->sizePolicy().verticalPolicy() & QSizePolicy::ExpandFlag)
+        {
+            // If the widget wants to use as much vertical space as possible, place it immediately after the caption.
+            return QPointF(mSpacing + getPortWidth(EPortType::Input), captionHeight());
+        }
+        else
+        {
+            if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
+            {
+                return QPointF(mSpacing + getPortWidth(EPortType::Input), (captionHeight() + mHeight - getValidationHeight() - mSpacing - w->height()) / 2.0);
+            }
+
+            return QPointF(mSpacing + getPortWidth(EPortType::Input), (captionHeight() + mHeight - w->height()) / 2.0);
+        }
+    }
+
+    return QPointF();
 }
 
 void AprochNode::resetReactionToConnection()
@@ -317,9 +414,9 @@ void AprochNode::onDataUpdated(PortIndex index)
 
 void AprochNode::onNodeSizeUpdated()
 {
-    if (mNodeDataModel->embeddedWidget())
+    if (mNodeDataModel->getEmbeddedWidget())
     {
-        mNodeDataModel->embeddedWidget()->adjustSize();
+        mNodeDataModel->getEmbeddedWidget()->adjustSize();
     }
 
     resize();

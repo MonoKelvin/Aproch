@@ -1,24 +1,12 @@
 #include "AprochFlowView.h"
 
-#include <QPen>
-#include <QBrush>
-#include <QMenu>
-
-#include <QRectF>
-#include <QPointF>
-
-#include <QtOpenGL/QtOpenGL>
+//#include <QtOpenGL/QtOpenGL>
 #include <QtWidgets>
 
-#include <QDebug>
-#include <iostream>
-#include <cmath>
-
 #include "AprochFlowScene.h"
-//#include "AprochDataModelRegistry.h"
-//#include "AprochNode.h"
-//#include "AprochNodeGraphicsObject.h"
-//#include "AprochConnectionGraphicsObject.h"
+#include "AprochDataModelRegistry.h"
+#include "AprochNode.h"
+#include "AprochConnectionGraphicsObject.h"
 #include "AprochStyle.h"
 
 APROCH_NAMESPACE_BEGIN
@@ -84,7 +72,6 @@ void AprochFlowView::setScene(AprochFlowScene *scene)
     addAction(mDeleteSelectionAction);
 }
 
-/*
 void AprochFlowView::contextMenuEvent(QContextMenuEvent *event)
 {
     // 如果鼠标下有节点，则把事件传递给scene处理
@@ -119,7 +106,7 @@ void AprochFlowView::contextMenuEvent(QContextMenuEvent *event)
     modelMenu.addAction(treeViewAction);
 
     QMap<QString, QTreeWidgetItem *> topLevelItems;
-    for (auto const &cat : mScene->registry().categories())
+    for (auto const &cat : mScene->registry().getCategories())
     {
         auto item = new QTreeWidgetItem(treeView);
         item->setText(0, cat);
@@ -127,7 +114,7 @@ void AprochFlowView::contextMenuEvent(QContextMenuEvent *event)
         topLevelItems[cat] = item;
     }
 
-    for (auto const &assoc : mScene->registry().registeredModelsCategoryAssociation())
+    for (auto const &assoc : mScene->registry().getRegisteredModelsCategoryAssociation())
     {
         auto parent = topLevelItems[assoc.second];
         auto item = new QTreeWidgetItem(parent);
@@ -155,7 +142,7 @@ void AprochFlowView::contextMenuEvent(QContextMenuEvent *event)
 
             QPointF posView = this->mapToScene(pos);
 
-            node.nodeGraphicsObject().setPos(posView);
+            node.getNodeGraphicsObject().setPos(posView);
 
             mScene->nodePlaced(node);
         }
@@ -186,7 +173,7 @@ void AprochFlowView::contextMenuEvent(QContextMenuEvent *event)
 
     modelMenu.exec(event->globalPos());
 }
-*/
+
 void AprochFlowView::wheelEvent(QWheelEvent *event)
 {
     QPoint delta = event->angleDelta();
@@ -238,7 +225,7 @@ void AprochFlowView::scaleDown()
 void AprochFlowView::deleteSelectedNodes()
 {
     // 首先删除连线，为了确保它们不会由于删除节点时被自动删除
-    /*for (QGraphicsItem *item : mScene->selectedItems())
+    for (QGraphicsItem *item : mScene->selectedItems())
     {
         if (auto c = qgraphicsitem_cast<AprochConnectionGraphicsObject *>(item))
         {
@@ -252,7 +239,7 @@ void AprochFlowView::deleteSelectedNodes()
         {
             mScene->removeNode(n->node());
         }
-    }*/
+    }
 }
 
 void AprochFlowView::keyPressEvent(QKeyEvent *event)

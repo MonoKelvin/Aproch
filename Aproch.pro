@@ -28,6 +28,7 @@ SOURCES += \
     Core/AprochNodeGraphicsObject.cpp \
     Core/AprochNodePainter.cpp \
     Core/AprochStyle.cpp \
+    Test/MyTestDataModel_1.cpp \
     main.cpp \
     Editor/AprochMainWindow.cpp
 
@@ -49,7 +50,8 @@ HEADERS += \
     Core/ISerializable.h \
     Core/IStyle.h \
     Core/Utilities.h \
-    Editor/AprochMainWindow.h
+    Editor/AprochMainWindow.h \
+    Test/MyTestDataModel_1.h
 
 FORMS += \
     Editor/UI/aprochmainwindow.ui

@@ -100,7 +100,7 @@ public:
 
     virtual std::shared_ptr<INodeData> getOutputData(PortIndex port) = 0;
 
-    virtual QWidget *embeddedWidget() = 0;
+    virtual QWidget *getEmbeddedWidget() = 0;
 
     virtual bool resizable() const { return false; }
 

@@ -34,6 +34,11 @@ AprochConnectionGraphicsObject::AprochConnectionGraphicsObject(AprochFlowScene &
     setZValue(-1.0);
 }
 
+AprochConnectionGraphicsObject::~AprochConnectionGraphicsObject()
+{
+    mScene.removeItem(this);
+}
+
 QRectF AprochConnectionGraphicsObject::boundingRect() const
 {
     return mConnection.boundingRect();

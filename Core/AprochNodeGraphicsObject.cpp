@@ -75,7 +75,7 @@ AprochNode const &AprochNodeGraphicsObject::node() const
 
 void AprochNodeGraphicsObject::embedQWidget()
 {
-    if (auto w = mNode.getNodeDataModel()->embeddedWidget())
+    if (auto w = mNode.getNodeDataModel()->getEmbeddedWidget())
     {
         mProxyWidget = new QGraphicsProxyWidget(this);
 
@@ -237,7 +237,7 @@ void AprochNodeGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
     {
         auto diff = event->pos() - event->lastPos();
 
-        if (auto w = mNode.mNodeDataModel->embeddedWidget())
+        if (auto w = mNode.mNodeDataModel->getEmbeddedWidget())
         {
             prepareGeometryChange();
 

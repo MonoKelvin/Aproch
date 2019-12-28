@@ -54,8 +54,8 @@ public:
     int captionHeight(void) const;
     int captionWidth(void) const;
 
-    int validationHeight() const;
-    int validationWidth() const;
+    int getValidationHeight() const;
+    int getValidationWidth() const;
 
     // Returns the maximum height a widget can be without causing the node to grow.
     int equivalentWidgetHeight() const;
@@ -67,6 +67,8 @@ public:
     inline void setWidth(int width) { mWidth = width; }
     inline int getHeight(void) const { return mHeight; }
     inline void setHeight(int height) { mHeight = height; }
+    inline int getSpacing(void) const { return mSpacing; }
+    inline void setSpacing(int spacing) { mSpacing = spacing; }
     inline bool isHovered(void) const { return mIsHovered; }
     inline void setHovered(bool isHovered) { mIsHovered = isHovered; }
 
@@ -93,8 +95,8 @@ public:
 
     void reactToPossibleConnection(EPortType reactingPortType, const SNodeDataType &reactingDataType, const QPointF &scenePoint);
 
-    EPortType reactingPortType(void) const;
-    SNodeDataType reactingDataType(void) const;
+    inline EPortType getReactingPortType(void) const { return mNodeState.ReactingPortType; }
+    SNodeDataType getReactingDataType(void) const { return mNodeState.ReactingDataType; }
 
     void setReaction(SNodeState::EReactToConnectionState reaction,
                      EPortType reactingPortType = EPortType::None,
@@ -103,12 +105,11 @@ public:
     bool isReacting(void) const { return mNodeState.IsResizing;}
 
     void setResizing(bool resizing) { mNodeState.IsResizing = resizing; }
-
-    bool resizing(void) const;
+    inline bool resizing(void) const { return mNodeState.IsResizing; }
 
     SNodeState const &getNodeState(void) const {return mNodeState;}
 
-    QPoint getWidgetPosition();
+    QPointF getWidgetPosition();
 
     void resetReactionToConnection();
 
@@ -116,6 +117,10 @@ public:
     inline void setDraggingPosition(QPointF const &pos) { mDraggingPos = pos; }
 
     QRect resizeRect() const;
+
+    void recalculateSize() const;
+
+    void recalculateSize(const QFont &font) const;
 
 public Q_SLOTS:
 
@@ -135,6 +140,8 @@ private:
     int getPortWidth(EPortType portType) const;
 
 private:
+    QUuid mUuid;
+
     mutable int mWidth;
     mutable int mHeight;
     mutable int mPortWidth;
@@ -144,9 +151,11 @@ private:
     mutable QFontMetrics mBoldFontMetrics;
 
     bool mIsHovered;
-    QPointF mDraggingPos;
 
-    QUuid mUuid;
+    int mSinks;
+    int mSources;
+
+    QPointF mDraggingPos;
 
     SNodeState mNodeState;
 
