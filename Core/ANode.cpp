@@ -42,6 +42,11 @@ ANode::ANode(INodeDataModel *dataModel, QObject *parent)
     connect(mNodeDataModel, &INodeDataModel::embeddedWidgetSizeUpdated, this, &ANode::onNodeSizeUpdated);
 }
 
+ANode::~ANode()
+{
+
+}
+
 QRectF ANode::boundingRect(void) const
 {
     double addon = double(AStyle::GetNodeStyle().ConnectionPointDiameter);

@@ -232,7 +232,7 @@ void AFlowView::deleteSelectedNodes()
     {
         if (auto c = qgraphicsitem_cast<AConnectionGraphicsObject *>(item))
         {
-            mScene->deleteConnection(c->getConnection());
+            mScene->deleteConnection(&c->getConnection());
         }
     }
 

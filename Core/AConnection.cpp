@@ -18,6 +18,7 @@ AConnection::AConnection(EPortType portType, ANode *node, PortIndex portIndex, Q
 {
     setNodeToPort(node, portType, portIndex);
     setRequiredPort(APort::OppositePort(portType));
+    qDebug() << "new Connection:" << this;
 }
 
 AConnection::AConnection(ANode *nodeIn, PortIndex portIndexIn, ANode *nodeOut, PortIndex portIndexOut, TypeConverter typeConverter, QObject *parent)

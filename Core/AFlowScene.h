@@ -36,7 +36,7 @@ public:
 
     AConnection *restoreConnection(const QJsonObject &connectionJson);
 
-    void deleteConnection(AConnection &connection);
+    void deleteConnection(AConnection *connection);
 
     ANode &createNode(INodeDataModel *dataModel);
 

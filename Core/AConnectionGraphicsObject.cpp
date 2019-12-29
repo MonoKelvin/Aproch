@@ -50,10 +50,10 @@ QPainterPath AConnectionGraphicsObject::shape() const
 {
 #ifdef APROCH_DEBUG_DRAWING
 
-    // QPainterPath path;
+    QPainterPath path;
 
-    // path.addRect(boundingRect());
-    // return path;
+    path.addRect(boundingRect());
+    return path;
 
 #else
     return AConnectionPainter::GetPainterStroke(mConnection);
@@ -111,6 +111,8 @@ void AConnectionGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     prepareGeometryChange();
 
+    setCursor(Qt::CrossCursor);
+
     auto view = static_cast<QGraphicsView *>(event->widget());
     auto node = AFlowScene::LocateNodeAt(event->scenePos(), mScene, view->transform());
 
@@ -142,6 +144,8 @@ void AConnectionGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void AConnectionGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    setCursor(Qt::ArrowCursor);
+
     ungrabMouse();
     event->accept();
 
@@ -156,7 +160,7 @@ void AConnectionGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *even
 
     if (mConnection.isRequirePort())
     {
-        mScene.deleteConnection(mConnection);
+        mScene.deleteConnection(&mConnection);
     }
 }
 

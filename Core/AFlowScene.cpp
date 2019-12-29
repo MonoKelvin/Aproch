@@ -13,6 +13,17 @@
 
 APROCH_NAMESPACE_BEGIN
 
+static void DBG_PrintConnection(const std::unordered_map<QUuid, AConnection *> &connections)
+{
+    qDebug() << "*******************************\nConnection Map:";
+    for (auto i : connections)
+    {
+        qDebug() << i.first << ", " << i.second;
+    }
+    qDebug() << "*******************************";
+
+}
+
 ANode *AFlowScene::LocateNodeAt(QPointF scenePoint, AFlowScene &scene, const QTransform &viewTransform)
 {
     // items under cursor
@@ -142,13 +153,14 @@ AConnection *AFlowScene::restoreConnection(const QJsonObject &connectionJson)
     return connection;
 }
 
-void AFlowScene::deleteConnection(AConnection &connection)
+void AFlowScene::deleteConnection(AConnection *connection)
 {
-    auto it = mConnections.find(connection.getId());
+    auto it = mConnections.find(connection->getId());
     if (it != mConnections.end())
     {
-        connection.removeFromNodes();
+        connection->removeFromNodes();
         mConnections.erase(it);
+        (*it->second).getConnectionGraphicsObject()->deleteLater();
     }
 }
 
@@ -201,12 +213,13 @@ void AFlowScene::removeNode(ANode &node)
         {
             for (auto const &pair : connections)
             {
-                deleteConnection(*pair.second);
+                deleteConnection(pair.second);
             }
         }
     }
 
     mNodes.erase(node.getId());
+    node.getNodeGraphicsObject()->deleteLater();
 }
 
 void AFlowScene::iterateOverNodes(const std::function<void(ANode *)> &visitor)
@@ -349,12 +362,9 @@ QVector<ANode *> AFlowScene::selectedNodes() const
 
 void AFlowScene::clearScene()
 {
-    //Manual node cleanup. Simply clearing the holding datastructures doesn't work, the code crashes when
-    // there are both nodes and connections in the scene. (The data propagation internal logic tries to propagate
-    // data through already freed connections.)
     while (mConnections.size() > 0)
     {
-        deleteConnection(*mConnections.begin()->second);
+        deleteConnection(mConnections.begin()->second);
     }
 
 //    for (auto iter = mConnections.begin(); iter != mConnections.end(); ++iter)

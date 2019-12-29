@@ -194,7 +194,7 @@ void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
                     auto const outPolicy = mNode.mNodeDataModel->portOutConnectionPolicy(portIndex);
                     if (!connections.empty() && outPolicy == INodeDataModel::EConnectionPolicy::One)
                     {
-                        mScene.deleteConnection(*connections.begin()->second);
+                        mScene.deleteConnection(connections.begin()->second);
                     }
                 }
 

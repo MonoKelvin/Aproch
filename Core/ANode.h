@@ -40,7 +40,7 @@ class APROCH_EXPORT ANode : public QObject, public ISerializable
     friend class ANodeGraphicsObject;
 public:
     ANode(INodeDataModel *dataModel, QObject *parent = nullptr);
-    virtual ~ANode(void) override = default;
+    virtual ~ANode() override;
 
 public:
     QJsonObject save(void) const override;
