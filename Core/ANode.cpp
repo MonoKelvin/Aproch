@@ -164,7 +164,7 @@ QPointF ANode::getPortScenePosition(PortIndex index, EPortType portType, const Q
     QPointF result;
 
     double totalHeight = getCaptionHeight();
-    totalHeight += double(mSpacing) * index + mSpacing / 2.0;
+    totalHeight += (double(mSpacing) * index) + mSpacing * 0.5;
 
     switch (portType)
     {

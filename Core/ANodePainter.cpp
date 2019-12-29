@@ -152,7 +152,7 @@ void ANodePainter::DrawPort(QPainter *painter, ANode &node, AFlowScene &scene)
 
             bool canConnect = (node.getEntries(portType)[int(i)].empty() ||
                                (portType == EPortType::Output &&
-                                model->portOutConnectionPolicy(i) == INodeDataModel::EConnectionPolicy::Many));
+                                model->getPortOutConnectionPolicy(i) == INodeDataModel::EConnectionPolicy::Many));
 
             double r = 1.0;
             if (node.isReacting() && canConnect && portType == node.getReactingPortType())

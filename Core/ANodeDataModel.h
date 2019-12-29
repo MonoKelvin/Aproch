@@ -85,7 +85,7 @@ public:
         Many,
     };
 
-    virtual EConnectionPolicy portOutConnectionPolicy(PortIndex) const
+    virtual EConnectionPolicy getPortOutConnectionPolicy(PortIndex) const
     {
         return EConnectionPolicy::Many;
     }

@@ -146,12 +146,12 @@ QVariant ANodeGraphicsObject::itemChange(GraphicsItemChange change, const QVaria
 
 void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    // 把所有的item放到最底层
+    // 把所有相邻的item放到最底层
     for (QGraphicsItem *item : collidingItems())
     {
         if (item->zValue() > 0.0)
         {
-            item->setZValue(0.0);
+            item->setZValue(-1.0);
         }
     }
 
@@ -178,8 +178,8 @@ void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
         {
             ConnectionPtrSet connections = mNode.getConnections(portToCheck, portIndex);
 
-            // 拖拽出已经存在的连线
-            if (!connections.empty() && portToCheck == EPortType::Input)
+            // 拖拽已经存在的连线
+            if (!connections.empty()/* && portToCheck == EPortType::Input*/)
             {
                 auto con = connections.begin()->second;
 
@@ -191,14 +191,13 @@ void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
             {
                 if (portToCheck == EPortType::Output)
                 {
-                    auto const outPolicy = mNode.mNodeDataModel->portOutConnectionPolicy(portIndex);
+                    auto const outPolicy = mNode.mNodeDataModel->getPortOutConnectionPolicy(portIndex);
                     if (!connections.empty() && outPolicy == INodeDataModel::EConnectionPolicy::One)
                     {
                         mScene.deleteConnection(connections.begin()->second);
                     }
                 }
 
-                // TODO: add to FlowScene
                 auto connection = mScene.createConnection(portToCheck, &mNode, portIndex);
 
                 mNode.setConnection(portToCheck, portIndex, *connection);
@@ -208,9 +207,7 @@ void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
     }
 
-    auto pos = event->pos();
-
-    if (mNode.mNodeDataModel->resizable() && mNode.resizeRect().contains(QPoint(int(pos.x()), int(pos.y()))))
+    if (mNode.mNodeDataModel->resizable() && mNode.resizeRect().contains(event->pos().toPoint()))
     {
         mNode.setResizing(true);
     }

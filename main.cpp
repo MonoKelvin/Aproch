@@ -22,6 +22,9 @@ int main(int argc, char *argv[])
 //    AprochMainWindow w;
 //    w.show();
 
+    view.resize(800, 600);
+    view.centerOn(50, 50);
     view.show();
+
     return a.exec();
 }

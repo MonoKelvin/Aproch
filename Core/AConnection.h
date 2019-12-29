@@ -63,9 +63,12 @@ public:
 
     void removeFromNodes() const;
 
-    QPointF const &getEndPoint(EPortType portType) const;
-    void setEndPoint(EPortType portType, QPointF const &point);
-    void moveEndPoint(EPortType portType, QPointF const &offset);
+    const QPointF &getStartPoint(EPortType portType) const;
+    void setStartPoint(EPortType portType, const QPointF &point);
+
+    const QPointF &getEndPoint(EPortType portType) const;
+    void setEndPoint(EPortType portType, const QPointF &point);
+    void moveEndPoint(EPortType portType, const QPointF &offset);
 
     QRectF boundingRect() const;
 
@@ -73,7 +76,7 @@ public:
 
     inline QPointF source() const { return mOutPoint; }
     inline QPointF sink() const { return mInPoint; }
-    inline double lineWidth() const { return mLineWidth; }
+    inline float lineWidth() const { return mLineWidth; }
     inline bool hovered() const { return mIsHovered; }
     inline void setHovered(bool hovered) { mIsHovered = hovered; }
 

@@ -13,17 +13,6 @@
 
 APROCH_NAMESPACE_BEGIN
 
-static void DBG_PrintConnection(const std::unordered_map<QUuid, AConnection *> &connections)
-{
-    qDebug() << "*******************************\nConnection Map:";
-    for (auto i : connections)
-    {
-        qDebug() << i.first << ", " << i.second;
-    }
-    qDebug() << "*******************************";
-
-}
-
 ANode *AFlowScene::LocateNodeAt(QPointF scenePoint, AFlowScene &scene, const QTransform &viewTransform)
 {
     // items under cursor

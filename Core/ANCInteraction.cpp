@@ -189,7 +189,7 @@ bool ANCInteraction::isNodePortEmpty(EPortType portType, PortIndex portIndex) co
         return true;
     }
 
-    const auto outPolicy = mNode->getNodeDataModel()->portOutConnectionPolicy(portIndex);
+    const auto outPolicy = mNode->getNodeDataModel()->getPortOutConnectionPolicy(portIndex);
     return (portType == EPortType::Output && outPolicy == INodeDataModel::EConnectionPolicy::Many);
 }
 

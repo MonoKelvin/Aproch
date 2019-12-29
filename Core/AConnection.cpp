@@ -18,7 +18,6 @@ AConnection::AConnection(EPortType portType, ANode *node, PortIndex portIndex, Q
 {
     setNodeToPort(node, portType, portIndex);
     setRequiredPort(APort::OppositePort(portType));
-    qDebug() << "new Connection:" << this;
 }
 
 AConnection::AConnection(ANode *nodeIn, PortIndex portIndexIn, ANode *nodeOut, PortIndex portIndexOut, TypeConverter typeConverter, QObject *parent)
@@ -181,11 +180,11 @@ void AConnection::setNodeToPort(ANode *node, EPortType portType, PortIndex portI
 
     setNoRequiredPort();
 
-    updated(*this);
+    emit updated(*this);
 
     if (complete() && wasIncomplete)
     {
-        connectionCompleted(*this);
+        emit connectionCompleted(*this);
     }
 }
 
@@ -201,14 +200,38 @@ void AConnection::removeFromNodes() const
     }
 }
 
-QPointF const &AConnection::getEndPoint(EPortType portType) const
+const QPointF &AConnection::getStartPoint(EPortType portType) const
+{
+    Q_ASSERT(portType != EPortType::None);
+
+    return (portType == EPortType::Output ? mInPoint : mOutPoint);
+}
+
+void AConnection::setStartPoint(EPortType portType, const QPointF &point)
+{
+    switch (portType)
+    {
+    case EPortType::Output:
+        mInPoint = point;
+        break;
+
+    case EPortType::Input:
+        mOutPoint = point;
+        break;
+
+    default:
+        break;
+    }
+}
+
+const QPointF &AConnection::getEndPoint(EPortType portType) const
 {
     Q_ASSERT(portType != EPortType::None);
 
     return (portType == EPortType::Output ? mOutPoint : mInPoint);
 }
 
-void AConnection::setEndPoint(EPortType portType, QPointF const &point)
+void AConnection::setEndPoint(EPortType portType, const QPointF &point)
 {
     switch (portType)
     {
@@ -225,7 +248,7 @@ void AConnection::setEndPoint(EPortType portType, QPointF const &point)
     }
 }
 
-void AConnection::moveEndPoint(EPortType portType, QPointF const &offset)
+void AConnection::moveEndPoint(EPortType portType, const QPointF &offset)
 {
     switch (portType)
     {
