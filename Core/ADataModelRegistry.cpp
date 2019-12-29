@@ -1,11 +1,11 @@
-#include "ADataModelRegistry.h"
+﻿#include "ADataModelRegistry.h"
 
 #include <QFile>
 #include <QMessageBox>
 
 APROCH_NAMESPACE_BEGIN
 
-std::unique_ptr<INodeDataModel> ADataModelRegistry::create(const QString &modelName)
+INodeDataModel *ADataModelRegistry::create(const QString &modelName)
 {
     auto it = mRegisteredItemCreators.find(modelName);
 

@@ -9,13 +9,13 @@ APROCH_NAMESPACE_BEGIN
 
 void ANodePainter::Paint(QPainter *painter, ANode &node, AFlowScene &scene)
 {
-//    node.recalculateSize(painter->font());
+    node.recalculateSize(painter->font());
 
     DrawNodeRect(painter, node);
-//    DrawModelName(painter, node);
-//    DrawPortLabel(painter, node);
-//    DrawPort(painter, node, scene);
-//    DrawConnectedPort(painter, node);
+    DrawModelName(painter, node);
+    DrawPortLabel(painter, node);
+    DrawPort(painter, node, scene);
+    DrawConnectedPort(painter, node);
 }
 
 void ANodePainter::DrawNodeRect(QPainter *painter, ANode &node)
@@ -106,7 +106,7 @@ void ANodePainter::DrawPortLabel(QPainter *painter, ANode &node)
             }
             else
             {
-                s = model->dataType(portType, i).name;
+                s = model->dataType(portType, i).Name;
             }
 
             auto rect = metrics.boundingRect(s);
@@ -172,7 +172,7 @@ void ANodePainter::DrawPort(QPainter *painter, ANode &node, AFlowScene &scene)
                     }
                 }
 
-                if (node.getReactingDataType().id == dataType.id || typeConvertable)
+                if (node.getReactingDataType().ID == dataType.ID || typeConvertable)
                 {
                     double const thres = 1600.0;
                     r = (distSqrt < thres) ? (2.0 - distSqrt / thres) : 1.0;

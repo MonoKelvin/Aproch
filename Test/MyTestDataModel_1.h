@@ -1,4 +1,4 @@
-#ifndef MYTESTDATAMODEL_1_H
+﻿#ifndef MYTESTDATAMODEL_1_H
 #define MYTESTDATAMODEL_1_H
 
 #include "Core/ANodeDataModel.h"
@@ -18,6 +18,10 @@ using Aproch::PortIndex;
 class MyNodeData : public INodeData
 {
 public:
+    MyNodeData(QObject *parent = nullptr)
+        : INodeData(parent)
+    { }
+
     SNodeDataType type() const override
     {
         return SNodeDataType{"MyNodeData", "My Node Data"};
@@ -33,7 +37,7 @@ class MyDataModel : public INodeDataModel
     Q_OBJECT
 
 public:
-    virtual ~MyDataModel() {}
+    virtual ~MyDataModel() override {}
 
 public:
     QString caption() const override
@@ -67,17 +71,17 @@ public:
         return MyNodeData().type();
     }
 
-    std::shared_ptr<INodeData> getOutputData(PortIndex) override
+    INodeData *getOutputData(PortIndex) override
     {
-        return std::make_shared<MyNodeData>();
+        return new MyNodeData(this);
     }
 
-    void setInputData(std::shared_ptr<INodeData>, PortIndex) override
+    void setInputData(INodeData *, PortIndex) override
     {
         //
     }
 
-    QWidget * getEmbeddedWidget() override { return nullptr; }
+    QWidget *getEmbeddedWidget() override { return nullptr; }
 };
 
 #endif // MYTESTDATAMODEL_1_H

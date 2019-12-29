@@ -109,6 +109,7 @@ public:
     }
 
     inline INodeDataModel *getNodeDataModel(void) const { return mNodeDataModel; }
+    inline void setNodeDataModel(INodeDataModel *dataModel) { mNodeDataModel = dataModel; }
 
     /** 获得输入端口还是输出端口的所有连线
      * @param portType 输入端口还是输出端口
@@ -180,7 +181,7 @@ public:
 public Q_SLOTS:
 
     /// Propagates incoming data to the underlying model.
-    void propagateData(std::shared_ptr<INodeData> nodeData, PortIndex inPortIndex) const;
+    void propagateData(INodeData *nodeData, PortIndex inPortIndex) const;
 
     /// Fetches data from model's OUT #index port
     /// and propagates it to the connection

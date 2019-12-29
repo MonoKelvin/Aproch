@@ -39,10 +39,8 @@ APROCH_NAMESPACE_BEGIN
 class INodeData;
 class SNodeDataType;
 
-using SharedNodeData = std::shared_ptr<INodeData>;
-
 // a function taking in NodeData and returning NodeData
-using TypeConverter = std::function<SharedNodeData(SharedNodeData)>;
+using TypeConverter = std::function<INodeData*(INodeData *)>;
 
 // data-type-in, data-type-out
 using TypeConverterId = std::pair<SNodeDataType, SNodeDataType>;

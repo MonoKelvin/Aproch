@@ -16,8 +16,8 @@ class AConnectionGraphicsObject;
 
 struct SConnectionState
 {
-    EPortType RequiredPort;
-    ANode *LastHoveredNode{nullptr};
+    EPortType RequiredPort = EPortType::None;
+    ANode *LastHoveredNode = nullptr;
 };
 
 class APROCH_EXPORT AConnection : public QObject, public ISerializable
@@ -31,8 +31,8 @@ public:
      * The port has parameters (portType, portIndex).
      * The opposite connection end will require another port.
      */
-    AConnection(EPortType portType, ANode &node, PortIndex portIndex, QObject *parent = nullptr);
-    AConnection(ANode &nodeIn, PortIndex portIndexIn, ANode &nodeOut, PortIndex portIndexOut, TypeConverter converter = TypeConverter{}, QObject *parent = nullptr);
+    AConnection(EPortType portType, ANode *node, PortIndex portIndex, QObject *parent = nullptr);
+    AConnection(ANode *nodeIn, PortIndex portIndexIn, ANode *nodeOut, PortIndex portIndexOut, TypeConverter converter = TypeConverter{}, QObject *parent = nullptr);
 
     AConnection(const AConnection &) = delete;
     AConnection operator=(const AConnection &) = delete;
@@ -59,7 +59,7 @@ public:
 
     /// Assigns a node to the required port.
     /// It is assumed that there is a required port, no extra checks
-    void setNodeToPort(ANode &node, EPortType portType, PortIndex portIndex);
+    void setNodeToPort(ANode *node, EPortType portType, PortIndex portIndex);
 
     void removeFromNodes() const;
 
@@ -78,7 +78,10 @@ public:
     inline void setHovered(bool hovered) { mIsHovered = hovered; }
 
 public:
-    AConnectionGraphicsObject *getConnectionGraphicsObject() const;
+    inline AConnectionGraphicsObject *getConnectionGraphicsObject() const
+    {
+        return mConnectionGraphicsObject;
+    }
 
     inline SConnectionState const &getConnectionState() const { return mConnectionState; }
     inline SConnectionState &getConnectionState() { return mConnectionState; }
@@ -96,7 +99,7 @@ public:
 
     inline bool complete() const { return mInNode != nullptr && mOutNode != nullptr; }
 
-    void propagateData(std::shared_ptr<INodeData> nodeData) const;
+    void propagateData(INodeData *nodeData) const;
     void propagateEmptyData() const;
 
     void interactWithNode(ANode *node);
@@ -117,7 +120,7 @@ private:
     QPointF mInPoint;
     QPointF mOutPoint;
 
-    double mLineWidth;
+    float mLineWidth;
     bool mIsHovered;
 
     ANode *mOutNode = nullptr;

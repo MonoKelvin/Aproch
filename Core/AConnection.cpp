@@ -5,7 +5,7 @@
 
 APROCH_NAMESPACE_BEGIN
 
-AConnection::AConnection(EPortType portType, ANode &node, PortIndex portIndex, QObject *parent)
+AConnection::AConnection(EPortType portType, ANode *node, PortIndex portIndex, QObject *parent)
     : QObject(parent)
     , mUuid(QUuid::createUuid())
     , mInPoint(0, 0)
@@ -20,11 +20,11 @@ AConnection::AConnection(EPortType portType, ANode &node, PortIndex portIndex, Q
     setRequiredPort(APort::OppositePort(portType));
 }
 
-AConnection::AConnection(ANode &nodeIn, PortIndex portIndexIn, ANode &nodeOut, PortIndex portIndexOut, TypeConverter typeConverter, QObject *parent)
+AConnection::AConnection(ANode *nodeIn, PortIndex portIndexIn, ANode *nodeOut, PortIndex portIndexOut, TypeConverter typeConverter, QObject *parent)
     : QObject(parent)
     , mUuid(QUuid::createUuid())
-    , mOutNode(&nodeOut)
-    , mInNode(&nodeIn)
+    , mOutNode(nodeOut)
+    , mInNode(nodeIn)
     , mOutPortIndex(portIndexOut)
     , mInPortIndex(portIndexIn)
     , mConnectionState()
@@ -38,7 +38,7 @@ AConnection::~AConnection()
 {
     if (complete())
     {
-        connectionMadeIncomplete(*this);
+        emit connectionMadeIncomplete(*this);
     }
 
     propagateEmptyData();
@@ -74,8 +74,8 @@ QJsonObject AConnection::save() const
             {
                 QJsonObject typeJson;
                 SNodeDataType nodeType = this->dataType(type);
-                typeJson["id"] = nodeType.id;
-                typeJson["name"] = nodeType.name;
+                typeJson["id"] = nodeType.ID;
+                typeJson["name"] = nodeType.Name;
 
                 return typeJson;
             };
@@ -161,13 +161,13 @@ PortIndex AConnection::getPortIndex(EPortType portType) const
     return result;
 }
 
-void AConnection::setNodeToPort(ANode &node, EPortType portType, PortIndex portIndex)
+void AConnection::setNodeToPort(ANode *node, EPortType portType, PortIndex portIndex)
 {
     bool wasIncomplete = !complete();
 
     auto &nodeWeak = getNode(portType);
 
-    nodeWeak = &node;
+    nodeWeak = node;
 
     if (portType == EPortType::Output)
     {
@@ -294,25 +294,21 @@ std::pair<QPointF, QPointF> AConnection::pointsC1C2() const
     return std::pair<QPointF, QPointF>(c1, c2);
 }
 
-AConnectionGraphicsObject *AConnection::getConnectionGraphicsObject() const
-{
-    return mConnectionGraphicsObject;
-}
-
 ANode *AConnection::getNode(EPortType portType) const
 {
     switch (portType)
     {
     case EPortType::Input:
         return mInNode;
-        break;
+//        break;
     case EPortType::Output:
         return mOutNode;
-        break;
+//        break;
     default:
         // not possible
         break;
     }
+
     return nullptr;
 }
 
@@ -322,10 +318,10 @@ ANode *&AConnection::getNode(EPortType portType)
     {
     case EPortType::Input:
         return mInNode;
-        break;
+//        break;
     case EPortType::Output:
         return mOutNode;
-        break;
+//        break;
     default:
         // not possible
         break;
@@ -381,8 +377,7 @@ SNodeDataType AConnection::dataType(EPortType portType) const
 
         if (validNode)
         {
-            auto const &model = validNode->getNodeDataModel();
-            return model->dataType(portType, index);
+            return validNode->getNodeDataModel()->dataType(portType, index);
         }
     }
 
@@ -394,7 +389,7 @@ void AConnection::setTypeConverter(TypeConverter converter)
     mTypeConverter = std::move(converter);
 }
 
-void AConnection::propagateData(std::shared_ptr<INodeData> nodeData) const
+void AConnection::propagateData(INodeData *nodeData) const
 {
     if (mInNode)
     {
@@ -409,10 +404,8 @@ void AConnection::propagateData(std::shared_ptr<INodeData> nodeData) const
 
 void AConnection::propagateEmptyData() const
 {
-    std::shared_ptr<INodeData> emptyData;
-    propagateData(emptyData);
+    propagateData(nullptr);
 }
-
 
 void AConnection::interactWithNode(ANode *node)
 {

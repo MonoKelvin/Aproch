@@ -61,7 +61,7 @@ bool ANCInteraction::canConnect(PortIndex &portIndex, TypeConverter &converter) 
     auto const &modelTarget = mNode->getNodeDataModel();
     SNodeDataType candidateNodeDataType = modelTarget->dataType(requiredPort, portIndex);
 
-    if (connectionDataType.id != candidateNodeDataType.id)
+    if (connectionDataType.ID != candidateNodeDataType.ID)
     {
         if (requiredPort == EPortType::Input)
         {
@@ -104,7 +104,7 @@ bool ANCInteraction::tryConnect() const
 
     // 3) Assign AConnection to empty port in NodeState
     // The port is not longer required after this function
-    mConnection->setNodeToPort(*mNode, requiredPort, portIndex);
+    mConnection->setNodeToPort(mNode, requiredPort, portIndex);
 
     // 4) Adjust AConnection geometry
 

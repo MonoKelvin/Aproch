@@ -62,7 +62,7 @@ AFlowScene::~AFlowScene()
 
 //------------------------------------------------------------------------------
 
-AConnection *AFlowScene::createConnection(EPortType connectedPort, ANode &node, PortIndex portIndex)
+AConnection *AFlowScene::createConnection(EPortType connectedPort, ANode *node, PortIndex portIndex)
 {
     auto connection = new AConnection(connectedPort, node, portIndex, this);
     new AConnectionGraphicsObject(*this, *connection);
@@ -80,20 +80,20 @@ AConnection *AFlowScene::createConnection(EPortType connectedPort, ANode &node, 
     return connection;
 }
 
-AConnection *AFlowScene::createConnection(ANode &nodeIn, PortIndex portIndexIn, ANode &nodeOut, PortIndex portIndexOut, TypeConverter const &converter)
+AConnection *AFlowScene::createConnection(ANode *nodeIn, PortIndex portIndexIn, ANode *nodeOut, PortIndex portIndexOut, const TypeConverter &converter)
 {
     auto connection = new AConnection(nodeIn, portIndexIn, nodeOut, portIndexOut, converter, this);
     new AConnectionGraphicsObject(*this, *connection);
 
-    nodeIn.setConnection(EPortType::Input, portIndexIn, *connection);
-    nodeOut.setConnection(EPortType::Output, portIndexOut, *connection);
+    nodeIn->setConnection(EPortType::Input, portIndexIn, *connection);
+    nodeOut->setConnection(EPortType::Output, portIndexOut, *connection);
 
     // trigger data propagation
-    nodeOut.onDataUpdated(portIndexOut);
+    nodeOut->onDataUpdated(portIndexOut);
 
     mConnections[connection->getId()] = connection;
 
-    connectionCreated(*connection);
+    emit connectionCreated(*connection);
 
     return connection;
 }
@@ -134,7 +134,8 @@ AConnection *AFlowScene::restoreConnection(const QJsonObject &connectionJson)
         return TypeConverter{};
     };
 
-    auto connection = createConnection(*nodeIn, portIndexIn, *nodeOut, portIndexOut, getConverter());
+    auto connection = createConnection(nodeIn, portIndexIn, nodeOut, portIndexOut, getConverter());
+
     // Note: the connectionCreated(...) signal has already been sent
     // by createConnection(...)
 
@@ -174,7 +175,7 @@ ANode &AFlowScene::restoreNode(const QJsonObject &nodeJson)
         throw std::logic_error(std::string("No registered model with name ") + modelName.toLocal8Bit().data());
     }
 
-    auto node = new ANode(dataModel.get());
+    auto node = new ANode(dataModel);
     auto ngo = new ANodeGraphicsObject(*this, *node);
     node->setNodeGraphicsObject(ngo);
 
@@ -355,6 +356,12 @@ void AFlowScene::clearScene()
     {
         deleteConnection(*mConnections.begin()->second);
     }
+
+//    for (auto iter = mConnections.begin(); iter != mConnections.end(); ++iter)
+//    {
+//        (*iter->second).removeFromNodes();
+//        iter = mConnections.erase(iter);
+//    }
 
     while (mNodes.size() > 0)
     {

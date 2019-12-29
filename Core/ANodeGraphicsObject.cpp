@@ -99,13 +99,6 @@ QRectF ANodeGraphicsObject::boundingRect() const
     return mNode.boundingRect();
 }
 
-
-void ANodeGraphicsObject::setGeometryChanged()
-{
-    prepareGeometryChange();
-}
-
-
 void ANodeGraphicsObject::moveConnections() const
 {
     for (EPortType portType : {EPortType::Input, EPortType::Output})
@@ -206,7 +199,7 @@ void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 }
 
                 // TODO: add to FlowScene
-                auto connection = mScene.createConnection(portToCheck, mNode, portIndex);
+                auto connection = mScene.createConnection(portToCheck, &mNode, portIndex);
 
                 mNode.setConnection(portToCheck, portIndex, *connection);
 

@@ -115,7 +115,7 @@ void AFlowView::contextMenuEvent(QContextMenuEvent *event)
         topLevelItems[cat] = item;
     }
 
-    for (auto const &assoc : mScene->getRegistry()->getRegisteredModelsCategoryAssociation())
+    for (auto const &assoc : mScene->getRegistry()->getRegisteredModelsCategoryMap())
     {
         auto parent = topLevelItems[assoc.second];
         auto item = new QTreeWidgetItem(parent);
@@ -138,7 +138,7 @@ void AFlowView::contextMenuEvent(QContextMenuEvent *event)
 
         if (type)
         {
-            auto &node = mScene->createNode(type.get());
+            auto &node = mScene->createNode(type);
 
             QPoint pos = event->pos();
 
@@ -232,7 +232,7 @@ void AFlowView::deleteSelectedNodes()
     {
         if (auto c = qgraphicsitem_cast<AConnectionGraphicsObject *>(item))
         {
-            mScene->deleteConnection(c->connection());
+            mScene->deleteConnection(c->getConnection());
         }
     }
 

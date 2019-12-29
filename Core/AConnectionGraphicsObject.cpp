@@ -165,7 +165,7 @@ void AConnectionGraphicsObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     mConnection.mIsHovered = true;
 
     update();
-    mScene.connectionHovered(connection(), event->screenPos());
+    mScene.connectionHovered(getConnection(), event->screenPos());
     event->accept();
 }
 
@@ -174,7 +174,7 @@ void AConnectionGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     mConnection.mIsHovered = false;
 
     update();
-    mScene.connectionHoverLeft(connection());
+    mScene.connectionHoverLeft(getConnection());
     event->accept();
 }
 

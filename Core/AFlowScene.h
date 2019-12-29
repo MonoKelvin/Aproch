@@ -26,11 +26,11 @@ public:
 public:
     static ANode *LocateNodeAt(QPointF scenePoint, AFlowScene &scene, const QTransform &viewTransform);
 
-    AConnection *createConnection(EPortType connectedPort, ANode &node, PortIndex portIndex);
+    AConnection *createConnection(EPortType connectedPort, ANode *node, PortIndex portIndex);
 
-    AConnection *createConnection(ANode &nodeIn,
+    AConnection *createConnection(ANode *nodeIn,
                                   PortIndex portIndexIn,
-                                  ANode &nodeOut,
+                                  ANode *nodeOut,
                                   PortIndex portIndexOut,
                                   const TypeConverter &converter = TypeConverter{});
 

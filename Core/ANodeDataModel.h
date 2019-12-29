@@ -5,10 +5,11 @@
 #include "AStyle.h"
 #include "ISerializable.h"
 
-#include <QObject>
-#include <memory>
-
 APROCH_NAMESPACE_BEGIN
+
+class AConnection;
+class INodeDataModel;
+class ANode;
 
 enum class ENodeValidationState
 {
@@ -19,23 +20,24 @@ enum class ENodeValidationState
 
 struct SNodeDataType
 {
-    QString id;
-    QString name;
+    QString ID;
+    QString Name;
 
     friend inline bool operator<(const SNodeDataType &d1, const SNodeDataType &d2)
     {
-        return d1.id < d2.id;
+        return d1.ID < d2.ID;
     }
 };
 
-class AConnection;
-
-// Class represents data transferred between nodes.
-// @param type is used for comparing the types
-// The actual data is stored in subtypes
-class APROCH_EXPORT INodeData
+/// Class represents data transferred between nodes.
+/// @param type is used for comparing the types
+/// The actual data is stored in subtypes
+class APROCH_EXPORT INodeData : public QObject
 {
 public:
+    INodeData(QObject *parent = nullptr)
+        : QObject(parent)
+    {}
 
     virtual ~INodeData() = default;
 
@@ -49,7 +51,6 @@ class APROCH_EXPORT INodeDataModel : public QObject, public ISerializable
 {
     Q_OBJECT
 public:
-
     INodeDataModel();
 
     virtual ~INodeDataModel() override = default;
@@ -78,7 +79,6 @@ public:
     virtual SNodeDataType dataType(EPortType portType, PortIndex portIndex) const = 0;
 
 public:
-
     enum class EConnectionPolicy
     {
         One,
@@ -94,11 +94,9 @@ public:
     inline SNodeStyle const &getNodeStyle(void) const { return mNodeStyle; }
 
 public:
+    virtual void setInputData(INodeData *nodeData, PortIndex port) = 0;
 
-    // Triggers the algorithm
-    virtual void setInputData(std::shared_ptr<INodeData> nodeData, PortIndex port) = 0;
-
-    virtual std::shared_ptr<INodeData> getOutputData(PortIndex port) = 0;
+    virtual INodeData *getOutputData(PortIndex port) = 0;
 
     virtual QWidget *getEmbeddedWidget() = 0;
 
@@ -108,7 +106,7 @@ public:
 
     virtual QString validationMessage() const { return QString(""); }
 
-//    virtual ANodePainterDelegate* painterDelegate() const { return nullptr; }
+    //    virtual ANodePainterDelegate* painterDelegate() const { return nullptr; }
 
 public Q_SLOTS:
 
@@ -136,7 +134,6 @@ Q_SIGNALS:
     void embeddedWidgetSizeUpdated();
 
 private:
-
     SNodeStyle mNodeStyle;
 };
 

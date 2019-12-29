@@ -142,7 +142,7 @@ int ANode::getPortWidth(EPortType portType) const
         }
         else
         {
-            name = mNodeDataModel->dataType(portType, i).name;
+            name = mNodeDataModel->dataType(portType, i).Name;
         }
 
         // width(name) is deprecated, so use horizontalAdvance(name).
@@ -394,7 +394,7 @@ void ANode::resetReactionToConnection()
     mNodeGraphicsObject->update();
 }
 
-void ANode::propagateData(std::shared_ptr<INodeData> nodeData, PortIndex inPortIndex) const
+void ANode::propagateData(INodeData *nodeData, PortIndex inPortIndex) const
 {
     mNodeDataModel->setInputData(nodeData, inPortIndex);
 

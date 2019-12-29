@@ -4,24 +4,21 @@
 #include "ANodeDataModel.h"
 #include "Utilities.h"
 
-#include <QSet>
 #include <QString>
 #include <unordered_map>
+#include <set>
 
 APROCH_NAMESPACE_BEGIN
 
-// Class uses map for storing models (name, model)
+using RegistryModelCreator = std::function<INodeDataModel*(void)>;
+using RegisteredModelCreatorsMap = std::unordered_map<QString, RegistryModelCreator>;
+using RegisteredModelsCategoryMap = std::unordered_map<QString, QString>;
+using RegisteredTypeConvertersMap = std::map<TypeConverterId, TypeConverter>;
+using CategoriesSet = std::set<QString>;
+
 class APROCH_EXPORT ADataModelRegistry
 {
 public:
-    using RegistryItemPtr = std::unique_ptr<INodeDataModel>;
-    using RegistryItemCreator = std::function<RegistryItemPtr()>;
-    using RegisteredModelCreatorsMap = std::unordered_map<QString, RegistryItemCreator>;
-    using RegisteredModelsCategoryMap = std::unordered_map<QString, QString>;
-    using CategoriesSet = QSet<QString>;
-
-    using RegisteredTypeConvertersMap = std::map<TypeConverterId, TypeConverter>;
-
     ADataModelRegistry()  = default;
     ~ADataModelRegistry() = default;
 
@@ -32,22 +29,15 @@ public:
     ADataModelRegistry &operator=(ADataModelRegistry &&)      = default;
 
 public:
-
-    template<typename ModelType>
-    void registerModel(RegistryItemCreator creator, const QString &category = QObject::tr("Others"))
-    {
-        registerModelImpl<ModelType>(std::move(creator), category);
-    }
-
     template<typename ModelType>
     void registerModel(const QString &category = QObject::tr("Others"))
     {
-        RegistryItemCreator creator = []() { return std::make_unique<ModelType>(); };
+        RegistryModelCreator creator = []() { return new ModelType(); };
         registerModelImpl<ModelType>(std::move(creator), category);
     }
 
     template<typename ModelType>
-    void registerModel(const QString &category, RegistryItemCreator creator)
+    void registerModel(const QString &category, RegistryModelCreator creator)
     {
         registerModelImpl<ModelType>(std::move(creator), category);
     }
@@ -57,14 +47,15 @@ public:
         mRegisteredTypeConverters[id] = std::move(typeConverter);
     }
 
-    std::unique_ptr<INodeDataModel> create(const QString  &modelName);
+    INodeDataModel *create(const QString  &modelName);
 
+public:
     inline RegisteredModelCreatorsMap const &getRegisteredModelCreators() const
     {
         return mRegisteredItemCreators;
     }
 
-    inline RegisteredModelsCategoryMap const &getRegisteredModelsCategoryAssociation() const
+    inline RegisteredModelsCategoryMap const &getRegisteredModelsCategoryMap() const
     {
         return mRegisteredModelsCategory;
     }
@@ -110,7 +101,7 @@ private:
 
     template<typename ModelType>
     typename std::enable_if< HasStaticMethodName<ModelType>::value>::type
-    registerModelImpl(RegistryItemCreator creator, QString const &category)
+    registerModelImpl(RegistryModelCreator creator, QString const &category)
     {
         const QString name = ModelType::Name();
         if (mRegisteredItemCreators.count(name) == 0)
@@ -123,7 +114,7 @@ private:
 
     template<typename ModelType>
     typename std::enable_if < !HasStaticMethodName<ModelType>::value >::type
-    registerModelImpl(RegistryItemCreator creator, QString const &category)
+    registerModelImpl(RegistryModelCreator creator, QString const &category)
     {
         const QString name = creator()->name();
         if (mRegisteredItemCreators.count(name) == 0)

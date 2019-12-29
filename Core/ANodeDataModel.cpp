@@ -1,14 +1,16 @@
-#include "ANodeDataModel.h"
+﻿#include "ANodeDataModel.h"
+
+#include "ANode.h"
 
 APROCH_NAMESPACE_BEGIN
 
-bool INodeData::isSameType(const INodeData& nodeData) const
+bool INodeData::isSameType(const INodeData &nodeData) const
 {
-    return (this->type().id == nodeData.type().id);
+    return (this->type().ID == nodeData.type().ID);
 }
 
 INodeDataModel::INodeDataModel()
-    :mNodeStyle(AStyle::GetNodeStyle())
+    : mNodeStyle(AStyle::GetNodeStyle())
 {
 
 }

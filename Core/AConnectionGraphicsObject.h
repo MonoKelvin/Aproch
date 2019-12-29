@@ -28,7 +28,7 @@ public:
     }
 
 public:
-    inline AConnection &connection() { return mConnection; }
+    inline AConnection &getConnection() { return mConnection; }
 
     QRectF boundingRect() const override;
 

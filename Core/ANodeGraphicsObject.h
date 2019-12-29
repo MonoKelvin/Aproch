@@ -27,7 +27,10 @@ public:
     inline ANode &getNode() { return mNode; }
     inline ANode const &getNode() const { return mNode;  }
 
-    void setGeometryChanged();
+    inline void setGeometryChanged()
+    {
+        prepareGeometryChange();
+    }
 
     void lock(bool locked);
 
