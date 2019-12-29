@@ -1,4 +1,4 @@
-#include "AConnectionPainter.h"
+﻿#include "AConnectionPainter.h"
 
 #include "AConnection.h"
 #include "AConnectionGraphicsObject.h"
@@ -57,6 +57,8 @@ void AConnectionPainter::DebugDrawing(QPainter *painter, AConnection const &conn
 
 void AConnectionPainter::Paint(QPainter *painter, const AConnection &connection, EConnectionShape shape)
 {
+    Q_UNUSED(shape)
+
     DrawHoveredOrSelected(painter, connection);
     DrawSketchLine(painter, connection);
     DrawNormalLine(painter, connection);
@@ -123,7 +125,7 @@ void AConnectionPainter::DrawHoveredOrSelected(QPainter *painter, const AConnect
 {
     bool const hovered = connection.hovered();
     auto const &graphicsObject = connection.getConnectionGraphicsObject();
-    bool const selected = graphicsObject.isSelected();
+    bool const selected = graphicsObject->isSelected();
 
     // drawn as a fat background
     if (hovered || selected)
@@ -176,7 +178,7 @@ void AConnectionPainter::DrawNormalLine(QPainter *painter, const AConnection &co
     p.setWidthF(double(connectionStyle.LineWidth));
 
     auto const &graphicsObject = connection.getConnectionGraphicsObject();
-    bool const selected = graphicsObject.isSelected();
+    bool const selected = graphicsObject->isSelected();
 
     auto cubic = ShapePath(connection);
     if (gradientColor)
@@ -202,7 +204,9 @@ void AConnectionPainter::DrawNormalLine(QPainter *painter, const AConnection &co
             {
                 QColor c = connectionStyle.NormalColor;
                 if (selected)
+                {
                     c = c.darker(200);
+                }
 
                 p.setColor(c);
                 painter->setPen(p);

@@ -32,6 +32,8 @@ AConnectionGraphicsObject::AConnectionGraphicsObject(AFlowScene &scene, AConnect
     // addGraphicsEffect();
 
     setZValue(-1.0);
+
+    connection.mConnectionGraphicsObject = this;
 }
 
 AConnectionGraphicsObject::~AConnectionGraphicsObject()
@@ -71,7 +73,7 @@ void AConnectionGraphicsObject::move()
         {
             auto const &nodeGraphics = node->getNodeGraphicsObject();
 
-            QPointF scenePos = node->getPortScenePosition(mConnection.getPortIndex(portType), portType, nodeGraphics.sceneTransform());
+            QPointF scenePos = node->getPortScenePosition(mConnection.getPortIndex(portType), portType, nodeGraphics->sceneTransform());
 
             QTransform sceneTransform = this->sceneTransform();
 

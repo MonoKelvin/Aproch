@@ -1,16 +1,18 @@
-#ifndef APROCH_H
+﻿#ifndef APROCH_H
 #define APROCH_H
+
+#include <QDebug>
 
 #define APROCH_PLATFORM_WINDOWS
 
 #ifdef APROCH_PLATFORM_WINDOWS
-#  define APROCH_EXPORT __declspec(dllexport)
-#  define APROCH_IMPORT __declspec(dllimport)
-#  define APROCH_PRIVATE
+    #define APROCH_EXPORT __declspec(dllexport)
+    #define APROCH_IMPORT __declspec(dllimport)
+    #define APROCH_PRIVATE
 #else
-#  define APROCH_EXPORT
-#  define APROCH_IMPORT
-#  define APROCH_LOCAL
+    #define APROCH_EXPORT
+    #define APROCH_IMPORT
+    #define APROCH_LOCAL
 #endif
 
 //#ifdef __cplusplus

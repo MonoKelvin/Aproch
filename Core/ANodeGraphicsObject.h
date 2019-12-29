@@ -1,4 +1,4 @@
-#ifndef APROCHNODEGRAPHICSOBJECT_H
+﻿#ifndef APROCHNODEGRAPHICSOBJECT_H
 #define APROCHNODEGRAPHICSOBJECT_H
 
 #include "Aproch.h"
@@ -18,14 +18,14 @@ class APROCH_EXPORT ANodeGraphicsObject : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    ANodeGraphicsObject(AFlowScene& scene, ANode& node);
+    ANodeGraphicsObject(AFlowScene &scene, ANode &getNode);
 
     virtual ~ANodeGraphicsObject() override;
 
-    using ConnectionPtrSet = std::unordered_map<QUuid, AConnection*>;
+    using ConnectionPtrSet = std::unordered_map<QUuid, AConnection *>;
 
-    ANode& node();
-    ANode const& node() const;
+    inline ANode &getNode() { return mNode; }
+    inline ANode const &getNode() const { return mNode;  }
 
     void setGeometryChanged();
 
@@ -40,28 +40,28 @@ public:
     void moveConnections() const;
 
 protected:
-    void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
-    QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
-    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
-    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
-    void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
-    void hoverMoveEvent(QGraphicsSceneHoverEvent*) override;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
-    void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
+    void paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWidget *widget = nullptr) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
 private:
     void embedQWidget();
 
 private:
-    AFlowScene&  mScene;
-    ANode& mNode;
+    AFlowScene  &mScene;
+    ANode &mNode;
 
     bool mIsLocked;
 
     // either nullptr or owned by parent QGraphicsItem
-    QGraphicsProxyWidget* mProxyWidget;
+    QGraphicsProxyWidget *mProxyWidget;
 
 };
 

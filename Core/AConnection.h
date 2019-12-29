@@ -31,8 +31,8 @@ public:
      * The port has parameters (portType, portIndex).
      * The opposite connection end will require another port.
      */
-    AConnection(EPortType portType, ANode &node, PortIndex portIndex);
-    AConnection(ANode &nodeIn, PortIndex portIndexIn, ANode &nodeOut, PortIndex portIndexOut, TypeConverter converter = TypeConverter{});
+    AConnection(EPortType portType, ANode &node, PortIndex portIndex, QObject *parent = nullptr);
+    AConnection(ANode &nodeIn, PortIndex portIndexIn, ANode &nodeOut, PortIndex portIndexOut, TypeConverter converter = TypeConverter{}, QObject *parent = nullptr);
 
     AConnection(const AConnection &) = delete;
     AConnection operator=(const AConnection &) = delete;
@@ -55,7 +55,7 @@ public:
     inline void setNoRequiredPort() { mConnectionState.RequiredPort = EPortType::None; }
     inline bool isRequirePort() const { return mConnectionState.RequiredPort != EPortType::None; }
 
-    void setGraphicsObject(std::unique_ptr<AConnectionGraphicsObject> &&graphics);
+    void setGraphicsObject(AConnectionGraphicsObject *graphics);
 
     /// Assigns a node to the required port.
     /// It is assumed that there is a required port, no extra checks
@@ -78,7 +78,7 @@ public:
     inline void setHovered(bool hovered) { mIsHovered = hovered; }
 
 public:
-    AConnectionGraphicsObject &getConnectionGraphicsObject() const;
+    AConnectionGraphicsObject *getConnectionGraphicsObject() const;
 
     inline SConnectionState const &getConnectionState() const { return mConnectionState; }
     inline SConnectionState &getConnectionState() { return mConnectionState; }
@@ -128,7 +128,7 @@ private:
 
     SConnectionState mConnectionState;
 
-    std::unique_ptr<AConnectionGraphicsObject> mConnectionGraphicsObject;
+    AConnectionGraphicsObject *mConnectionGraphicsObject;
 
     TypeConverter mTypeConverter;
 };

@@ -5,8 +5,9 @@
 
 APROCH_NAMESPACE_BEGIN
 
-AConnection::AConnection(EPortType portType, ANode& node, PortIndex portIndex)
-    : mUuid(QUuid::createUuid())
+AConnection::AConnection(EPortType portType, ANode &node, PortIndex portIndex, QObject *parent)
+    : QObject(parent)
+    , mUuid(QUuid::createUuid())
     , mInPoint(0, 0)
     , mOutPoint(0, 0)
     , mLineWidth(3.0)
@@ -19,8 +20,15 @@ AConnection::AConnection(EPortType portType, ANode& node, PortIndex portIndex)
     setRequiredPort(APort::OppositePort(portType));
 }
 
-AConnection::AConnection(ANode& nodeIn, PortIndex portIndexIn, ANode& nodeOut, PortIndex portIndexOut, TypeConverter typeConverter)
-    : mUuid(QUuid::createUuid()), mOutNode(&nodeOut), mInNode(&nodeIn), mOutPortIndex(portIndexOut), mInPortIndex(portIndexIn), mConnectionState(), mTypeConverter(std::move(typeConverter))
+AConnection::AConnection(ANode &nodeIn, PortIndex portIndexIn, ANode &nodeOut, PortIndex portIndexOut, TypeConverter typeConverter, QObject *parent)
+    : QObject(parent)
+    , mUuid(QUuid::createUuid())
+    , mOutNode(&nodeOut)
+    , mInNode(&nodeIn)
+    , mOutPortIndex(portIndexOut)
+    , mInPortIndex(portIndexIn)
+    , mConnectionState()
+    , mTypeConverter(std::move(typeConverter))
 {
     setNodeToPort(nodeIn, EPortType::Input, portIndexIn);
     setNodeToPort(nodeOut, EPortType::Output, portIndexOut);
@@ -37,12 +45,12 @@ AConnection::~AConnection()
 
     if (mInNode)
     {
-        mInNode->getNodeGraphicsObject().update();
+        mInNode->getNodeGraphicsObject()->update();
     }
 
     if (mOutNode)
     {
-        mOutNode->getNodeGraphicsObject().update();
+        mOutNode->getNodeGraphicsObject()->update();
     }
 
     resetLastHoveredNode();
@@ -104,9 +112,9 @@ void AConnection::setRequiredPort(EPortType dragging)
     }
 }
 
-void AConnection::setGraphicsObject(std::unique_ptr<AConnectionGraphicsObject>&& graphics)
+void AConnection::setGraphicsObject(AConnectionGraphicsObject *graphics)
 {
-    mConnectionGraphicsObject = std::move(graphics);
+    mConnectionGraphicsObject = graphics;
 
     // This function is only called when the ConnectionGraphicsObject
     // is newly created. At this moment both end coordinates are (0, 0)
@@ -124,8 +132,7 @@ void AConnection::setGraphicsObject(std::unique_ptr<AConnectionGraphicsObject>&&
 
         auto node = getNode(attachedPort);
 
-        QTransform nodeSceneTransform =
-            node->getNodeGraphicsObject().sceneTransform();
+        QTransform nodeSceneTransform = node->getNodeGraphicsObject()->sceneTransform();
 
         QPointF pos = node->getPortScenePosition(attachedPortIndex, attachedPort, nodeSceneTransform);
 
@@ -154,11 +161,11 @@ PortIndex AConnection::getPortIndex(EPortType portType) const
     return result;
 }
 
-void AConnection::setNodeToPort(ANode& node, EPortType portType, PortIndex portIndex)
+void AConnection::setNodeToPort(ANode &node, EPortType portType, PortIndex portIndex)
 {
     bool wasIncomplete = !complete();
 
-    auto& nodeWeak = getNode(portType);
+    auto &nodeWeak = getNode(portType);
 
     nodeWeak = &node;
 
@@ -193,14 +200,14 @@ void AConnection::removeFromNodes() const
     }
 }
 
-QPointF const& AConnection::getEndPoint(EPortType portType) const
+QPointF const &AConnection::getEndPoint(EPortType portType) const
 {
     Q_ASSERT(portType != EPortType::None);
 
     return (portType == EPortType::Output ? mOutPoint : mInPoint);
 }
 
-void AConnection::setEndPoint(EPortType portType, QPointF const& point)
+void AConnection::setEndPoint(EPortType portType, QPointF const &point)
 {
     switch (portType)
     {
@@ -217,7 +224,7 @@ void AConnection::setEndPoint(EPortType portType, QPointF const& point)
     }
 }
 
-void AConnection::moveEndPoint(EPortType portType, QPointF const& offset)
+void AConnection::moveEndPoint(EPortType portType, QPointF const &offset)
 {
     switch (portType)
     {
@@ -242,7 +249,7 @@ QRectF AConnection::boundingRect() const
 
     QRectF c1c2Rect = QRectF(points.first, points.second).normalized();
 
-    auto const& connectionStyle = AStyle::GetConnectionStyle();
+    auto const &connectionStyle = AStyle::GetConnectionStyle();
 
     double const diam = double(connectionStyle.PointDiameter);
 
@@ -287,12 +294,12 @@ std::pair<QPointF, QPointF> AConnection::pointsC1C2() const
     return std::pair<QPointF, QPointF>(c1, c2);
 }
 
-AConnectionGraphicsObject& AConnection::getConnectionGraphicsObject() const
+AConnectionGraphicsObject *AConnection::getConnectionGraphicsObject() const
 {
-    return *mConnectionGraphicsObject;
+    return mConnectionGraphicsObject;
 }
 
-ANode* AConnection::getNode(EPortType portType) const
+ANode *AConnection::getNode(EPortType portType) const
 {
     switch (portType)
     {
@@ -309,7 +316,7 @@ ANode* AConnection::getNode(EPortType portType) const
     return nullptr;
 }
 
-ANode*& AConnection::getNode(EPortType portType)
+ANode *&AConnection::getNode(EPortType portType)
 {
     switch (portType)
     {
@@ -351,14 +358,14 @@ SNodeDataType AConnection::dataType(EPortType portType) const
 {
     if (mInNode && mOutNode)
     {
-        auto const& model = (portType == EPortType::Input) ? mInNode->getNodeDataModel() : mOutNode->getNodeDataModel();
+        auto const &model = (portType == EPortType::Input) ? mInNode->getNodeDataModel() : mOutNode->getNodeDataModel();
         PortIndex index = (portType == EPortType::Input) ? mInPortIndex : mOutPortIndex;
 
         return model->dataType(portType, index);
     }
     else
     {
-        ANode* validNode;
+        ANode *validNode;
         PortIndex index = INVALID_PORT_INDEX;
 
         if ((validNode = mInNode))
@@ -374,7 +381,7 @@ SNodeDataType AConnection::dataType(EPortType portType) const
 
         if (validNode)
         {
-            auto const& model = validNode->getNodeDataModel();
+            auto const &model = validNode->getNodeDataModel();
             return model->dataType(portType, index);
         }
     }
@@ -407,7 +414,7 @@ void AConnection::propagateEmptyData() const
 }
 
 
-void AConnection::interactWithNode(ANode* node)
+void AConnection::interactWithNode(ANode *node)
 {
     if (node)
     {

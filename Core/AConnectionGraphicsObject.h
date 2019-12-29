@@ -19,7 +19,7 @@ class APROCH_EXPORT AConnectionGraphicsObject : public QGraphicsObject
 public:
     AConnectionGraphicsObject(AFlowScene &scene, AConnection &connection);
 
-    virtual ~AConnectionGraphicsObject() override;
+    ~AConnectionGraphicsObject() override;
 
     enum { Type = UserType + 2 };
     int type() const override

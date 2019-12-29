@@ -18,7 +18,7 @@ class APROCH_EXPORT AFlowScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    AFlowScene(std::shared_ptr<ADataModelRegistry> registry, QObject *parent = nullptr);
+    AFlowScene(QSharedPointer<ADataModelRegistry> getRegistry, QObject *parent = nullptr);
     AFlowScene(QObject *parent = nullptr);
 
     ~AFlowScene();
@@ -26,27 +26,33 @@ public:
 public:
     static ANode *LocateNodeAt(QPointF scenePoint, AFlowScene &scene, const QTransform &viewTransform);
 
-    std::shared_ptr<AConnection> createConnection(EPortType connectedPort, ANode &node, PortIndex portIndex);
+    AConnection *createConnection(EPortType connectedPort, ANode &node, PortIndex portIndex);
 
-    std::shared_ptr<AConnection> createConnection(ANode &nodeIn,
-                                                       PortIndex portIndexIn,
-                                                       ANode &nodeOut,
-                                                       PortIndex portIndexOut,
-                                                       const TypeConverter &converter = TypeConverter{});
+    AConnection *createConnection(ANode &nodeIn,
+                                  PortIndex portIndexIn,
+                                  ANode &nodeOut,
+                                  PortIndex portIndexOut,
+                                  const TypeConverter &converter = TypeConverter{});
 
-    std::shared_ptr<AConnection> restoreConnection(const QJsonObject &connectionJson);
+    AConnection *restoreConnection(const QJsonObject &connectionJson);
 
     void deleteConnection(AConnection &connection);
 
-    ANode &createNode(std::unique_ptr<INodeDataModel> &&dataModel);
+    ANode &createNode(INodeDataModel *dataModel);
 
     ANode &restoreNode(const QJsonObject &nodeJson);
 
     void removeNode(ANode &node);
 
-    ADataModelRegistry &registry() const;
+    inline QSharedPointer<ADataModelRegistry> &getRegistry()
+    {
+        return mRegistry;
+    }
 
-    void setRegistry(std::shared_ptr<ADataModelRegistry> registry);
+    inline void setRegistry(QSharedPointer<ADataModelRegistry> registry)
+    {
+        mRegistry = registry;
+    }
 
     void iterateOverNodes(const std::function<void(ANode *)> &visitor);
 
@@ -61,12 +67,12 @@ public:
     QSizeF getNodeSize(const ANode &node) const;
 
 public:
-    inline std::unordered_map<QUuid, std::unique_ptr<ANode>> const &getNodes() const
+    inline std::unordered_map<QUuid, ANode *> const &getNodes() const
     {
         return mNodes;
     }
 
-    inline std::unordered_map<QUuid, std::shared_ptr<AConnection>> const &getConnections() const
+    inline std::unordered_map<QUuid, AConnection *> const &getConnections() const
     {
         return mConnections;
     }
@@ -126,12 +132,10 @@ private Q_SLOTS:
     void sendConnectionDeletedToNodes(const AConnection &c);
 
 private:
-    using SharedConnection = std::shared_ptr<AConnection>;
-    using UniqueNode = std::unique_ptr<ANode>;
 
-    std::unordered_map<QUuid, SharedConnection> mConnections;
-    std::unordered_map<QUuid, UniqueNode> mNodes;
-    std::shared_ptr<ADataModelRegistry> mRegistry;
+    std::unordered_map<QUuid, AConnection *> mConnections;
+    std::unordered_map<QUuid, ANode *> mNodes;
+    QSharedPointer<ADataModelRegistry> mRegistry;
 };
 
 APROCH_NAMESPACE_END

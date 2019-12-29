@@ -1,4 +1,4 @@
-#ifndef APROCHDATAMODELREGISTRY_H
+﻿#ifndef APROCHDATAMODELREGISTRY_H
 #define APROCHDATAMODELREGISTRY_H
 
 #include "ANodeDataModel.h"
@@ -77,13 +77,16 @@ public:
     TypeConverter getTypeConverter(const SNodeDataType &d1, const SNodeDataType &d2) const;
 
 private:
-
+    /// 数据模型类别映射
     RegisteredModelsCategoryMap mRegisteredModelsCategory;
 
+    /// 所有的类别集合
     CategoriesSet mCategories;
 
+    /// 数据模型的创建映射
     RegisteredModelCreatorsMap mRegisteredItemCreators;
 
+    /// 数据模型类型转换映射
     RegisteredTypeConvertersMap mRegisteredTypeConverters;
 
 private:

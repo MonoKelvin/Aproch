@@ -32,15 +32,15 @@ ANode *AFlowScene::LocateNodeAt(QPointF scenePoint, AFlowScene &scene, const QTr
     {
         auto graphicsItem = filteredItems.front();
         auto ngo = dynamic_cast<ANodeGraphicsObject *>(graphicsItem);
-        resultNode = &ngo->node();
+        resultNode = &ngo->getNode();
     }
 
     return resultNode;
 }
 
-AFlowScene::AFlowScene(std::shared_ptr<ADataModelRegistry> registry, QObject *parent)
+AFlowScene::AFlowScene(QSharedPointer<ADataModelRegistry> registry, QObject *parent)
     : QGraphicsScene(parent)
-    , mRegistry(std::move(registry))
+    , mRegistry(registry)
 {
     setItemIndexMethod(QGraphicsScene::NoIndex);
 
@@ -51,7 +51,7 @@ AFlowScene::AFlowScene(std::shared_ptr<ADataModelRegistry> registry, QObject *pa
 }
 
 AFlowScene::AFlowScene(QObject *parent)
-    : AFlowScene(std::shared_ptr<ADataModelRegistry>(), parent)
+    : AFlowScene(nullptr, parent)
 {
 }
 
@@ -62,39 +62,31 @@ AFlowScene::~AFlowScene()
 
 //------------------------------------------------------------------------------
 
-std::shared_ptr<AConnection> AFlowScene::createConnection(EPortType connectedPort, ANode &node, PortIndex portIndex)
+AConnection *AFlowScene::createConnection(EPortType connectedPort, ANode &node, PortIndex portIndex)
 {
-    auto connection = std::make_shared<AConnection>(connectedPort, node, portIndex);
-
-    auto cgo = std::make_unique<AConnectionGraphicsObject>(*this, *connection);
-
-    // after this function connection points are set to node port
-    connection->setGraphicsObject(std::move(cgo));
+    auto connection = new AConnection(connectedPort, node, portIndex, this);
+    new AConnectionGraphicsObject(*this, *connection);
 
     mConnections[connection->getId()] = connection;
 
     // Note: this connection isn't truly created yet. It's only partially created.
     // Thus, don't send the connectionCreated(...) signal.
 
-    connect(connection.get(), &AConnection::connectionCompleted, this, [this](const AConnection & c)
+    connect(connection, &AConnection::connectionCompleted, this, [this](const AConnection & c)
     {
-        connectionCreated(c);
+        emit connectionCreated(c);
     });
 
     return connection;
 }
 
-std::shared_ptr<AConnection> AFlowScene::createConnection(ANode &nodeIn, PortIndex portIndexIn, ANode &nodeOut, PortIndex portIndexOut, TypeConverter const &converter)
+AConnection *AFlowScene::createConnection(ANode &nodeIn, PortIndex portIndexIn, ANode &nodeOut, PortIndex portIndexOut, TypeConverter const &converter)
 {
-    auto connection = std::make_shared<AConnection>(nodeIn, portIndexIn, nodeOut, portIndexOut, converter);
-
-    auto cgo = std::make_unique<AConnectionGraphicsObject>(*this, *connection);
+    auto connection = new AConnection(nodeIn, portIndexIn, nodeOut, portIndexOut, converter, this);
+    new AConnectionGraphicsObject(*this, *connection);
 
     nodeIn.setConnection(EPortType::Input, portIndexIn, *connection);
     nodeOut.setConnection(EPortType::Output, portIndexOut, *connection);
-
-    // after this function connection points are set to node port
-    connection->setGraphicsObject(std::move(cgo));
 
     // trigger data propagation
     nodeOut.onDataUpdated(portIndexOut);
@@ -106,7 +98,7 @@ std::shared_ptr<AConnection> AFlowScene::createConnection(ANode &nodeIn, PortInd
     return connection;
 }
 
-std::shared_ptr<AConnection> AFlowScene::restoreConnection(const QJsonObject &connectionJson)
+AConnection *AFlowScene::restoreConnection(const QJsonObject &connectionJson)
 {
     QUuid nodeInId = QUuid(connectionJson["in_id"].toString());
     QUuid nodeOutId = QUuid(connectionJson["out_id"].toString());
@@ -114,8 +106,8 @@ std::shared_ptr<AConnection> AFlowScene::restoreConnection(const QJsonObject &co
     PortIndex portIndexIn = unsigned(connectionJson["in_index"].toInt());
     PortIndex portIndexOut = unsigned(connectionJson["out_index"].toInt());
 
-    auto nodeIn = mNodes[nodeInId].get();
-    auto nodeOut = mNodes[nodeOutId].get();
+    auto nodeIn = mNodes[nodeInId];
+    auto nodeOut = mNodes[nodeOutId];
 
     auto getConverter = [&]()
     {
@@ -131,7 +123,7 @@ std::shared_ptr<AConnection> AFlowScene::restoreConnection(const QJsonObject &co
             SNodeDataType outType{converterJson["out"].toObject()["id"].toString(),
                                   converterJson["out"].toObject()["name"].toString()};
 
-            auto converter = registry().getTypeConverter(outType, inType);
+            auto converter = getRegistry()->getTypeConverter(outType, inType);
 
             if (converter)
             {
@@ -142,7 +134,7 @@ std::shared_ptr<AConnection> AFlowScene::restoreConnection(const QJsonObject &co
         return TypeConverter{};
     };
 
-    std::shared_ptr<AConnection> connection = createConnection(*nodeIn, portIndexIn, *nodeOut, portIndexOut, getConverter());
+    auto connection = createConnection(*nodeIn, portIndexIn, *nodeOut, portIndexOut, getConverter());
     // Note: the connectionCreated(...) signal has already been sent
     // by createConnection(...)
 
@@ -159,49 +151,46 @@ void AFlowScene::deleteConnection(AConnection &connection)
     }
 }
 
-ANode &AFlowScene::createNode(std::unique_ptr<INodeDataModel> &&dataModel)
+ANode &AFlowScene::createNode(INodeDataModel *dataModel)
 {
-    auto node = std::make_unique<ANode>(std::move(dataModel));
-    auto ngo = std::make_unique<ANodeGraphicsObject>(*this, *node);
+    ANode *node = new ANode(dataModel, this);
+    new ANodeGraphicsObject(*this, *node);
 
-    node->setNodeGraphicsObject(std::move(ngo));
+    mNodes[node->getId()] = node;
 
-    auto nodePtr = node.get();
-    mNodes[node->getId()] = std::move(node);
+    emit nodeCreated(*node);
 
-    nodeCreated(*nodePtr);
-    return *nodePtr;
+    return *node;
 }
 
 ANode &AFlowScene::restoreNode(const QJsonObject &nodeJson)
 {
     QString modelName = nodeJson["model"].toObject()["name"].toString();
 
-    auto dataModel = registry().create(modelName);
+    auto dataModel = getRegistry()->create(modelName);
 
     if (!dataModel)
     {
         throw std::logic_error(std::string("No registered model with name ") + modelName.toLocal8Bit().data());
     }
 
-    auto node = std::make_unique<ANode>(std::move(dataModel));
-    auto ngo = std::make_unique<ANodeGraphicsObject>(*this, *node);
-    node->setNodeGraphicsObject(std::move(ngo));
+    auto node = new ANode(dataModel.get());
+    auto ngo = new ANodeGraphicsObject(*this, *node);
+    node->setNodeGraphicsObject(ngo);
 
     node->restore(nodeJson);
 
-    auto nodePtr = node.get();
-    mNodes[node->getId()] = std::move(node);
+    mNodes[node->getId()] = node;
 
-    nodePlaced(*nodePtr);
-    nodeCreated(*nodePtr);
-    return *nodePtr;
+    emit nodePlaced(*node);
+    emit nodeCreated(*node);
+
+    return *node;
 }
 
 void AFlowScene::removeNode(ANode &node)
 {
-    // call signal
-    nodeDeleted(node);
+    emit nodeDeleted(node);
 
     for (auto portType : {EPortType::Input, EPortType::Output})
     {
@@ -219,21 +208,11 @@ void AFlowScene::removeNode(ANode &node)
     mNodes.erase(node.getId());
 }
 
-ADataModelRegistry &AFlowScene::registry() const
-{
-    return *mRegistry;
-}
-
-void AFlowScene::setRegistry(std::shared_ptr<ADataModelRegistry> registry)
-{
-    mRegistry = std::move(registry);
-}
-
 void AFlowScene::iterateOverNodes(const std::function<void(ANode *)> &visitor)
 {
     for (const auto &_node : mNodes)
     {
-        visitor(_node.second.get());
+        visitor(_node.second);
     }
 }
 
@@ -324,8 +303,8 @@ QPointF AFlowScene::getNodePosition(const ANode &node) const
 
 void AFlowScene::setNodePosition(ANode &node, const QPointF &pos) const
 {
-    node.getNodeGraphicsObject().setPos(pos);
-    node.getNodeGraphicsObject().moveConnections();
+    node.getNodeGraphicsObject()->setPos(pos);
+    node.getNodeGraphicsObject()->moveConnections();
 }
 
 QSizeF AFlowScene::getNodeSize(const ANode &node) const
@@ -337,10 +316,9 @@ QVector<ANode *> AFlowScene::allNodes() const
 {
     QVector<ANode *> nodes;
 
-    std::transform(mNodes.begin(), mNodes.end(), std::back_inserter(nodes),
-                   [](std::pair<QUuid const, std::unique_ptr<ANode>> const & p)
+    std::transform(mNodes.begin(), mNodes.end(), std::back_inserter(nodes), [](const std::pair<QUuid, ANode *> &p)
     {
-        return p.second.get();
+        return p.second;
     });
 
     return nodes;
@@ -359,7 +337,7 @@ QVector<ANode *> AFlowScene::selectedNodes() const
 
         if (ngo != nullptr)
         {
-            ret.push_back(&ngo->node());
+            ret.push_back(&ngo->getNode());
         }
     }
 

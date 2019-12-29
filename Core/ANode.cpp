@@ -8,8 +8,9 @@
 
 APROCH_NAMESPACE_BEGIN
 
-ANode::ANode(std::unique_ptr<INodeDataModel> &&dataModel)
-    : mUuid(QUuid::createUuid())
+ANode::ANode(INodeDataModel *dataModel, QObject *parent)
+    : QObject(parent)
+    , mUuid(QUuid::createUuid())
     , mWidth(100)
     , mHeight(150)
     , mPortWidth(30)
@@ -37,8 +38,8 @@ ANode::ANode(std::unique_ptr<INodeDataModel> &&dataModel)
     recalculateSize();
 
     // propagate data: model => node
-    connect(mNodeDataModel.get(), &INodeDataModel::dataUpdated, this, &ANode::onDataUpdated);
-    connect(mNodeDataModel.get(), &INodeDataModel::embeddedWidgetSizeUpdated, this, &ANode::onNodeSizeUpdated );
+    connect(mNodeDataModel, &INodeDataModel::dataUpdated, this, &ANode::onDataUpdated);
+    connect(mNodeDataModel, &INodeDataModel::embeddedWidgetSizeUpdated, this, &ANode::onNodeSizeUpdated);
 }
 
 QRectF ANode::boundingRect(void) const
@@ -55,7 +56,7 @@ void ANode::resize(void) const
         mHeight = AMax(mHeight, w->height());
     }
 
-    mHeight += captionHeight();
+    mHeight += getCaptionHeight();
 
     mWidth = (mPortWidth + mSpacing) * 2;
 
@@ -64,7 +65,7 @@ void ANode::resize(void) const
         mWidth += w->width();
     }
 
-    mWidth = AMax(mWidth, captionWidth());
+    mWidth = AMax(mWidth, getCaptionWidth());
 
     if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
     {
@@ -82,14 +83,14 @@ QRect ANode::resizeRect() const
 
 void ANode::recalculateSize() const
 {
-    mHeight = mSpacing * AMax(mSinks, mSources);
+    mHeight = mSpacing * int(AMax(mSinks, mSources));
 
     if (auto w = mNodeDataModel->getEmbeddedWidget())
     {
         mHeight = AMax(mHeight, w->height());
     }
 
-    mHeight += captionHeight();
+    mHeight += getCaptionHeight();
 
     mPortWidth = getPortWidth(EPortType::Input);
 
@@ -100,7 +101,7 @@ void ANode::recalculateSize() const
         mWidth += w->width();
     }
 
-    mWidth = AMax(mWidth, captionWidth());
+    mWidth = AMax(mWidth, getCaptionWidth());
 
     if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
     {
@@ -157,7 +158,7 @@ QPointF ANode::getPortScenePosition(PortIndex index, EPortType portType, const Q
 
     QPointF result;
 
-    double totalHeight = captionHeight();
+    double totalHeight = getCaptionHeight();
     totalHeight += double(mSpacing) * index + mSpacing / 2.0;
 
     switch (portType)
@@ -188,7 +189,9 @@ PortIndex ANode::checkHitScenePoint(EPortType portType, QPointF scenePoint, cons
     PortIndex result = INVALID_PORT_INDEX;
 
     if (portType == EPortType::None)
+    {
         return result;
+    }
 
     float const tolerance = 2.0f * nodeStyle.ConnectionPointDiameter;
 
@@ -211,7 +214,7 @@ PortIndex ANode::checkHitScenePoint(EPortType portType, QPointF scenePoint, cons
     return result;
 }
 
-int ANode::captionHeight(void) const
+int ANode::getCaptionHeight(void) const
 {
     if (!mNodeDataModel->isCaptionVisible())
     {
@@ -223,7 +226,7 @@ int ANode::captionHeight(void) const
     return mBoldFontMetrics.boundingRect(name).height();
 }
 
-int ANode::captionWidth(void) const
+int ANode::getCaptionWidth(void) const
 {
     if (!mNodeDataModel->isCaptionVisible())
     {
@@ -235,43 +238,43 @@ int ANode::captionWidth(void) const
     return mBoldFontMetrics.boundingRect(name).width();
 }
 
-int ANode::getValidationHeight() const
+int ANode::getValidationHeight(void) const
 {
     return mBoldFontMetrics.boundingRect(mNodeDataModel->validationMessage()).height();
 }
 
-int ANode::getValidationWidth() const
+int ANode::getValidationWidth(void) const
 {
     return mBoldFontMetrics.boundingRect(mNodeDataModel->validationMessage()).width();
 }
 
-int ANode::equivalentWidgetHeight() const
+int ANode::getEquivalentWidgetHeight(void) const
 {
     if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
     {
-        return getHeight() - captionHeight() + getValidationHeight();
+        return getHeight() - getCaptionHeight() + getValidationHeight();
     }
 
-    return getHeight() - captionHeight();
+    return getHeight() - getCaptionHeight();
 }
 
-QPointF ANode::getWidgetPosition() const
+QPointF ANode::getWidgetPosition(void) const
 {
     if (auto w = mNodeDataModel->getEmbeddedWidget())
     {
         if (w->sizePolicy().verticalPolicy() & QSizePolicy::ExpandFlag)
         {
             // If the widget wants to use as much vertical space as possible, place it immediately after the caption.
-            return QPointF(mSpacing + getPortWidth(EPortType::Input), captionHeight());
+            return QPointF(mSpacing + getPortWidth(EPortType::Input), getCaptionHeight());
         }
         else
         {
             if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
             {
-                return QPointF(mSpacing + getPortWidth(EPortType::Input), (captionHeight() + mHeight - getValidationHeight() - mSpacing - w->height()) / 2.0);
+                return QPointF(mSpacing + getPortWidth(EPortType::Input), (getCaptionHeight() + mHeight - getValidationHeight() - mSpacing - w->height()) / 2.0);
             }
 
-            return QPointF(mSpacing + getPortWidth(EPortType::Input), (captionHeight() + mHeight - w->height()) / 2.0);
+            return QPointF(mSpacing + getPortWidth(EPortType::Input), (getCaptionHeight() + mHeight - w->height()) / 2.0);
         }
     }
     return QPointF();
@@ -334,12 +337,12 @@ ConnectionPtrSet ANode::getConnections(EPortType portType, PortIndex portIndex) 
 void ANode::setConnection(EPortType portType, PortIndex portIndex, AConnection &connection)
 {
     auto &connections = getEntries(portType);
-    connections[portIndex].insert(std::make_pair(connection.getId(), &connection));
+    connections[int(portIndex)].insert(std::make_pair(connection.getId(), &connection));
 }
 
 void ANode::eraseConnection(EPortType portType, PortIndex portIndex, QUuid id)
 {
-    getEntries(portType)[portIndex].erase(id);
+    getEntries(portType)[int(portIndex)].erase(id);
 }
 
 void ANode::reactToPossibleConnection(EPortType reactingPortType, const SNodeDataType &reactingDataType, const QPointF &scenePoint)
@@ -369,16 +372,16 @@ QPointF ANode::getWidgetPosition()
         if (w->sizePolicy().verticalPolicy() & QSizePolicy::ExpandFlag)
         {
             // If the widget wants to use as much vertical space as possible, place it immediately after the caption.
-            return QPointF(mSpacing + getPortWidth(EPortType::Input), captionHeight());
+            return QPointF(mSpacing + getPortWidth(EPortType::Input), getCaptionHeight());
         }
         else
         {
             if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
             {
-                return QPointF(mSpacing + getPortWidth(EPortType::Input), (captionHeight() + mHeight - getValidationHeight() - mSpacing - w->height()) / 2.0);
+                return QPointF(mSpacing + getPortWidth(EPortType::Input), (getCaptionHeight() + mHeight - getValidationHeight() - mSpacing - w->height()) / 2.0);
             }
 
-            return QPointF(mSpacing + getPortWidth(EPortType::Input), (captionHeight() + mHeight - w->height()) / 2.0);
+            return QPointF(mSpacing + getPortWidth(EPortType::Input), (getCaptionHeight() + mHeight - w->height()) / 2.0);
         }
     }
 
@@ -430,7 +433,7 @@ void ANode::onNodeSizeUpdated()
             for (auto &pair : conn_set)
             {
                 AConnection *conn = pair.second;
-                conn->getConnectionGraphicsObject().move();
+                conn->getConnectionGraphicsObject()->move();
             }
         }
     }

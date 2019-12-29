@@ -1,4 +1,4 @@
-#include "ANodeGraphicsObject.h"
+﻿#include "ANodeGraphicsObject.h"
 
 #include "ANode.h"
 #include "AConnection.h"
@@ -15,7 +15,7 @@
 
 APROCH_NAMESPACE_BEGIN
 
-ANodeGraphicsObject::ANodeGraphicsObject(AFlowScene &scene, ANode& node)
+ANodeGraphicsObject::ANodeGraphicsObject(AFlowScene &scene, ANode &node)
     : mScene(scene)
     , mNode(node)
     , mIsLocked(false)
@@ -29,7 +29,7 @@ ANodeGraphicsObject::ANodeGraphicsObject(AFlowScene &scene, ANode& node)
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
 
-    setCacheMode( QGraphicsItem::DeviceCoordinateCache );
+    setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 
     auto const &style = node.mNodeDataModel->getNodeStyle();
 
@@ -50,27 +50,20 @@ ANodeGraphicsObject::ANodeGraphicsObject(AFlowScene &scene, ANode& node)
     embedQWidget();
 
     // connect to the move signals to emit the move signals in FlowScene
-    auto onMoveSlot = [this] {
+    auto onMoveSlot = [this]
+    {
         mScene.nodeMoved(mNode, pos());
     };
 
     connect(this, &QGraphicsObject::xChanged, this, onMoveSlot);
     connect(this, &QGraphicsObject::yChanged, this, onMoveSlot);
+
+    mNode.setNodeGraphicsObject(this);
 }
 
 ANodeGraphicsObject::~ANodeGraphicsObject()
 {
     mScene.removeItem(this);
-}
-
-ANode &ANodeGraphicsObject::node()
-{
-    return mNode;
-}
-
-ANode const &ANodeGraphicsObject::node() const
-{
-    return mNode;
 }
 
 void ANodeGraphicsObject::embedQWidget()
@@ -88,7 +81,7 @@ void ANodeGraphicsObject::embedQWidget()
         if (w->sizePolicy().verticalPolicy() & QSizePolicy::ExpandFlag)
         {
             // If the widget wants to use as much vertical space as possible, set it to have the geom's equivalentWidgetHeight.
-            mProxyWidget->setMinimumHeight(mNode.equivalentWidgetHeight());
+            mProxyWidget->setMinimumHeight(mNode.getEquivalentWidgetHeight());
         }
 
         mProxyWidget->setPos(mNode.getWidgetPosition());
@@ -115,15 +108,15 @@ void ANodeGraphicsObject::setGeometryChanged()
 
 void ANodeGraphicsObject::moveConnections() const
 {
-    for (EPortType portType: {EPortType::Input, EPortType::Output})
+    for (EPortType portType : {EPortType::Input, EPortType::Output})
     {
-        auto const & connectionEntries = mNode.getEntries(portType);
+        auto const &connectionEntries = mNode.getEntries(portType);
 
-        for (auto const & connections : connectionEntries)
+        for (auto const &connections : connectionEntries)
         {
-            for (auto & con : connections)
+            for (auto &con : connections)
             {
-                con.second->getConnectionGraphicsObject().move();
+                con.second->getConnectionGraphicsObject()->move();
             }
         }
     }
@@ -131,7 +124,7 @@ void ANodeGraphicsObject::moveConnections() const
 
 void ANodeGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(widget);
+    Q_UNUSED(widget)
 
     painter->setClipRect(option->exposedRect);
     ANodePainter::Paint(painter, mNode, mScene);
@@ -158,9 +151,9 @@ QVariant ANodeGraphicsObject::itemChange(GraphicsItemChange change, const QVaria
 }
 
 
-void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
+void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    // bring all the colliding nodes to background
+    // 把所有的item放到最底层
     for (QGraphicsItem *item : collidingItems())
     {
         if (item->zValue() > 0.0)
@@ -169,7 +162,7 @@ void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
         }
     }
 
-    // bring this node forward
+    // 把当前点击的item置为最上层
     setZValue(1.0);
 
     if (mIsLocked)
@@ -177,13 +170,13 @@ void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
         return;
     }
 
-    // deselect all other items after this one is selected
+    // 单击：取消其他所有选择的item
     if (!isSelected() && !(event->modifiers() & Qt::ControlModifier))
     {
         mScene.clearSelection();
     }
 
-    for (EPortType portToCheck: {EPortType::Input, EPortType::Output})
+    for (EPortType portToCheck : {EPortType::Input, EPortType::Output})
     {
         // TODO do not pass sceneTransform
         PortIndex portIndex = mNode.checkHitScenePoint(portToCheck, event->scenePos(), sceneTransform());
@@ -192,7 +185,7 @@ void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
         {
             ConnectionPtrSet connections = mNode.getConnections(portToCheck, portIndex);
 
-            // start dragging existing connection
+            // 拖拽出已经存在的连线
             if (!connections.empty() && portToCheck == EPortType::Input)
             {
                 auto con = connections.begin()->second;
@@ -201,37 +194,36 @@ void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
 
                 interaction.disconnect(portToCheck);
             }
-            else // initialize new Connection
+            else // 创建一条新的连线
             {
                 if (portToCheck == EPortType::Output)
                 {
                     auto const outPolicy = mNode.mNodeDataModel->portOutConnectionPolicy(portIndex);
                     if (!connections.empty() && outPolicy == INodeDataModel::EConnectionPolicy::One)
                     {
-                        mScene.deleteConnection( *connections.begin()->second );
+                        mScene.deleteConnection(*connections.begin()->second);
                     }
                 }
 
-                // todo add to FlowScene
+                // TODO: add to FlowScene
                 auto connection = mScene.createConnection(portToCheck, mNode, portIndex);
 
                 mNode.setConnection(portToCheck, portIndex, *connection);
 
-                connection->getConnectionGraphicsObject().grabMouse();
+                connection->getConnectionGraphicsObject()->grabMouse();
             }
         }
     }
 
     auto pos = event->pos();
 
-    if (mNode.mNodeDataModel->resizable() && mNode.resizeRect().contains(QPoint(pos.x(), pos.y())))
+    if (mNode.mNodeDataModel->resizable() && mNode.resizeRect().contains(QPoint(int(pos.x()), int(pos.y()))))
     {
         mNode.setResizing(true);
     }
 }
 
-
-void ANodeGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
+void ANodeGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (mNode.resizing())
     {
@@ -278,8 +270,7 @@ void ANodeGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
     scene()->setSceneRect(r);
 }
 
-
-void ANodeGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+void ANodeGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     mNode.setResizing(false);
 
@@ -289,30 +280,27 @@ void ANodeGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     moveConnections();
 }
 
-
-void ANodeGraphicsObject::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
+void ANodeGraphicsObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     mNode.setHovered(true);
     update();
-    mScene.nodeHovered(node(), event->screenPos());
+    mScene.nodeHovered(getNode(), event->screenPos());
     event->accept();
 }
 
-
-void ANodeGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
+void ANodeGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     mNode.setHovered(false);
     update();
-    mScene.nodeHoverLeft(node());
+    mScene.nodeHoverLeft(getNode());
     event->accept();
 }
 
-
-void ANodeGraphicsObject::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
+void ANodeGraphicsObject::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
     auto pos = event->pos();
 
-    if (mNode.getNodeDataModel()->resizable() && mNode.resizeRect().contains(QPoint(pos.x(), pos.y())))
+    if (mNode.getNodeDataModel()->resizable() && mNode.resizeRect().contains(QPoint(int(pos.x()), int(pos.y()))))
     {
         setCursor(QCursor(Qt::SizeFDiagCursor));
     }
@@ -324,18 +312,17 @@ void ANodeGraphicsObject::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
     event->accept();
 }
 
-
-void ANodeGraphicsObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
+void ANodeGraphicsObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mouseDoubleClickEvent(event);
 
-    mScene.nodeDoubleClicked(node());
+    mScene.nodeDoubleClicked(getNode());
 }
 
 
-void ANodeGraphicsObject::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+void ANodeGraphicsObject::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-    mScene.nodeContextMenu(node(), mapToScene(event->pos()));
+    mScene.nodeContextMenu(getNode(), mapToScene(event->pos()));
 }
 
 APROCH_NAMESPACE_END

@@ -1,4 +1,4 @@
-#include "AFlowView.h"
+﻿#include "AFlowView.h"
 
 //#include <QtOpenGL/QtOpenGL>
 #include <QtWidgets>
@@ -38,7 +38,8 @@ AFlowView::AFlowView(AFlowScene *scene, QWidget *parent)
 
 AFlowView::~AFlowView()
 {
-    if(mScene) {
+    if (mScene)
+    {
         mScene->deleteLater();
     }
 }
@@ -106,7 +107,7 @@ void AFlowView::contextMenuEvent(QContextMenuEvent *event)
     modelMenu.addAction(treeViewAction);
 
     QMap<QString, QTreeWidgetItem *> topLevelItems;
-    for (auto const &cat : mScene->registry().getCategories())
+    for (auto const &cat : mScene->getRegistry()->getCategories())
     {
         auto item = new QTreeWidgetItem(treeView);
         item->setText(0, cat);
@@ -114,7 +115,7 @@ void AFlowView::contextMenuEvent(QContextMenuEvent *event)
         topLevelItems[cat] = item;
     }
 
-    for (auto const &assoc : mScene->registry().getRegisteredModelsCategoryAssociation())
+    for (auto const &assoc : mScene->getRegistry()->getRegisteredModelsCategoryAssociation())
     {
         auto parent = topLevelItems[assoc.second];
         auto item = new QTreeWidgetItem(parent);
@@ -124,7 +125,8 @@ void AFlowView::contextMenuEvent(QContextMenuEvent *event)
 
     treeView->expandAll();
 
-    connect(treeView, &QTreeWidget::itemClicked, [&](QTreeWidgetItem *item, int) {
+    connect(treeView, &QTreeWidget::itemClicked, [&](QTreeWidgetItem * item, int)
+    {
         QString modelName = item->data(0, Qt::UserRole).toString();
 
         if (modelName == skipText)
@@ -132,19 +134,19 @@ void AFlowView::contextMenuEvent(QContextMenuEvent *event)
             return;
         }
 
-        auto type = mScene->registry().create(modelName);
+        auto type = mScene->getRegistry()->create(modelName);
 
         if (type)
         {
-            auto &node = mScene->createNode(std::move(type));
+            auto &node = mScene->createNode(type.get());
 
             QPoint pos = event->pos();
 
             QPointF posView = this->mapToScene(pos);
 
-            node.getNodeGraphicsObject().setPos(posView);
+            node.getNodeGraphicsObject()->setPos(posView);
 
-            mScene->nodePlaced(node);
+            emit mScene->nodePlaced(node);
         }
         else
         {
@@ -154,8 +156,9 @@ void AFlowView::contextMenuEvent(QContextMenuEvent *event)
         modelMenu.close();
     });
 
-    //Setup filtering
-    connect(txtBox, &QLineEdit::textChanged, [&](const QString &text) {
+    // Setup filtering
+    connect(txtBox, &QLineEdit::textChanged, [&](const QString & text)
+    {
         for (auto &topLvlItem : topLevelItems)
         {
             for (int i = 0; i < topLvlItem->childCount(); ++i)
@@ -237,7 +240,7 @@ void AFlowView::deleteSelectedNodes()
     {
         if (auto n = qgraphicsitem_cast<ANodeGraphicsObject *>(item))
         {
-            mScene->removeNode(n->node());
+            mScene->removeNode(n->getNode());
         }
     }
 }
@@ -299,7 +302,8 @@ void AFlowView::drawBackground(QPainter *painter, const QRectF &viewRect)
     QPointF tl = mapToScene(windowRect.topLeft());
     QPointF br = mapToScene(windowRect.bottomRight());
 
-    auto drawGrid = [&](double gridStep) {
+    auto drawGrid = [&](double gridStep)
+    {
 
         double left = std::floor(tl.x() / gridStep - 0.5);
         double right = std::floor(br.x() / gridStep + 1.0);
@@ -316,7 +320,7 @@ void AFlowView::drawBackground(QPainter *painter, const QRectF &viewRect)
         // horizontal lines
         for (int yi = int(bottom); yi <= int(top); ++yi)
         {
-            QLineF line(left * gridStep, yi * gridStep,right * gridStep, yi * gridStep);
+            QLineF line(left * gridStep, yi * gridStep, right * gridStep, yi * gridStep);
             painter->drawLine(line);
         }
     };
@@ -341,7 +345,7 @@ void AFlowView::drawBackground(QPainter *painter, const QRectF &viewRect)
 
 void AFlowView::showEvent(QShowEvent *event)
 {
-    if(mScene)
+    if (mScene)
     {
         mScene->setSceneRect(this->rect());
     }

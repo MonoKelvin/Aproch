@@ -1,4 +1,4 @@
-#include "ANodePainter.h"
+﻿#include "ANodePainter.h"
 
 #include "AFlowScene.h"
 #include "AStyle.h"
@@ -7,31 +7,31 @@
 
 APROCH_NAMESPACE_BEGIN
 
-void ANodePainter::Paint(QPainter *painter, ANode &node, const AFlowScene &scene)
+void ANodePainter::Paint(QPainter *painter, ANode &node, AFlowScene &scene)
 {
-    node.recalculateSize(painter->font());
+//    node.recalculateSize(painter->font());
 
     DrawNodeRect(painter, node);
-    DrawModelName(painter, node);
-    DrawPortLabel(painter, node);
-    DrawPort(painter, node, scene);
-    DrawConnectedPort(painter, node);
+//    DrawModelName(painter, node);
+//    DrawPortLabel(painter, node);
+//    DrawPort(painter, node, scene);
+//    DrawConnectedPort(painter, node);
 }
 
 void ANodePainter::DrawNodeRect(QPainter *painter, ANode &node)
 {
     SNodeStyle const &nodeStyle = AStyle::GetNodeStyle();
 
-    auto color = node.getNodeGraphicsObject().isSelected() ? nodeStyle.SelectedBoundaryColor : nodeStyle.NormalBoundaryColor;
+    auto color = node.getNodeGraphicsObject()->isSelected() ? nodeStyle.SelectedBoundaryColor : nodeStyle.NormalBoundaryColor;
 
     if (node.isHovered())
     {
-        QPen p(color, nodeStyle.HoveredPenWidth);
+        QPen p(color, qreal(nodeStyle.HoveredPenWidth));
         painter->setPen(p);
     }
     else
     {
-        QPen p(color, nodeStyle.PenWidth);
+        QPen p(color, qreal(nodeStyle.PenWidth));
         painter->setPen(p);
     }
 
@@ -46,7 +46,7 @@ void ANodePainter::DrawNodeRect(QPainter *painter, ANode &node)
 
 void ANodePainter::DrawModelName(QPainter *painter, ANode &node)
 {
-    auto const &model = node.getNodeDataModel();
+    auto const *model = node.getNodeDataModel();
     auto const &nodeStyle = model->getNodeStyle();
 
     if (!model->isCaptionVisible())
@@ -80,16 +80,16 @@ void ANodePainter::DrawPortLabel(QPainter *painter, ANode &node)
 
     for (EPortType portType : {EPortType::Output, EPortType::Input})
     {
-        auto const &model = node.getNodeDataModel();
+        auto const *model = node.getNodeDataModel();
         auto const &nodeStyle = model->getNodeStyle();
         auto &entries = node.getEntries(portType);
 
-        int n = entries.size();
-        for (int i = 0; i < n; ++i)
+        unsigned int n = unsigned(entries.size());
+        for (unsigned int i = 0; i < n; ++i)
         {
             QPointF p = node.getPortScenePosition(i, portType);
 
-            if (entries[i].empty())
+            if (entries[int(i)].empty())
             {
                 painter->setPen(nodeStyle.FontColorFaded);
             }
@@ -132,17 +132,17 @@ void ANodePainter::DrawPortLabel(QPainter *painter, ANode &node)
     }
 }
 
-void ANodePainter::DrawPort(QPainter *painter, ANode &node, const AFlowScene &scene)
+void ANodePainter::DrawPort(QPainter *painter, ANode &node, AFlowScene &scene)
 {
-    auto const &model = node.getNodeDataModel();
+    auto const *model = node.getNodeDataModel();
     auto const &nodeStyle = model->getNodeStyle();
 
     float diameter = nodeStyle.ConnectionPointDiameter;
-    auto reducedDiameter = diameter * 0.6;
+    double reducedDiameter = double(diameter) * 0.6;
 
     for (EPortType portType : {EPortType::Output, EPortType::Input})
     {
-        size_t n = node.getEntries(portType).size();
+        unsigned int n = unsigned(node.getEntries(portType).size());
 
         for (unsigned int i = 0; i < n; ++i)
         {
@@ -150,7 +150,8 @@ void ANodePainter::DrawPort(QPainter *painter, ANode &node, const AFlowScene &sc
 
             auto const &dataType = model->dataType(portType, i);
 
-            bool canConnect = (node.getEntries(portType)[i].empty() || (portType == EPortType::Output &&
+            bool canConnect = (node.getEntries(portType)[int(i)].empty() ||
+                               (portType == EPortType::Output &&
                                 model->portOutConnectionPolicy(i) == INodeDataModel::EConnectionPolicy::Many));
 
             double r = 1.0;
@@ -163,11 +164,11 @@ void ANodePainter::DrawPort(QPainter *painter, ANode &node, const AFlowScene &sc
                 {
                     if (portType == EPortType::Input)
                     {
-                        typeConvertable = scene.registry().getTypeConverter(node.getReactingDataType(), dataType) != nullptr;
+                        typeConvertable = scene.getRegistry()->getTypeConverter(node.getReactingDataType(), dataType) != nullptr;
                     }
                     else
                     {
-                        typeConvertable = scene.registry().getTypeConverter(dataType, node.getReactingDataType()) != nullptr;
+                        typeConvertable = scene.getRegistry()->getTypeConverter(dataType, node.getReactingDataType()) != nullptr;
                     }
                 }
 
@@ -191,17 +192,17 @@ void ANodePainter::DrawPort(QPainter *painter, ANode &node, const AFlowScene &sc
 
 void ANodePainter::DrawConnectedPort(QPainter *painter, ANode &node)
 {
-    auto const &model = node.getNodeDataModel();
+    auto const *model = node.getNodeDataModel();
     auto const &nodeStyle = model->getNodeStyle();
-    auto diameter = nodeStyle.ConnectionPointDiameter;
+    double diameter = double(nodeStyle.ConnectionPointDiameter);
 
     for (EPortType portType : {EPortType::Output, EPortType::Input})
     {
-        size_t n = node.getEntries(portType).size();
+        int n = node.getEntries(portType).size();
 
-        for (size_t i = 0; i < n; ++i)
+        for (int i = 0; i < n; ++i)
         {
-            QPointF p = node.getPortScenePosition(i, portType);
+            QPointF p = node.getPortScenePosition(unsigned(i), portType);
 
             if (!node.getEntries(portType)[i].empty())
             {

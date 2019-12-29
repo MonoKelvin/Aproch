@@ -1,4 +1,4 @@
-#include "Editor/AprochMainWindow.h"
+﻿#include "Editor/AprochMainWindow.h"
 
 #include <QApplication>
 
@@ -9,20 +9,14 @@
 
 using namespace Aproch;
 
-static std::shared_ptr<ADataModelRegistry> registerDataModels()
-{
-    auto ret = std::make_shared<ADataModelRegistry>();
-
-    ret->registerModel<MyDataModel>();
-
-    return ret;
-}
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    AFlowScene scene(registerDataModels());
+    auto rm = new ADataModelRegistry;
+    rm->registerModel<MyDataModel>();
+
+    AFlowScene scene((QSharedPointer<ADataModelRegistry>(rm)));
     AFlowView view(&scene);
 
 //    AprochMainWindow w;

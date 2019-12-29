@@ -1,4 +1,4 @@
-#include "ANCInteraction.h"
+﻿#include "ANCInteraction.h"
 
 #include "ANode.h"
 #include "AConnection.h"
@@ -65,11 +65,11 @@ bool ANCInteraction::canConnect(PortIndex &portIndex, TypeConverter &converter) 
     {
         if (requiredPort == EPortType::Input)
         {
-            converter = mScene->registry().getTypeConverter(connectionDataType, candidateNodeDataType);
+            converter = mScene->getRegistry()->getTypeConverter(connectionDataType, candidateNodeDataType);
         }
         else if (requiredPort == EPortType::Output)
         {
-            converter = mScene->registry().getTypeConverter(candidateNodeDataType, connectionDataType);
+            converter = mScene->getRegistry()->getTypeConverter(candidateNodeDataType, connectionDataType);
         }
 
         return (converter != nullptr);
@@ -108,7 +108,7 @@ bool ANCInteraction::tryConnect() const
 
     // 4) Adjust AConnection geometry
 
-    mNode->getNodeGraphicsObject().moveConnections();
+    mNode->getNodeGraphicsObject()->moveConnections();
 
     // 5) Poke model to intiate data transfer
 
@@ -141,7 +141,7 @@ bool ANCInteraction::disconnect(EPortType portToDisconnect) const
 
     mConnection->setRequiredPort(portToDisconnect);
 
-    mConnection->getConnectionGraphicsObject().grabMouse();
+    mConnection->getConnectionGraphicsObject()->grabMouse();
 
     return true;
 }
@@ -159,7 +159,7 @@ QPointF ANCInteraction::getConnectionEndScenePosition(EPortType portType) const
 {
     QPointF endPoint = mConnection->getEndPoint(portType);
 
-    return mConnection->getConnectionGraphicsObject().mapToScene(endPoint);
+    return mConnection->getConnectionGraphicsObject()->mapToScene(endPoint);
 }
 
 
@@ -167,13 +167,13 @@ QPointF ANCInteraction::getNodePortScenePosition(EPortType portType, PortIndex p
 {
     QPointF p = mNode->getPortScenePosition(portIndex, portType);
 
-    return mNode->getNodeGraphicsObject().sceneTransform().map(p);
+    return mNode->getNodeGraphicsObject()->sceneTransform().map(p);
 }
 
 
 PortIndex ANCInteraction::getNodePortIndexUnderScenePoint(EPortType portType, const QPointF &scenePoint) const
 {
-    QTransform sceneTransform =  mNode->getNodeGraphicsObject().sceneTransform();
+    QTransform sceneTransform =  mNode->getNodeGraphicsObject()->sceneTransform();
     PortIndex portIndex = mNode->checkHitScenePoint(portType, scenePoint, sceneTransform);
 
     return portIndex;
