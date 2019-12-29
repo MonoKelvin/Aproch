@@ -56,7 +56,7 @@ struct APROCH_EXPORT SConnectionStyle : public IStyle
     void setStyle(const QJsonObject &obj);
 };
 
-class APROCH_EXPORT AprochStyle
+class APROCH_EXPORT AStyle
 {
 public:
     inline static SNodeStyle const &GetNodeStyle(void) {
@@ -83,12 +83,12 @@ public:
     void loadJsonFromByteArray(const QByteArray &byteArray);
 
 private:
-    AprochStyle();
-    AprochStyle(AprochStyle const &) = delete;
-    AprochStyle &operator=(AprochStyle const &) = delete;
+    AStyle();
+    AStyle(AStyle const &) = delete;
+    AStyle &operator=(AStyle const &) = delete;
 
-    inline static AprochStyle &GetInstance(void) {
-        static AprochStyle instance;
+    inline static AStyle &GetInstance(void) {
+        static AStyle instance;
         return instance;
     }
 

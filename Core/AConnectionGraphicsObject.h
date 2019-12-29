@@ -1,7 +1,7 @@
 ﻿#ifndef APROCHCONNECTIONGRAPHICSOBJECT_H
 #define APROCHCONNECTIONGRAPHICSOBJECT_H
 
-#include "AprochPort.h"
+#include "APort.h"
 #include "Utilities.h"
 
 #include <QGraphicsObject>
@@ -9,17 +9,17 @@
 
 APROCH_NAMESPACE_BEGIN
 
-class AprochFlowScene;
-class AprochConnection;
-class AprochNode;
+class AFlowScene;
+class AConnection;
+class ANode;
 
-class APROCH_EXPORT AprochConnectionGraphicsObject : public QGraphicsObject
+class APROCH_EXPORT AConnectionGraphicsObject : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    AprochConnectionGraphicsObject(AprochFlowScene &scene, AprochConnection &connection);
+    AConnectionGraphicsObject(AFlowScene &scene, AConnection &connection);
 
-    virtual ~AprochConnectionGraphicsObject() override;
+    virtual ~AConnectionGraphicsObject() override;
 
     enum { Type = UserType + 2 };
     int type() const override
@@ -28,7 +28,7 @@ public:
     }
 
 public:
-    inline AprochConnection &connection() { return mConnection; }
+    inline AConnection &connection() { return mConnection; }
 
     QRectF boundingRect() const override;
 
@@ -58,9 +58,9 @@ private:
     void addGraphicsEffect();
 
 private:
-    AprochFlowScene &mScene;
+    AFlowScene &mScene;
 
-    AprochConnection &mConnection;
+    AConnection &mConnection;
 };
 
 APROCH_NAMESPACE_END

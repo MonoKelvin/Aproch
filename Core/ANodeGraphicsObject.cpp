@@ -1,11 +1,11 @@
-#include "AprochNodeGraphicsObject.h"
+#include "ANodeGraphicsObject.h"
 
-#include "AprochNode.h"
-#include "AprochConnection.h"
-#include "AprochConnectionGraphicsObject.h"
-#include "AprochFlowScene.h"
-#include "AprochNodePainter.h"
-#include "AprochNCInteraction.h"
+#include "ANode.h"
+#include "AConnection.h"
+#include "AConnectionGraphicsObject.h"
+#include "AFlowScene.h"
+#include "ANodePainter.h"
+#include "ANCInteraction.h"
 
 #include <QGraphicsProxyWidget>
 #include <QGraphicsDropShadowEffect>
@@ -15,7 +15,7 @@
 
 APROCH_NAMESPACE_BEGIN
 
-AprochNodeGraphicsObject::AprochNodeGraphicsObject(AprochFlowScene &scene, AprochNode& node)
+ANodeGraphicsObject::ANodeGraphicsObject(AFlowScene &scene, ANode& node)
     : mScene(scene)
     , mNode(node)
     , mIsLocked(false)
@@ -58,22 +58,22 @@ AprochNodeGraphicsObject::AprochNodeGraphicsObject(AprochFlowScene &scene, Aproc
     connect(this, &QGraphicsObject::yChanged, this, onMoveSlot);
 }
 
-AprochNodeGraphicsObject::~AprochNodeGraphicsObject()
+ANodeGraphicsObject::~ANodeGraphicsObject()
 {
     mScene.removeItem(this);
 }
 
-AprochNode &AprochNodeGraphicsObject::node()
+ANode &ANodeGraphicsObject::node()
 {
     return mNode;
 }
 
-AprochNode const &AprochNodeGraphicsObject::node() const
+ANode const &ANodeGraphicsObject::node() const
 {
     return mNode;
 }
 
-void AprochNodeGraphicsObject::embedQWidget()
+void ANodeGraphicsObject::embedQWidget()
 {
     if (auto w = mNode.getNodeDataModel()->getEmbeddedWidget())
     {
@@ -101,19 +101,19 @@ void AprochNodeGraphicsObject::embedQWidget()
 }
 
 
-QRectF AprochNodeGraphicsObject::boundingRect() const
+QRectF ANodeGraphicsObject::boundingRect() const
 {
     return mNode.boundingRect();
 }
 
 
-void AprochNodeGraphicsObject::setGeometryChanged()
+void ANodeGraphicsObject::setGeometryChanged()
 {
     prepareGeometryChange();
 }
 
 
-void AprochNodeGraphicsObject::moveConnections() const
+void ANodeGraphicsObject::moveConnections() const
 {
     for (EPortType portType: {EPortType::Input, EPortType::Output})
     {
@@ -129,15 +129,15 @@ void AprochNodeGraphicsObject::moveConnections() const
     }
 }
 
-void AprochNodeGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void ANodeGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(widget);
 
     painter->setClipRect(option->exposedRect);
-    AprochNodePainter::Paint(painter, mNode, mScene);
+    ANodePainter::Paint(painter, mNode, mScene);
 }
 
-void AprochNodeGraphicsObject::lock(bool locked)
+void ANodeGraphicsObject::lock(bool locked)
 {
     mIsLocked = locked;
 
@@ -147,7 +147,7 @@ void AprochNodeGraphicsObject::lock(bool locked)
 }
 
 
-QVariant AprochNodeGraphicsObject::itemChange(GraphicsItemChange change, const QVariant &value)
+QVariant ANodeGraphicsObject::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if (change == ItemPositionChange && scene())
     {
@@ -158,7 +158,7 @@ QVariant AprochNodeGraphicsObject::itemChange(GraphicsItemChange change, const Q
 }
 
 
-void AprochNodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
+void ANodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     // bring all the colliding nodes to background
     for (QGraphicsItem *item : collidingItems())
@@ -173,7 +173,7 @@ void AprochNodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
     setZValue(1.0);
 
     if (mIsLocked)
-    {  
+    {
         return;
     }
 
@@ -197,7 +197,7 @@ void AprochNodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
             {
                 auto con = connections.begin()->second;
 
-                AprochNCInteraction interaction(mNode, *con, mScene);
+                ANCInteraction interaction(mNode, *con, mScene);
 
                 interaction.disconnect(portToCheck);
             }
@@ -231,7 +231,7 @@ void AprochNodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent * event)
 }
 
 
-void AprochNodeGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
+void ANodeGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
     if (mNode.resizing())
     {
@@ -279,7 +279,7 @@ void AprochNodeGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 }
 
 
-void AprochNodeGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+void ANodeGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     mNode.setResizing(false);
 
@@ -290,7 +290,7 @@ void AprochNodeGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent* event
 }
 
 
-void AprochNodeGraphicsObject::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
+void ANodeGraphicsObject::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
     mNode.setHovered(true);
     update();
@@ -299,7 +299,7 @@ void AprochNodeGraphicsObject::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 }
 
 
-void AprochNodeGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
+void ANodeGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
 {
     mNode.setHovered(false);
     update();
@@ -308,7 +308,7 @@ void AprochNodeGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
 }
 
 
-void AprochNodeGraphicsObject::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
+void ANodeGraphicsObject::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {
     auto pos = event->pos();
 
@@ -325,7 +325,7 @@ void AprochNodeGraphicsObject::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 }
 
 
-void AprochNodeGraphicsObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
+void ANodeGraphicsObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 {
     QGraphicsItem::mouseDoubleClickEvent(event);
 
@@ -333,7 +333,7 @@ void AprochNodeGraphicsObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* e
 }
 
 
-void AprochNodeGraphicsObject::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+void ANodeGraphicsObject::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
     mScene.nodeContextMenu(node(), mapToScene(event->pos()));
 }

@@ -1,7 +1,7 @@
 #ifndef MYTESTDATAMODEL_1_H
 #define MYTESTDATAMODEL_1_H
 
-#include "Core/AprochNodeDataModel.h"
+#include "Core/ANodeDataModel.h"
 
 //#include <QObject>
 //#include <QLabel>

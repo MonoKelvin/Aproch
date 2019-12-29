@@ -1,26 +1,26 @@
 #ifndef APROCHNCITERACTION_H
 #define APROCHNCITERACTION_H
 
-#include "AprochPort.h"
+#include "APort.h"
 #include "Utilities.h"
 
 class QPointF;
 
 APROCH_NAMESPACE_BEGIN
 
-class AprochNode;
-class AprochConnection;
-class AprochFlowScene;
+class ANode;
+class AConnection;
+class AFlowScene;
 
 // Class performs various operations on the Node and Connection pair.
 // An instance should be created on the stack and destroyed when
 // the operation is completed
-class AprochNCInteraction
+class ANCInteraction
 {
-    friend class AprochConnectionGraphicsObject;
-    friend class AprochNodeGraphicsObject;
+    friend class AConnectionGraphicsObject;
+    friend class ANodeGraphicsObject;
 public:
-    AprochNCInteraction(AprochNode &node, AprochConnection &connection, AprochFlowScene &scene);
+    ANCInteraction(ANode &node, AConnection &connection, AFlowScene &scene);
 
     /// Can connect when following conditions are met:
     /// 1) Connection 'requires' a port
@@ -54,9 +54,9 @@ public:
     bool isNodePortEmpty(EPortType portType, PortIndex portIndex) const;
 
 private:
-    AprochNode *mNode;
-    AprochConnection *mConnection;
-    AprochFlowScene *mScene;
+    ANode *mNode;
+    AConnection *mConnection;
+    AFlowScene *mScene;
 };
 
 

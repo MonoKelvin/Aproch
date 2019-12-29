@@ -8,8 +8,8 @@ AprochMainWindow::AprochMainWindow(QWidget *parent)
 
 //    auto layout = new QHBoxLayout(this);
 
-//    AprochFlowScene *scene = new AprochFlowScene(registerDataModels());
-//    AprochFlowView *view = new AprochFlowView(scene);
+//    AFlowScene *scene = new AFlowScene(registerDataModels());
+//    AFlowView *view = new AFlowView(scene);
 
 //    layout->addWidget(view);
 }

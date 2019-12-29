@@ -7,24 +7,24 @@
 
 APROCH_NAMESPACE_BEGIN
 
-class AprochFlowScene;
+class AFlowScene;
 
-class APROCH_EXPORT AprochFlowView : public QGraphicsView
+class APROCH_EXPORT AFlowView : public QGraphicsView
 {
     Q_OBJECT
 public:
-    AprochFlowView(QWidget *parent = nullptr);
-    AprochFlowView(AprochFlowScene *scene, QWidget *parent = nullptr);
-    ~AprochFlowView() override;
+    AFlowView(QWidget *parent = nullptr);
+    AFlowView(AFlowScene *scene, QWidget *parent = nullptr);
+    ~AFlowView() override;
 
-    AprochFlowView(const AprochFlowView &) = delete;
-    AprochFlowView operator=(const AprochFlowView &) = delete;
+    AFlowView(const AFlowView &) = delete;
+    AFlowView operator=(const AFlowView &) = delete;
 
     QAction *getClearSelectionAction() const;
 
     QAction *getDeleteSelectionAction() const;
 
-    void setScene(AprochFlowScene *scene);
+    void setScene(AFlowScene *scene);
 
 public Q_SLOTS:
 
@@ -52,7 +52,7 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 protected:
-    inline AprochFlowScene *scene() {
+    inline AFlowScene *scene() {
         return mScene;
     }
 
@@ -62,7 +62,7 @@ private:
 
     QPointF mClickPos;
 
-    AprochFlowScene *mScene;
+    AFlowScene *mScene;
 };
 
 APROCH_NAMESPACE_END

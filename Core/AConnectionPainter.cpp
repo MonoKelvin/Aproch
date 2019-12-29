@@ -1,15 +1,15 @@
-#include "AprochConnectionPainter.h"
+#include "AConnectionPainter.h"
 
-#include "AprochConnection.h"
-#include "AprochConnectionGraphicsObject.h"
-#include "AprochStyle.h"
+#include "AConnection.h"
+#include "AConnectionGraphicsObject.h"
+#include "AStyle.h"
 
 #include <QPainter>
 #include <QIcon>
 
 APROCH_NAMESPACE_BEGIN
 
-static QPainterPath ShapePath(const AprochConnection &connection)
+static QPainterPath ShapePath(const AConnection &connection)
 {
     QPointF const &source = connection.source();
     QPointF const &sink = connection.sink();
@@ -26,7 +26,7 @@ static QPainterPath ShapePath(const AprochConnection &connection)
 
 
 #ifdef APROCH_DEBUG_DRAWING
-void AprochConnectionPainter::DebugDrawing(QPainter *painter, AprochConnection const &connection)
+void AConnectionPainter::DebugDrawing(QPainter *painter, AConnection const &connection)
 {
     Q_UNUSED(painter);
     {
@@ -55,7 +55,7 @@ void AprochConnectionPainter::DebugDrawing(QPainter *painter, AprochConnection c
 }
 #endif
 
-void AprochConnectionPainter::Paint(QPainter *painter, const AprochConnection &connection, EConnectionShape shape)
+void AConnectionPainter::Paint(QPainter *painter, const AConnection &connection, EConnectionShape shape)
 {
     DrawHoveredOrSelected(painter, connection);
     DrawSketchLine(painter, connection);
@@ -68,7 +68,7 @@ void AprochConnectionPainter::Paint(QPainter *painter, const AprochConnection &c
     QPointF const &source = connection.source();
     QPointF const &sink = connection.sink();
 
-    auto const &connectionStyle = AprochStyle::GetConnectionStyle();
+    auto const &connectionStyle = AStyle::GetConnectionStyle();
 
     float const pointDiameter = connectionStyle.PointDiameter;
 
@@ -79,7 +79,7 @@ void AprochConnectionPainter::Paint(QPainter *painter, const AprochConnection &c
     painter->drawEllipse(sink, pointRadius, pointRadius);
 }
 
-QPainterPath AprochConnectionPainter::GetPainterStroke(const AprochConnection &connection)
+QPainterPath AConnectionPainter::GetPainterStroke(const AConnection &connection)
 {
     auto cubic = ShapePath(connection);
 
@@ -100,11 +100,11 @@ QPainterPath AprochConnectionPainter::GetPainterStroke(const AprochConnection &c
 }
 
 
-void AprochConnectionPainter::DrawSketchLine(QPainter *painter, const AprochConnection &connection)
+void AConnectionPainter::DrawSketchLine(QPainter *painter, const AConnection &connection)
 {
     if (connection.isRequirePort())
     {
-        auto const &connectionStyle = AprochStyle::GetConnectionStyle();
+        auto const &connectionStyle = AStyle::GetConnectionStyle();
 
         QPen p;
         p.setWidthF(double(connectionStyle.ConstructionLineWidth));
@@ -119,7 +119,7 @@ void AprochConnectionPainter::DrawSketchLine(QPainter *painter, const AprochConn
     }
 }
 
-void AprochConnectionPainter::DrawHoveredOrSelected(QPainter *painter, const AprochConnection &connection)
+void AConnectionPainter::DrawHoveredOrSelected(QPainter *painter, const AConnection &connection)
 {
     bool const hovered = connection.hovered();
     auto const &graphicsObject = connection.getConnectionGraphicsObject();
@@ -130,7 +130,7 @@ void AprochConnectionPainter::DrawHoveredOrSelected(QPainter *painter, const Apr
     {
         QPen p;
 
-        auto const &connectionStyle = AprochStyle::GetConnectionStyle();
+        auto const &connectionStyle = AStyle::GetConnectionStyle();
         float const lineWidth = connectionStyle.LineWidth;
 
         p.setWidthF(2.0 * double(lineWidth));
@@ -145,14 +145,14 @@ void AprochConnectionPainter::DrawHoveredOrSelected(QPainter *painter, const Apr
     }
 }
 
-void AprochConnectionPainter::DrawNormalLine(QPainter *painter, const AprochConnection &connection)
+void AConnectionPainter::DrawNormalLine(QPainter *painter, const AConnection &connection)
 {
     if (connection.isRequirePort())
     {
         return;
     }
 
-    auto const &connectionStyle = AprochStyle::GetConnectionStyle();
+    auto const &connectionStyle = AStyle::GetConnectionStyle();
 
     QColor selectedColor = connectionStyle.SelectedColor;
 

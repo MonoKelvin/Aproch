@@ -1,7 +1,7 @@
 #ifndef APROCHDATAMODELREGISTRY_H
 #define APROCHDATAMODELREGISTRY_H
 
-#include "AprochNodeDataModel.h"
+#include "ANodeDataModel.h"
 #include "Utilities.h"
 
 #include <QSet>
@@ -11,7 +11,7 @@
 APROCH_NAMESPACE_BEGIN
 
 // Class uses map for storing models (name, model)
-class APROCH_EXPORT AprochDataModelRegistry
+class APROCH_EXPORT ADataModelRegistry
 {
 public:
     using RegistryItemPtr = std::unique_ptr<INodeDataModel>;
@@ -22,14 +22,14 @@ public:
 
     using RegisteredTypeConvertersMap = std::map<TypeConverterId, TypeConverter>;
 
-    AprochDataModelRegistry()  = default;
-    ~AprochDataModelRegistry() = default;
+    ADataModelRegistry()  = default;
+    ~ADataModelRegistry() = default;
 
-    AprochDataModelRegistry(const AprochDataModelRegistry &) = delete;
-    AprochDataModelRegistry(AprochDataModelRegistry &&)      = default;
+    ADataModelRegistry(const ADataModelRegistry &) = delete;
+    ADataModelRegistry(ADataModelRegistry &&)      = default;
 
-    AprochDataModelRegistry &operator=(const AprochDataModelRegistry &) = delete;
-    AprochDataModelRegistry &operator=(AprochDataModelRegistry &&)      = default;
+    ADataModelRegistry &operator=(const ADataModelRegistry &) = delete;
+    ADataModelRegistry &operator=(ADataModelRegistry &&)      = default;
 
 public:
 

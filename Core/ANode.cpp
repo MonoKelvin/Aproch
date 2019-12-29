@@ -1,6 +1,6 @@
-﻿#include "AprochNode.h"
+﻿#include "ANode.h"
 
-#include "AprochConnectionGraphicsObject.h"
+#include "AConnectionGraphicsObject.h"
 
 #include <QWidget>
 #include <QVector>
@@ -8,7 +8,7 @@
 
 APROCH_NAMESPACE_BEGIN
 
-AprochNode::AprochNode(std::unique_ptr<INodeDataModel> &&dataModel)
+ANode::ANode(std::unique_ptr<INodeDataModel> &&dataModel)
     : mUuid(QUuid::createUuid())
     , mWidth(100)
     , mHeight(150)
@@ -37,18 +37,18 @@ AprochNode::AprochNode(std::unique_ptr<INodeDataModel> &&dataModel)
     recalculateSize();
 
     // propagate data: model => node
-    connect(mNodeDataModel.get(), &INodeDataModel::dataUpdated, this, &AprochNode::onDataUpdated);
-    connect(mNodeDataModel.get(), &INodeDataModel::embeddedWidgetSizeUpdated, this, &AprochNode::onNodeSizeUpdated );
+    connect(mNodeDataModel.get(), &INodeDataModel::dataUpdated, this, &ANode::onDataUpdated);
+    connect(mNodeDataModel.get(), &INodeDataModel::embeddedWidgetSizeUpdated, this, &ANode::onNodeSizeUpdated );
 }
 
-QRectF AprochNode::boundingRect(void) const
+QRectF ANode::boundingRect(void) const
 {
-    double addon = double(AprochStyle::GetNodeStyle().ConnectionPointDiameter);
+    double addon = double(AStyle::GetNodeStyle().ConnectionPointDiameter);
 
     return QRectF(-addon, -addon, mWidth + 2 * addon, mHeight + 2 * addon);
 }
 
-void AprochNode::resize(void) const
+void ANode::resize(void) const
 {
     if (auto w = mNodeDataModel->getEmbeddedWidget())
     {
@@ -73,14 +73,14 @@ void AprochNode::resize(void) const
     }
 }
 
-QRect AprochNode::resizeRect() const
+QRect ANode::resizeRect() const
 {
     const int rectSize = 7;
     return QRect(mWidth - rectSize, mHeight - rectSize, rectSize, rectSize);
 }
 
 
-void AprochNode::recalculateSize() const
+void ANode::recalculateSize() const
 {
     mHeight = mSpacing * AMax(mSinks, mSources);
 
@@ -109,7 +109,7 @@ void AprochNode::recalculateSize() const
     }
 }
 
-void AprochNode::recalculateSize(QFont const &font) const
+void ANode::recalculateSize(QFont const &font) const
 {
     QFontMetrics fontMetrics(font);
     QFont boldFont = font;
@@ -127,7 +127,7 @@ void AprochNode::recalculateSize(QFont const &font) const
     }
 }
 
-int AprochNode::getPortWidth(EPortType portType) const
+int ANode::getPortWidth(EPortType portType) const
 {
     int width = 0;
 
@@ -151,9 +151,9 @@ int AprochNode::getPortWidth(EPortType portType) const
     return width;
 }
 
-QPointF AprochNode::getPortScenePosition(PortIndex index, EPortType portType, const QTransform &transform) const
+QPointF ANode::getPortScenePosition(PortIndex index, EPortType portType, const QTransform &transform) const
 {
-    auto const &nodeStyle = AprochStyle::GetNodeStyle();
+    auto const &nodeStyle = AStyle::GetNodeStyle();
 
     QPointF result;
 
@@ -181,9 +181,9 @@ QPointF AprochNode::getPortScenePosition(PortIndex index, EPortType portType, co
     return transform.map(result);
 }
 
-PortIndex AprochNode::checkHitScenePoint(EPortType portType, QPointF scenePoint, const QTransform &sceneTransform) const
+PortIndex ANode::checkHitScenePoint(EPortType portType, QPointF scenePoint, const QTransform &sceneTransform) const
 {
-    auto const &nodeStyle = AprochStyle::GetNodeStyle();
+    auto const &nodeStyle = AStyle::GetNodeStyle();
 
     PortIndex result = INVALID_PORT_INDEX;
 
@@ -211,7 +211,7 @@ PortIndex AprochNode::checkHitScenePoint(EPortType portType, QPointF scenePoint,
     return result;
 }
 
-int AprochNode::captionHeight(void) const
+int ANode::captionHeight(void) const
 {
     if (!mNodeDataModel->isCaptionVisible())
     {
@@ -223,7 +223,7 @@ int AprochNode::captionHeight(void) const
     return mBoldFontMetrics.boundingRect(name).height();
 }
 
-int AprochNode::captionWidth(void) const
+int ANode::captionWidth(void) const
 {
     if (!mNodeDataModel->isCaptionVisible())
     {
@@ -235,17 +235,17 @@ int AprochNode::captionWidth(void) const
     return mBoldFontMetrics.boundingRect(name).width();
 }
 
-int AprochNode::getValidationHeight() const
+int ANode::getValidationHeight() const
 {
     return mBoldFontMetrics.boundingRect(mNodeDataModel->validationMessage()).height();
 }
 
-int AprochNode::getValidationWidth() const
+int ANode::getValidationWidth() const
 {
     return mBoldFontMetrics.boundingRect(mNodeDataModel->validationMessage()).width();
 }
 
-int AprochNode::equivalentWidgetHeight() const
+int ANode::equivalentWidgetHeight() const
 {
     if (mNodeDataModel->validationState() != ENodeValidationState::Valid)
     {
@@ -255,7 +255,7 @@ int AprochNode::equivalentWidgetHeight() const
     return getHeight() - captionHeight();
 }
 
-QPointF AprochNode::getWidgetPosition() const
+QPointF ANode::getWidgetPosition() const
 {
     if (auto w = mNodeDataModel->getEmbeddedWidget())
     {
@@ -277,7 +277,7 @@ QPointF AprochNode::getWidgetPosition() const
     return QPointF();
 }
 
-QJsonObject AprochNode::save(void) const
+QJsonObject ANode::save(void) const
 {
     QJsonObject nodeJson;
     nodeJson["id"] = mUuid.toString();
@@ -291,7 +291,7 @@ QJsonObject AprochNode::save(void) const
     return nodeJson;
 }
 
-void AprochNode::restore(const QJsonObject &json)
+void ANode::restore(const QJsonObject &json)
 {
     mUuid = QUuid(json["id"].toString());
 
@@ -302,7 +302,7 @@ void AprochNode::restore(const QJsonObject &json)
     mNodeDataModel->restore(json["model"].toObject());
 }
 
-QVector<ConnectionPtrSet> const &AprochNode::getEntries(EPortType portType) const
+QVector<ConnectionPtrSet> const &ANode::getEntries(EPortType portType) const
 {
     if (portType == EPortType::Input)
     {
@@ -314,7 +314,7 @@ QVector<ConnectionPtrSet> const &AprochNode::getEntries(EPortType portType) cons
     }
 }
 
-QVector<ConnectionPtrSet> &AprochNode::getEntries(EPortType portType)
+QVector<ConnectionPtrSet> &ANode::getEntries(EPortType portType)
 {
     if (portType == EPortType::Input)
     {
@@ -326,23 +326,23 @@ QVector<ConnectionPtrSet> &AprochNode::getEntries(EPortType portType)
     }
 }
 
-ConnectionPtrSet AprochNode::getConnections(EPortType portType, PortIndex portIndex) const
+ConnectionPtrSet ANode::getConnections(EPortType portType, PortIndex portIndex) const
 {
     return getEntries(portType)[int(portIndex)];
 }
 
-void AprochNode::setConnection(EPortType portType, PortIndex portIndex, AprochConnection &connection)
+void ANode::setConnection(EPortType portType, PortIndex portIndex, AConnection &connection)
 {
     auto &connections = getEntries(portType);
     connections[portIndex].insert(std::make_pair(connection.getId(), &connection));
 }
 
-void AprochNode::eraseConnection(EPortType portType, PortIndex portIndex, QUuid id)
+void ANode::eraseConnection(EPortType portType, PortIndex portIndex, QUuid id)
 {
     getEntries(portType)[portIndex].erase(id);
 }
 
-void AprochNode::reactToPossibleConnection(EPortType reactingPortType, const SNodeDataType &reactingDataType, const QPointF &scenePoint)
+void ANode::reactToPossibleConnection(EPortType reactingPortType, const SNodeDataType &reactingDataType, const QPointF &scenePoint)
 {
     QTransform const t = mNodeGraphicsObject->sceneTransform();
 
@@ -355,14 +355,14 @@ void AprochNode::reactToPossibleConnection(EPortType reactingPortType, const SNo
     setReaction(SNodeState::REACTING, reactingPortType, reactingDataType);
 }
 
-void AprochNode::setReaction(SNodeState::EReactToConnectionState reaction, EPortType reactingPortType, SNodeDataType reactingDataType)
+void ANode::setReaction(SNodeState::EReactToConnectionState reaction, EPortType reactingPortType, SNodeDataType reactingDataType)
 {
     mNodeState.Reaction = reaction;
     mNodeState.ReactingPortType = reactingPortType;
     mNodeState.ReactingDataType = std::move(reactingDataType);
 }
 
-QPointF AprochNode::getWidgetPosition()
+QPointF ANode::getWidgetPosition()
 {
     if (auto w = mNodeDataModel->getEmbeddedWidget())
     {
@@ -385,13 +385,13 @@ QPointF AprochNode::getWidgetPosition()
     return QPointF();
 }
 
-void AprochNode::resetReactionToConnection()
+void ANode::resetReactionToConnection()
 {
     setReaction(SNodeState::NOT_REACTING);
     mNodeGraphicsObject->update();
 }
 
-void AprochNode::propagateData(std::shared_ptr<INodeData> nodeData, PortIndex inPortIndex) const
+void ANode::propagateData(std::shared_ptr<INodeData> nodeData, PortIndex inPortIndex) const
 {
     mNodeDataModel->setInputData(nodeData, inPortIndex);
 
@@ -402,7 +402,7 @@ void AprochNode::propagateData(std::shared_ptr<INodeData> nodeData, PortIndex in
     mNodeGraphicsObject->moveConnections();
 }
 
-void AprochNode::onDataUpdated(PortIndex index)
+void ANode::onDataUpdated(PortIndex index)
 {
     auto nodeData = mNodeDataModel->getOutputData(index);
 
@@ -414,7 +414,7 @@ void AprochNode::onDataUpdated(PortIndex index)
     }
 }
 
-void AprochNode::onNodeSizeUpdated()
+void ANode::onNodeSizeUpdated()
 {
     if (mNodeDataModel->getEmbeddedWidget())
     {
@@ -429,7 +429,7 @@ void AprochNode::onNodeSizeUpdated()
         {
             for (auto &pair : conn_set)
             {
-                AprochConnection *conn = pair.second;
+                AConnection *conn = pair.second;
                 conn->getConnectionGraphicsObject().move();
             }
         }

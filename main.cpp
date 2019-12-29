@@ -2,16 +2,16 @@
 
 #include <QApplication>
 
-#include "Core/AprochFlowView.h"
-#include "Core/AprochFlowScene.h"
-#include "Core/AprochDataModelRegistry.h"
+#include "Core/AFlowView.h"
+#include "Core/AFlowScene.h"
+#include "Core/ADataModelRegistry.h"
 #include "Test/MyTestDataModel_1.h"
 
 using namespace Aproch;
 
-static std::shared_ptr<AprochDataModelRegistry> registerDataModels()
+static std::shared_ptr<ADataModelRegistry> registerDataModels()
 {
-    auto ret = std::make_shared<AprochDataModelRegistry>();
+    auto ret = std::make_shared<ADataModelRegistry>();
 
     ret->registerModel<MyDataModel>();
 
@@ -22,8 +22,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    AprochFlowScene scene(registerDataModels());
-    AprochFlowView view(&scene);
+    AFlowScene scene(registerDataModels());
+    AFlowView view(&scene);
 
 //    AprochMainWindow w;
 //    w.show();

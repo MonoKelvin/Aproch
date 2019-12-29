@@ -1,11 +1,11 @@
-#include "AprochDataModelRegistry.h"
+#include "ADataModelRegistry.h"
 
 #include <QFile>
 #include <QMessageBox>
 
 APROCH_NAMESPACE_BEGIN
 
-std::unique_ptr<INodeDataModel> AprochDataModelRegistry::create(const QString &modelName)
+std::unique_ptr<INodeDataModel> ADataModelRegistry::create(const QString &modelName)
 {
     auto it = mRegisteredItemCreators.find(modelName);
 
@@ -17,7 +17,7 @@ std::unique_ptr<INodeDataModel> AprochDataModelRegistry::create(const QString &m
     return nullptr;
 }
 
-TypeConverter AprochDataModelRegistry::getTypeConverter(const SNodeDataType &d1, const SNodeDataType &d2) const
+TypeConverter ADataModelRegistry::getTypeConverter(const SNodeDataType &d1, const SNodeDataType &d2) const
 {
     TypeConverterId converterId = std::make_pair(d1, d2);
 

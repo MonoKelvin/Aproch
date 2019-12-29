@@ -1,4 +1,4 @@
-#include "AprochNodeDataModel.h"
+#include "ANodeDataModel.h"
 
 APROCH_NAMESPACE_BEGIN
 
@@ -8,7 +8,7 @@ bool INodeData::isSameType(const INodeData& nodeData) const
 }
 
 INodeDataModel::INodeDataModel()
-    :mNodeStyle(AprochStyle::GetNodeStyle())
+    :mNodeStyle(AStyle::GetNodeStyle())
 {
 
 }

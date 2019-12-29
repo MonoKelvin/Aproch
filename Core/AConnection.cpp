@@ -1,11 +1,11 @@
-﻿#include "AprochConnection.h"
+﻿#include "AConnection.h"
 
-#include "AprochNode.h"
-#include "AprochConnectionGraphicsObject.h"
+#include "ANode.h"
+#include "AConnectionGraphicsObject.h"
 
 APROCH_NAMESPACE_BEGIN
 
-AprochConnection::AprochConnection(EPortType portType, AprochNode& node, PortIndex portIndex)
+AConnection::AConnection(EPortType portType, ANode& node, PortIndex portIndex)
     : mUuid(QUuid::createUuid())
     , mInPoint(0, 0)
     , mOutPoint(0, 0)
@@ -16,17 +16,17 @@ AprochConnection::AprochConnection(EPortType portType, AprochNode& node, PortInd
     , mConnectionState()
 {
     setNodeToPort(node, portType, portIndex);
-    setRequiredPort(AprochPort::OppositePort(portType));
+    setRequiredPort(APort::OppositePort(portType));
 }
 
-AprochConnection::AprochConnection(AprochNode& nodeIn, PortIndex portIndexIn, AprochNode& nodeOut, PortIndex portIndexOut, TypeConverter typeConverter)
+AConnection::AConnection(ANode& nodeIn, PortIndex portIndexIn, ANode& nodeOut, PortIndex portIndexOut, TypeConverter typeConverter)
     : mUuid(QUuid::createUuid()), mOutNode(&nodeOut), mInNode(&nodeIn), mOutPortIndex(portIndexOut), mInPortIndex(portIndexIn), mConnectionState(), mTypeConverter(std::move(typeConverter))
 {
     setNodeToPort(nodeIn, EPortType::Input, portIndexIn);
     setNodeToPort(nodeOut, EPortType::Output, portIndexOut);
 }
 
-AprochConnection::~AprochConnection()
+AConnection::~AConnection()
 {
     if (complete())
     {
@@ -48,7 +48,7 @@ AprochConnection::~AprochConnection()
     resetLastHoveredNode();
 }
 
-QJsonObject AprochConnection::save() const
+QJsonObject AConnection::save() const
 {
     QJsonObject connectionJson;
 
@@ -83,7 +83,7 @@ QJsonObject AprochConnection::save() const
     return connectionJson;
 }
 
-void AprochConnection::setRequiredPort(EPortType dragging)
+void AConnection::setRequiredPort(EPortType dragging)
 {
     mConnectionState.RequiredPort = dragging;
 
@@ -104,21 +104,21 @@ void AprochConnection::setRequiredPort(EPortType dragging)
     }
 }
 
-void AprochConnection::setGraphicsObject(std::unique_ptr<AprochConnectionGraphicsObject>&& graphics)
+void AConnection::setGraphicsObject(std::unique_ptr<AConnectionGraphicsObject>&& graphics)
 {
     mConnectionGraphicsObject = std::move(graphics);
 
     // This function is only called when the ConnectionGraphicsObject
     // is newly created. At this moment both end coordinates are (0, 0)
-    // in AprochConnection G.O. coordinates. The position of the whole
-    // AprochConnection G. O. in scene coordinate system is also (0, 0).
+    // in AConnection G.O. coordinates. The position of the whole
+    // AConnection G. O. in scene coordinate system is also (0, 0).
     // By moving the whole object to the Node Port position
     // we position both connection ends correctly.
 
     if (getRequiredPort() != EPortType::None)
     {
 
-        EPortType attachedPort = AprochPort::OppositePort(getRequiredPort());
+        EPortType attachedPort = APort::OppositePort(getRequiredPort());
 
         PortIndex attachedPortIndex = getPortIndex(attachedPort);
 
@@ -135,7 +135,7 @@ void AprochConnection::setGraphicsObject(std::unique_ptr<AprochConnectionGraphic
     mConnectionGraphicsObject->move();
 }
 
-PortIndex AprochConnection::getPortIndex(EPortType portType) const
+PortIndex AConnection::getPortIndex(EPortType portType) const
 {
     PortIndex result = INVALID_PORT_INDEX;
 
@@ -154,7 +154,7 @@ PortIndex AprochConnection::getPortIndex(EPortType portType) const
     return result;
 }
 
-void AprochConnection::setNodeToPort(AprochNode& node, EPortType portType, PortIndex portIndex)
+void AConnection::setNodeToPort(ANode& node, EPortType portType, PortIndex portIndex)
 {
     bool wasIncomplete = !complete();
 
@@ -181,7 +181,7 @@ void AprochConnection::setNodeToPort(AprochNode& node, EPortType portType, PortI
     }
 }
 
-void AprochConnection::removeFromNodes() const
+void AConnection::removeFromNodes() const
 {
     if (mInNode)
     {
@@ -193,14 +193,14 @@ void AprochConnection::removeFromNodes() const
     }
 }
 
-QPointF const& AprochConnection::getEndPoint(EPortType portType) const
+QPointF const& AConnection::getEndPoint(EPortType portType) const
 {
     Q_ASSERT(portType != EPortType::None);
 
     return (portType == EPortType::Output ? mOutPoint : mInPoint);
 }
 
-void AprochConnection::setEndPoint(EPortType portType, QPointF const& point)
+void AConnection::setEndPoint(EPortType portType, QPointF const& point)
 {
     switch (portType)
     {
@@ -217,7 +217,7 @@ void AprochConnection::setEndPoint(EPortType portType, QPointF const& point)
     }
 }
 
-void AprochConnection::moveEndPoint(EPortType portType, QPointF const& offset)
+void AConnection::moveEndPoint(EPortType portType, QPointF const& offset)
 {
     switch (portType)
     {
@@ -234,7 +234,7 @@ void AprochConnection::moveEndPoint(EPortType portType, QPointF const& offset)
     }
 }
 
-QRectF AprochConnection::boundingRect() const
+QRectF AConnection::boundingRect() const
 {
     auto points = pointsC1C2();
 
@@ -242,7 +242,7 @@ QRectF AprochConnection::boundingRect() const
 
     QRectF c1c2Rect = QRectF(points.first, points.second).normalized();
 
-    auto const& connectionStyle = AprochStyle::GetConnectionStyle();
+    auto const& connectionStyle = AStyle::GetConnectionStyle();
 
     double const diam = double(connectionStyle.PointDiameter);
 
@@ -256,7 +256,7 @@ QRectF AprochConnection::boundingRect() const
     return commonRect;
 }
 
-std::pair<QPointF, QPointF> AprochConnection::pointsC1C2() const
+std::pair<QPointF, QPointF> AConnection::pointsC1C2() const
 {
     const double defaultOffset = 200;
 
@@ -287,12 +287,12 @@ std::pair<QPointF, QPointF> AprochConnection::pointsC1C2() const
     return std::pair<QPointF, QPointF>(c1, c2);
 }
 
-AprochConnectionGraphicsObject& AprochConnection::getConnectionGraphicsObject() const
+AConnectionGraphicsObject& AConnection::getConnectionGraphicsObject() const
 {
     return *mConnectionGraphicsObject;
 }
 
-AprochNode* AprochConnection::getNode(EPortType portType) const
+ANode* AConnection::getNode(EPortType portType) const
 {
     switch (portType)
     {
@@ -309,7 +309,7 @@ AprochNode* AprochConnection::getNode(EPortType portType) const
     return nullptr;
 }
 
-AprochNode*& AprochConnection::getNode(EPortType portType)
+ANode*& AConnection::getNode(EPortType portType)
 {
     switch (portType)
     {
@@ -327,7 +327,7 @@ AprochNode*& AprochConnection::getNode(EPortType portType)
     Q_UNREACHABLE();
 }
 
-void AprochConnection::
+void AConnection::
 clearNode(EPortType portType)
 {
     if (complete())
@@ -347,7 +347,7 @@ clearNode(EPortType portType)
     }
 }
 
-SNodeDataType AprochConnection::dataType(EPortType portType) const
+SNodeDataType AConnection::dataType(EPortType portType) const
 {
     if (mInNode && mOutNode)
     {
@@ -358,7 +358,7 @@ SNodeDataType AprochConnection::dataType(EPortType portType) const
     }
     else
     {
-        AprochNode* validNode;
+        ANode* validNode;
         PortIndex index = INVALID_PORT_INDEX;
 
         if ((validNode = mInNode))
@@ -382,12 +382,12 @@ SNodeDataType AprochConnection::dataType(EPortType portType) const
     Q_UNREACHABLE();
 }
 
-void AprochConnection::setTypeConverter(TypeConverter converter)
+void AConnection::setTypeConverter(TypeConverter converter)
 {
     mTypeConverter = std::move(converter);
 }
 
-void AprochConnection::propagateData(std::shared_ptr<INodeData> nodeData) const
+void AConnection::propagateData(std::shared_ptr<INodeData> nodeData) const
 {
     if (mInNode)
     {
@@ -400,14 +400,14 @@ void AprochConnection::propagateData(std::shared_ptr<INodeData> nodeData) const
     }
 }
 
-void AprochConnection::propagateEmptyData() const
+void AConnection::propagateEmptyData() const
 {
     std::shared_ptr<INodeData> emptyData;
     propagateData(emptyData);
 }
 
 
-void AprochConnection::interactWithNode(AprochNode* node)
+void AConnection::interactWithNode(ANode* node)
 {
     if (node)
     {
@@ -419,7 +419,7 @@ void AprochConnection::interactWithNode(AprochNode* node)
     }
 }
 
-void AprochConnection::resetLastHoveredNode()
+void AConnection::resetLastHoveredNode()
 {
     if (mConnectionState.LastHoveredNode)
     {

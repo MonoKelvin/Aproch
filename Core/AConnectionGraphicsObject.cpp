@@ -1,12 +1,12 @@
-﻿#include "AprochConnectionGraphicsObject.h"
+﻿#include "AConnectionGraphicsObject.h"
 
-#include "AprochNode.h"
-#include "AprochFlowScene.h"
-#include "AprochConnection.h"
-#include "AprochNodeGraphicsObject.h"
-#include "AprochConnectionPainter.h"
-#include "AprochDataModelRegistry.h"
-#include "AprochNCInteraction.h"
+#include "ANode.h"
+#include "AFlowScene.h"
+#include "AConnection.h"
+#include "ANodeGraphicsObject.h"
+#include "AConnectionPainter.h"
+#include "ADataModelRegistry.h"
+#include "ANCInteraction.h"
 
 #include <QPainter>
 #include <QGraphicsView>
@@ -17,7 +17,7 @@
 
 APROCH_NAMESPACE_BEGIN
 
-AprochConnectionGraphicsObject::AprochConnectionGraphicsObject(AprochFlowScene &scene, AprochConnection &connection)
+AConnectionGraphicsObject::AConnectionGraphicsObject(AFlowScene &scene, AConnection &connection)
     : mScene(scene)
     , mConnection(connection)
 {
@@ -34,17 +34,17 @@ AprochConnectionGraphicsObject::AprochConnectionGraphicsObject(AprochFlowScene &
     setZValue(-1.0);
 }
 
-AprochConnectionGraphicsObject::~AprochConnectionGraphicsObject()
+AConnectionGraphicsObject::~AConnectionGraphicsObject()
 {
     mScene.removeItem(this);
 }
 
-QRectF AprochConnectionGraphicsObject::boundingRect() const
+QRectF AConnectionGraphicsObject::boundingRect() const
 {
     return mConnection.boundingRect();
 }
 
-QPainterPath AprochConnectionGraphicsObject::shape() const
+QPainterPath AConnectionGraphicsObject::shape() const
 {
 #ifdef APROCH_DEBUG_DRAWING
 
@@ -54,16 +54,16 @@ QPainterPath AprochConnectionGraphicsObject::shape() const
     // return path;
 
 #else
-    return AprochConnectionPainter::GetPainterStroke(mConnection);
+    return AConnectionPainter::GetPainterStroke(mConnection);
 #endif
 }
 
-void AprochConnectionGraphicsObject::setGeometryChanged()
+void AConnectionGraphicsObject::setGeometryChanged()
 {
     prepareGeometryChange();
 }
 
-void AprochConnectionGraphicsObject::move()
+void AConnectionGraphicsObject::move()
 {
     for (EPortType portType : {EPortType::Input, EPortType::Output})
     {
@@ -85,38 +85,38 @@ void AprochConnectionGraphicsObject::move()
     }
 }
 
-void AprochConnectionGraphicsObject::lock(bool locked)
+void AConnectionGraphicsObject::lock(bool locked)
 {
     setFlag(QGraphicsItem::ItemIsMovable, !locked);
     setFlag(QGraphicsItem::ItemIsFocusable, !locked);
     setFlag(QGraphicsItem::ItemIsSelectable, !locked);
 }
 
-void AprochConnectionGraphicsObject::paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWidget *)
+void AConnectionGraphicsObject::paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWidget *)
 {
     painter->setClipRect(option->exposedRect);
 
-    AprochConnectionPainter::Paint(painter, mConnection);
+    AConnectionPainter::Paint(painter, mConnection);
 }
 
-void AprochConnectionGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void AConnectionGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mousePressEvent(event);
     // event->ignore();
 }
 
-void AprochConnectionGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void AConnectionGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     prepareGeometryChange();
 
     auto view = static_cast<QGraphicsView *>(event->widget());
-    auto node = AprochFlowScene::LocateNodeAt(event->scenePos(), mScene, view->transform());
+    auto node = AFlowScene::LocateNodeAt(event->scenePos(), mScene, view->transform());
 
     mConnection.interactWithNode(node);
     if (node)
     {
         node->reactToPossibleConnection(mConnection.getRequiredPort(),
-                                        mConnection.dataType(AprochPort::OppositePort(mConnection.getRequiredPort())),
+                                        mConnection.dataType(APort::OppositePort(mConnection.getRequiredPort())),
                                         event->scenePos());
     }
 
@@ -138,14 +138,14 @@ void AprochConnectionGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *ev
     event->accept();
 }
 
-void AprochConnectionGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void AConnectionGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     ungrabMouse();
     event->accept();
 
-    auto node = AprochFlowScene::LocateNodeAt(event->scenePos(), mScene, mScene.views()[0]->transform());
+    auto node = AFlowScene::LocateNodeAt(event->scenePos(), mScene, mScene.views()[0]->transform());
 
-    AprochNCInteraction interaction(*node, mConnection, mScene);
+    ANCInteraction interaction(*node, mConnection, mScene);
 
     if (node && interaction.tryConnect())
     {
@@ -158,7 +158,7 @@ void AprochConnectionGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent 
     }
 }
 
-void AprochConnectionGraphicsObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void AConnectionGraphicsObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     mConnection.mIsHovered = true;
 
@@ -167,7 +167,7 @@ void AprochConnectionGraphicsObject::hoverEnterEvent(QGraphicsSceneHoverEvent *e
     event->accept();
 }
 
-void AprochConnectionGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+void AConnectionGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     mConnection.mIsHovered = false;
 
@@ -176,7 +176,7 @@ void AprochConnectionGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *e
     event->accept();
 }
 
-void AprochConnectionGraphicsObject::addGraphicsEffect()
+void AConnectionGraphicsObject::addGraphicsEffect()
 {
     auto effect = new QGraphicsBlurEffect;
 

@@ -1,4 +1,4 @@
-#include "AprochStyle.h"
+#include "AStyle.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -46,12 +46,12 @@ void SConnectionStyle::setStyle(const QJsonObject &obj)
     READ_FLOAT_FROM_JSON(obj, PointDiameter);
 }
 
-AprochStyle::AprochStyle()
+AStyle::AStyle()
 {
     loadJsonFile(":/style/DefaultStyle.json");
 }
 
-void AprochStyle::loadJsonFile(QString fileName)
+void AStyle::loadJsonFile(QString fileName)
 {
     QFile file(fileName);
 
@@ -64,7 +64,7 @@ void AprochStyle::loadJsonFile(QString fileName)
     loadJsonFromByteArray(file.readAll());
 }
 
-void AprochStyle::loadJsonFromByteArray(const QByteArray &byteArray)
+void AStyle::loadJsonFromByteArray(const QByteArray &byteArray)
 {
     QJsonObject rootObj = QJsonDocument::fromJson(byteArray).object();
     mNodeStyle.setStyle(rootObj["NodeStyle"].toObject());

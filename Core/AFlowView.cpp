@@ -1,17 +1,17 @@
-#include "AprochFlowView.h"
+#include "AFlowView.h"
 
 //#include <QtOpenGL/QtOpenGL>
 #include <QtWidgets>
 
-#include "AprochFlowScene.h"
-#include "AprochDataModelRegistry.h"
-#include "AprochNode.h"
-#include "AprochConnectionGraphicsObject.h"
-#include "AprochStyle.h"
+#include "AFlowScene.h"
+#include "ADataModelRegistry.h"
+#include "ANode.h"
+#include "AConnectionGraphicsObject.h"
+#include "AStyle.h"
 
 APROCH_NAMESPACE_BEGIN
 
-AprochFlowView::AprochFlowView(QWidget *parent)
+AFlowView::AFlowView(QWidget *parent)
     : QGraphicsView(parent)
     , mClearSelectionAction(nullptr)
     , mDeleteSelectionAction(nullptr)
@@ -19,7 +19,7 @@ AprochFlowView::AprochFlowView(QWidget *parent)
 {
     setDragMode(QGraphicsView::ScrollHandDrag);
     setRenderHint(QPainter::Antialiasing);
-    setBackgroundBrush(AprochStyle::GetFlowViewStyle().BackgroundColor);
+    setBackgroundBrush(AStyle::GetFlowViewStyle().BackgroundColor);
 
     //setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     //setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
@@ -30,30 +30,30 @@ AprochFlowView::AprochFlowView(QWidget *parent)
     //setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 }
 
-AprochFlowView::AprochFlowView(AprochFlowScene *scene, QWidget *parent)
-    : AprochFlowView(parent)
+AFlowView::AFlowView(AFlowScene *scene, QWidget *parent)
+    : AFlowView(parent)
 {
     setScene(scene);
 }
 
-AprochFlowView::~AprochFlowView()
+AFlowView::~AFlowView()
 {
     if(mScene) {
         mScene->deleteLater();
     }
 }
 
-QAction *AprochFlowView::getClearSelectionAction() const
+QAction *AFlowView::getClearSelectionAction() const
 {
     return mClearSelectionAction;
 }
 
-QAction *AprochFlowView::getDeleteSelectionAction() const
+QAction *AFlowView::getDeleteSelectionAction() const
 {
     return mDeleteSelectionAction;
 }
 
-void AprochFlowView::setScene(AprochFlowScene *scene)
+void AFlowView::setScene(AFlowScene *scene)
 {
     mScene = scene;
     QGraphicsView::setScene(mScene);
@@ -68,11 +68,11 @@ void AprochFlowView::setScene(AprochFlowScene *scene)
     delete mDeleteSelectionAction;
     mDeleteSelectionAction = new QAction(tr("删除选择的节点"), this);
     mDeleteSelectionAction->setShortcut(Qt::Key_Delete);
-    connect(mDeleteSelectionAction, &QAction::triggered, this, &AprochFlowView::deleteSelectedNodes);
+    connect(mDeleteSelectionAction, &QAction::triggered, this, &AFlowView::deleteSelectedNodes);
     addAction(mDeleteSelectionAction);
 }
 
-void AprochFlowView::contextMenuEvent(QContextMenuEvent *event)
+void AFlowView::contextMenuEvent(QContextMenuEvent *event)
 {
     // 如果鼠标下有节点，则把事件传递给scene处理
     if (itemAt(event->pos()))
@@ -174,7 +174,7 @@ void AprochFlowView::contextMenuEvent(QContextMenuEvent *event)
     modelMenu.exec(event->globalPos());
 }
 
-void AprochFlowView::wheelEvent(QWheelEvent *event)
+void AFlowView::wheelEvent(QWheelEvent *event)
 {
     QPoint delta = event->angleDelta();
 
@@ -196,7 +196,7 @@ void AprochFlowView::wheelEvent(QWheelEvent *event)
     }
 }
 
-void AprochFlowView::scaleUp()
+void AFlowView::scaleUp()
 {
     double const step = 1.2;
     double const factor = std::pow(step, 1.0);
@@ -209,7 +209,7 @@ void AprochFlowView::scaleUp()
     scale(factor, factor);
 }
 
-void AprochFlowView::scaleDown()
+void AFlowView::scaleDown()
 {
     double const step = 1.2;
     double const factor = std::pow(step, -1.0);
@@ -222,12 +222,12 @@ void AprochFlowView::scaleDown()
     scale(factor, factor);
 }
 
-void AprochFlowView::deleteSelectedNodes()
+void AFlowView::deleteSelectedNodes()
 {
     // 首先删除连线，为了确保它们不会由于删除节点时被自动删除
     for (QGraphicsItem *item : mScene->selectedItems())
     {
-        if (auto c = qgraphicsitem_cast<AprochConnectionGraphicsObject *>(item))
+        if (auto c = qgraphicsitem_cast<AConnectionGraphicsObject *>(item))
         {
             mScene->deleteConnection(c->connection());
         }
@@ -235,14 +235,14 @@ void AprochFlowView::deleteSelectedNodes()
 
     for (QGraphicsItem *item : mScene->selectedItems())
     {
-        if (auto n = qgraphicsitem_cast<AprochNodeGraphicsObject *>(item))
+        if (auto n = qgraphicsitem_cast<ANodeGraphicsObject *>(item))
         {
             mScene->removeNode(n->node());
         }
     }
 }
 
-void AprochFlowView::keyPressEvent(QKeyEvent *event)
+void AFlowView::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key())
     {
@@ -256,7 +256,7 @@ void AprochFlowView::keyPressEvent(QKeyEvent *event)
     QGraphicsView::keyPressEvent(event);
 }
 
-void AprochFlowView::keyReleaseEvent(QKeyEvent *event)
+void AFlowView::keyReleaseEvent(QKeyEvent *event)
 {
     switch (event->key())
     {
@@ -269,7 +269,7 @@ void AprochFlowView::keyReleaseEvent(QKeyEvent *event)
     QGraphicsView::keyReleaseEvent(event);
 }
 
-void AprochFlowView::mousePressEvent(QMouseEvent *event)
+void AFlowView::mousePressEvent(QMouseEvent *event)
 {
     QGraphicsView::mousePressEvent(event);
     if (event->button() == Qt::LeftButton)
@@ -278,7 +278,7 @@ void AprochFlowView::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void AprochFlowView::mouseMoveEvent(QMouseEvent *event)
+void AFlowView::mouseMoveEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseMoveEvent(event);
     if (scene() && scene()->mouseGrabberItem() == nullptr && event->buttons() == Qt::LeftButton)
@@ -291,7 +291,7 @@ void AprochFlowView::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-void AprochFlowView::drawBackground(QPainter *painter, const QRectF &viewRect)
+void AFlowView::drawBackground(QPainter *painter, const QRectF &viewRect)
 {
     QGraphicsView::drawBackground(painter, viewRect);
 
@@ -321,7 +321,7 @@ void AprochFlowView::drawBackground(QPainter *painter, const QRectF &viewRect)
         }
     };
 
-    auto const &flowViewStyle = AprochStyle::GetFlowViewStyle();
+    auto const &flowViewStyle = AStyle::GetFlowViewStyle();
 
     QBrush bBrush = backgroundBrush();
 
@@ -339,7 +339,7 @@ void AprochFlowView::drawBackground(QPainter *painter, const QRectF &viewRect)
     painter->drawLine(QLineF(0.0, tl.y(), 0.0, br.y()));
 }
 
-void AprochFlowView::showEvent(QShowEvent *event)
+void AFlowView::showEvent(QShowEvent *event)
 {
     if(mScene)
     {

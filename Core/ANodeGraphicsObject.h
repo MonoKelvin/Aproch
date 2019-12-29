@@ -10,22 +10,22 @@ class QGraphicsProxyWidget;
 
 APROCH_NAMESPACE_BEGIN
 
-class AprochNode;
-class AprochConnection;
-class AprochFlowScene;
+class ANode;
+class AConnection;
+class AFlowScene;
 
-class APROCH_EXPORT AprochNodeGraphicsObject : public QGraphicsObject
+class APROCH_EXPORT ANodeGraphicsObject : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    AprochNodeGraphicsObject(AprochFlowScene& scene, AprochNode& node);
+    ANodeGraphicsObject(AFlowScene& scene, ANode& node);
 
-    virtual ~AprochNodeGraphicsObject() override;
+    virtual ~ANodeGraphicsObject() override;
 
-    using ConnectionPtrSet = std::unordered_map<QUuid, AprochConnection*>;
+    using ConnectionPtrSet = std::unordered_map<QUuid, AConnection*>;
 
-    AprochNode& node();
-    AprochNode const& node() const;
+    ANode& node();
+    ANode const& node() const;
 
     void setGeometryChanged();
 
@@ -55,8 +55,8 @@ private:
     void embedQWidget();
 
 private:
-    AprochFlowScene&  mScene;
-    AprochNode& mNode;
+    AFlowScene&  mScene;
+    ANode& mNode;
 
     bool mIsLocked;
 

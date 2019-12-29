@@ -16,37 +16,37 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    Core/AprochConnectionPainter.cpp \
-    Core/AprochConnectionGraphicsObject.cpp \
-    Core/AprochConnection.cpp \
-    Core/AprochDataModelRegistry.cpp \
-    Core/AprochFlowScene.cpp \
-    Core/AprochFlowView.cpp \
-    Core/AprochNCInteraction.cpp \
-    Core/AprochNode.cpp \
-    Core/AprochNodeDataModel.cpp \
-    Core/AprochNodeGraphicsObject.cpp \
-    Core/AprochNodePainter.cpp \
-    Core/AprochStyle.cpp \
+    Core/AConnectionPainter.cpp \
+    Core/AConnectionGraphicsObject.cpp \
+    Core/AConnection.cpp \
+    Core/ADataModelRegistry.cpp \
+    Core/AFlowScene.cpp \
+    Core/AFlowView.cpp \
+    Core/ANCInteraction.cpp \
+    Core/ANode.cpp \
+    Core/ANodeDataModel.cpp \
+    Core/ANodeGraphicsObject.cpp \
+    Core/ANodePainter.cpp \
+    Core/AStyle.cpp \
     Test/MyTestDataModel_1.cpp \
     main.cpp \
     Editor/AprochMainWindow.cpp
 
 HEADERS += \
-    Core/AprochConnectionPainter.h \
-    Core/AprochConnectionGraphicsObject.h \
+    Core/AConnectionPainter.h \
+    Core/AConnectionGraphicsObject.h \
     Core/Aproch.h \
-    Core/AprochConnection.h \
-    Core/AprochDataModelRegistry.h \
-    Core/AprochFlowScene.h \
-    Core/AprochFlowView.h \
-    Core/AprochNCInteraction.h \
-    Core/AprochNode.h \
-    Core/AprochNodeDataModel.h \
-    Core/AprochNodeGraphicsObject.h \
-    Core/AprochNodePainter.h \
-    Core/AprochPort.h \
-    Core/AprochStyle.h \
+    Core/AConnection.h \
+    Core/ADataModelRegistry.h \
+    Core/AFlowScene.h \
+    Core/AFlowView.h \
+    Core/ANCInteraction.h \
+    Core/ANode.h \
+    Core/ANodeDataModel.h \
+    Core/ANodeGraphicsObject.h \
+    Core/ANodePainter.h \
+    Core/APort.h \
+    Core/AStyle.h \
     Core/ISerializable.h \
     Core/IStyle.h \
     Core/Utilities.h \

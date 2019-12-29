@@ -14,15 +14,15 @@ enum class EPortType
 
 using PortIndex = unsigned int;
 
-class AprochPort
+class APort
 {
 public:
-    AprochPort()
+    APort()
         : Type(EPortType::None)
         , Index(INVALID_PORT_INDEX)
     {}
 
-    AprochPort(EPortType type, PortIndex index)
+    APort(EPortType type, PortIndex index)
         : Type(type)
         , Index(index)
     {}

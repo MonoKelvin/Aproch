@@ -8,9 +8,9 @@ class QPainterPath;
 
 APROCH_NAMESPACE_BEGIN
 
-class AprochConnection;
+class AConnection;
 
-class AprochConnectionPainter
+class AConnectionPainter
 {
 public:
     enum class EConnectionShape
@@ -41,16 +41,16 @@ public:
         LeadLine
     };
 
-    static void Paint(QPainter *painter, const AprochConnection &connection, EConnectionShape shape = EConnectionShape::Cubic);
-    static QPainterPath GetPainterStroke(const AprochConnection &connection);
+    static void Paint(QPainter *painter, const AConnection &connection, EConnectionShape shape = EConnectionShape::Cubic);
+    static QPainterPath GetPainterStroke(const AConnection &connection);
 
 private:
-    static void DrawNormalLine(QPainter *painter, const AprochConnection &connection);
-    static void DrawHoveredOrSelected(QPainter *painter, const AprochConnection &connection);
-    static void DrawSketchLine(QPainter *painter, const AprochConnection &connection);
+    static void DrawNormalLine(QPainter *painter, const AConnection &connection);
+    static void DrawHoveredOrSelected(QPainter *painter, const AConnection &connection);
+    static void DrawSketchLine(QPainter *painter, const AConnection &connection);
 
 #ifdef APROCH_DEBUG_DRAWING
-    static void DebugDrawing(QPainter *painter, const AprochConnection &connection);
+    static void DebugDrawing(QPainter *painter, const AConnection &connection);
 #endif
 };
 

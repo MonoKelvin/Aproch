@@ -2,7 +2,7 @@
 #define APROCHCONNECTION_H
 
 #include "Utilities.h"
-#include "AprochPort.h"
+#include "APort.h"
 #include "ISerializable.h"
 
 #include <QVariant>
@@ -10,34 +10,34 @@
 
 APROCH_NAMESPACE_BEGIN
 
-class AprochNode;
+class ANode;
 class INodeData;
-class AprochConnectionGraphicsObject;
+class AConnectionGraphicsObject;
 
 struct SConnectionState
 {
     EPortType RequiredPort;
-    AprochNode *LastHoveredNode{nullptr};
+    ANode *LastHoveredNode{nullptr};
 };
 
-class APROCH_EXPORT AprochConnection : public QObject, public ISerializable
+class APROCH_EXPORT AConnection : public QObject, public ISerializable
 {
     Q_OBJECT
 
-    friend class AprochConnectionGraphicsObject;
+    friend class AConnectionGraphicsObject;
 public:
     /**
      * New Connection is attached to the port of the given Node.
      * The port has parameters (portType, portIndex).
      * The opposite connection end will require another port.
      */
-    AprochConnection(EPortType portType, AprochNode &node, PortIndex portIndex);
-    AprochConnection(AprochNode &nodeIn, PortIndex portIndexIn, AprochNode &nodeOut, PortIndex portIndexOut, TypeConverter converter = TypeConverter{});
+    AConnection(EPortType portType, ANode &node, PortIndex portIndex);
+    AConnection(ANode &nodeIn, PortIndex portIndexIn, ANode &nodeOut, PortIndex portIndexOut, TypeConverter converter = TypeConverter{});
 
-    AprochConnection(const AprochConnection &) = delete;
-    AprochConnection operator=(const AprochConnection &) = delete;
+    AConnection(const AConnection &) = delete;
+    AConnection operator=(const AConnection &) = delete;
 
-    ~AprochConnection();
+    ~AConnection();
 
     // ISerializable interface
 public:
@@ -55,11 +55,11 @@ public:
     inline void setNoRequiredPort() { mConnectionState.RequiredPort = EPortType::None; }
     inline bool isRequirePort() const { return mConnectionState.RequiredPort != EPortType::None; }
 
-    void setGraphicsObject(std::unique_ptr<AprochConnectionGraphicsObject> &&graphics);
+    void setGraphicsObject(std::unique_ptr<AConnectionGraphicsObject> &&graphics);
 
     /// Assigns a node to the required port.
     /// It is assumed that there is a required port, no extra checks
-    void setNodeToPort(AprochNode &node, EPortType portType, PortIndex portIndex);
+    void setNodeToPort(ANode &node, EPortType portType, PortIndex portIndex);
 
     void removeFromNodes() const;
 
@@ -78,13 +78,13 @@ public:
     inline void setHovered(bool hovered) { mIsHovered = hovered; }
 
 public:
-    AprochConnectionGraphicsObject &getConnectionGraphicsObject() const;
+    AConnectionGraphicsObject &getConnectionGraphicsObject() const;
 
     inline SConnectionState const &getConnectionState() const { return mConnectionState; }
     inline SConnectionState &getConnectionState() { return mConnectionState; }
 
-    AprochNode *getNode(EPortType portType) const;
-    AprochNode *&getNode(EPortType portType);
+    ANode *getNode(EPortType portType) const;
+    ANode *&getNode(EPortType portType);
 
     PortIndex getPortIndex(EPortType portType) const;
 
@@ -99,17 +99,17 @@ public:
     void propagateData(std::shared_ptr<INodeData> nodeData) const;
     void propagateEmptyData() const;
 
-    void interactWithNode(AprochNode *node);
+    void interactWithNode(ANode *node);
 
-    inline void setLastHoveredNode(AprochNode *node) { mConnectionState.LastHoveredNode = node; }
-    inline AprochNode *getLastHoveredNode() const { return mConnectionState.LastHoveredNode; }
+    inline void setLastHoveredNode(ANode *node) { mConnectionState.LastHoveredNode = node; }
+    inline ANode *getLastHoveredNode() const { return mConnectionState.LastHoveredNode; }
 
     void resetLastHoveredNode();
 
 Q_SIGNALS:
-    void connectionCompleted(const AprochConnection &) const;
-    void connectionMadeIncomplete(const AprochConnection &) const;
-    void updated(AprochConnection &conn) const;
+    void connectionCompleted(const AConnection &) const;
+    void connectionMadeIncomplete(const AConnection &) const;
+    void updated(AConnection &conn) const;
 
 private:
     QUuid mUuid;
@@ -120,15 +120,15 @@ private:
     double mLineWidth;
     bool mIsHovered;
 
-    AprochNode *mOutNode = nullptr;
-    AprochNode *mInNode = nullptr;
+    ANode *mOutNode = nullptr;
+    ANode *mInNode = nullptr;
 
     PortIndex mOutPortIndex;
     PortIndex mInPortIndex;
 
     SConnectionState mConnectionState;
 
-    std::unique_ptr<AprochConnectionGraphicsObject> mConnectionGraphicsObject;
+    std::unique_ptr<AConnectionGraphicsObject> mConnectionGraphicsObject;
 
     TypeConverter mTypeConverter;
 };

@@ -1,13 +1,13 @@
-#include "AprochNodePainter.h"
+#include "ANodePainter.h"
 
-#include "AprochFlowScene.h"
-#include "AprochStyle.h"
-#include "AprochNode.h"
-#include "AprochDataModelRegistry.h"
+#include "AFlowScene.h"
+#include "AStyle.h"
+#include "ANode.h"
+#include "ADataModelRegistry.h"
 
 APROCH_NAMESPACE_BEGIN
 
-void AprochNodePainter::Paint(QPainter *painter, AprochNode &node, const AprochFlowScene &scene)
+void ANodePainter::Paint(QPainter *painter, ANode &node, const AFlowScene &scene)
 {
     node.recalculateSize(painter->font());
 
@@ -18,9 +18,9 @@ void AprochNodePainter::Paint(QPainter *painter, AprochNode &node, const AprochF
     DrawConnectedPort(painter, node);
 }
 
-void AprochNodePainter::DrawNodeRect(QPainter *painter, AprochNode &node)
+void ANodePainter::DrawNodeRect(QPainter *painter, ANode &node)
 {
-    SNodeStyle const &nodeStyle = AprochStyle::GetNodeStyle();
+    SNodeStyle const &nodeStyle = AStyle::GetNodeStyle();
 
     auto color = node.getNodeGraphicsObject().isSelected() ? nodeStyle.SelectedBoundaryColor : nodeStyle.NormalBoundaryColor;
 
@@ -44,7 +44,7 @@ void AprochNodePainter::DrawNodeRect(QPainter *painter, AprochNode &node)
     painter->drawRoundedRect(boundary, NODE_BORDER_RADIUS, NODE_BORDER_RADIUS);
 }
 
-void AprochNodePainter::DrawModelName(QPainter *painter, AprochNode &node)
+void ANodePainter::DrawModelName(QPainter *painter, ANode &node)
 {
     auto const &model = node.getNodeDataModel();
     auto const &nodeStyle = model->getNodeStyle();
@@ -74,7 +74,7 @@ void AprochNodePainter::DrawModelName(QPainter *painter, AprochNode &node)
     painter->setFont(f);
 }
 
-void AprochNodePainter::DrawPortLabel(QPainter *painter, AprochNode &node)
+void ANodePainter::DrawPortLabel(QPainter *painter, ANode &node)
 {
     QFontMetrics const &metrics = painter->fontMetrics();
 
@@ -132,7 +132,7 @@ void AprochNodePainter::DrawPortLabel(QPainter *painter, AprochNode &node)
     }
 }
 
-void AprochNodePainter::DrawPort(QPainter *painter, AprochNode &node, const AprochFlowScene &scene)
+void ANodePainter::DrawPort(QPainter *painter, ANode &node, const AFlowScene &scene)
 {
     auto const &model = node.getNodeDataModel();
     auto const &nodeStyle = model->getNodeStyle();
@@ -189,7 +189,7 @@ void AprochNodePainter::DrawPort(QPainter *painter, AprochNode &node, const Apro
     }
 }
 
-void AprochNodePainter::DrawConnectedPort(QPainter *painter, AprochNode &node)
+void ANodePainter::DrawConnectedPort(QPainter *painter, ANode &node)
 {
     auto const &model = node.getNodeDataModel();
     auto const &nodeStyle = model->getNodeStyle();

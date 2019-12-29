@@ -1,9 +1,9 @@
 ﻿#ifndef APROCHNODE_H
 #define APROCHNODE_H
 
-#include "AprochNodeGraphicsObject.h"
-#include "AprochNodeDataModel.h"
-#include "AprochConnection.h"
+#include "ANodeGraphicsObject.h"
+#include "ANodeDataModel.h"
+#include "AConnection.h"
 
 #include <QUuid>
 #include <QFontMetrics>
@@ -11,7 +11,7 @@
 
 APROCH_NAMESPACE_BEGIN
 
-using ConnectionPtrSet = std::unordered_map<QUuid, AprochConnection *>;
+using ConnectionPtrSet = std::unordered_map<QUuid, AConnection *>;
 
 struct SNodeState
 {
@@ -32,14 +32,14 @@ struct SNodeState
     bool IsResizing;
 };
 
-class APROCH_EXPORT AprochNode : public QObject, public ISerializable
+class APROCH_EXPORT ANode : public QObject, public ISerializable
 {
     Q_OBJECT
 
-    friend class AprochNodeGraphicsObject;
+    friend class ANodeGraphicsObject;
 public:
-    AprochNode(std::unique_ptr<INodeDataModel> &&dataModel);
-    virtual ~AprochNode(void) override = default;
+    ANode(std::unique_ptr<INodeDataModel> &&dataModel);
+    virtual ~ANode(void) override = default;
 
 public:
     QJsonObject save(void) const override;
@@ -72,11 +72,11 @@ public:
     inline bool isHovered(void) const { return mIsHovered; }
     inline void setHovered(bool isHovered) { mIsHovered = isHovered; }
 
-    inline AprochNodeGraphicsObject const &getNodeGraphicsObject(void) const {return *mNodeGraphicsObject.get(); }
-    inline AprochNodeGraphicsObject &getNodeGraphicsObject(void) {return *mNodeGraphicsObject.get(); }
+    inline ANodeGraphicsObject const &getNodeGraphicsObject(void) const {return *mNodeGraphicsObject.get(); }
+    inline ANodeGraphicsObject &getNodeGraphicsObject(void) {return *mNodeGraphicsObject.get(); }
     inline INodeDataModel *getNodeDataModel(void) const { return mNodeDataModel.get(); }
 
-    inline void setNodeGraphicsObject(std::unique_ptr<AprochNodeGraphicsObject> &&graphicsObj)
+    inline void setNodeGraphicsObject(std::unique_ptr<ANodeGraphicsObject> &&graphicsObj)
     {
         mNodeGraphicsObject = std::move(graphicsObj);
         resize();
@@ -88,7 +88,7 @@ public:
 
     ConnectionPtrSet getConnections(EPortType portType, PortIndex portIndex) const;
 
-    void setConnection(EPortType portType, PortIndex portIndex, AprochConnection &connection);
+    void setConnection(EPortType portType, PortIndex portIndex, AConnection &connection);
     void eraseConnection(EPortType portType, PortIndex portIndex, QUuid id);
 
     SNodeState::EReactToConnectionState reaction() const;
@@ -160,7 +160,7 @@ private:
     SNodeState mNodeState;
 
     std::unique_ptr<INodeDataModel> const &mNodeDataModel;
-    std::unique_ptr<AprochNodeGraphicsObject> mNodeGraphicsObject;
+    std::unique_ptr<ANodeGraphicsObject> mNodeGraphicsObject;
 };
 
 APROCH_NAMESPACE_END

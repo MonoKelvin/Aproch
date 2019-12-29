@@ -1,24 +1,24 @@
-#include "AprochNCInteraction.h"
+#include "ANCInteraction.h"
 
-#include "AprochNode.h"
-#include "AprochConnection.h"
-#include "AprochFlowScene.h"
-#include "AprochDataModelRegistry.h"
-#include "AprochNodeGraphicsObject.h"
-#include "AprochConnectionGraphicsObject.h"
+#include "ANode.h"
+#include "AConnection.h"
+#include "AFlowScene.h"
+#include "ADataModelRegistry.h"
+#include "ANodeGraphicsObject.h"
+#include "AConnectionGraphicsObject.h"
 
 APROCH_NAMESPACE_BEGIN
 
-AprochNCInteraction::AprochNCInteraction(AprochNode &node, AprochConnection &connection, AprochFlowScene &scene)
+ANCInteraction::ANCInteraction(ANode &node, AConnection &connection, AFlowScene &scene)
     : mNode(&node)
     , mConnection(&connection)
     , mScene(&scene)
 {}
 
 
-bool AprochNCInteraction::canConnect(PortIndex &portIndex, TypeConverter &converter) const
+bool ANCInteraction::canConnect(PortIndex &portIndex, TypeConverter &converter) const
 {
-    // 1) AprochConnection requires a port
+    // 1) AConnection requires a port
 
     EPortType requiredPort = getConnectionRequiredPort();
 
@@ -28,7 +28,7 @@ bool AprochNCInteraction::canConnect(PortIndex &portIndex, TypeConverter &conver
     }
 
     // 1.5) Forbid connecting the node to itself
-    AprochNode *node = mConnection->getNode(AprochPort::OppositePort(requiredPort));
+    ANode *node = mConnection->getNode(APort::OppositePort(requiredPort));
 
     if (node == mNode)
     {
@@ -46,7 +46,7 @@ bool AprochNCInteraction::canConnect(PortIndex &portIndex, TypeConverter &conver
         return false;
     }
 
-    // 3) AprochNode port is vacant
+    // 3) ANode port is vacant
 
     // port should be empty
     if (!isNodePortEmpty(requiredPort, portIndex))
@@ -54,9 +54,9 @@ bool AprochNCInteraction::canConnect(PortIndex &portIndex, TypeConverter &conver
         return false;
     }
 
-    // 4) AprochConnection type equals node port type, or there is a registered type conversion that can translate between the two
+    // 4) AConnection type equals node port type, or there is a registered type conversion that can translate between the two
 
-    auto connectionDataType = mConnection->dataType(AprochPort::OppositePort(requiredPort));
+    auto connectionDataType = mConnection->dataType(APort::OppositePort(requiredPort));
 
     auto const &modelTarget = mNode->getNodeDataModel();
     SNodeDataType candidateNodeDataType = modelTarget->dataType(requiredPort, portIndex);
@@ -79,7 +79,7 @@ bool AprochNCInteraction::canConnect(PortIndex &portIndex, TypeConverter &conver
 }
 
 
-bool AprochNCInteraction::tryConnect() const
+bool ANCInteraction::tryConnect() const
 {
     // 1) Check conditions from 'canConnect'
     PortIndex portIndex = INVALID_PORT_INDEX;
@@ -98,15 +98,15 @@ bool AprochNCInteraction::tryConnect() const
         mConnection->setTypeConverter(converter);
     }
 
-    // 2) Assign node to required port in AprochConnection
+    // 2) Assign node to required port in AConnection
     EPortType requiredPort = getConnectionRequiredPort();
     mNode->setConnection(requiredPort, portIndex, *mConnection);
 
-    // 3) Assign AprochConnection to empty port in NodeState
+    // 3) Assign AConnection to empty port in NodeState
     // The port is not longer required after this function
     mConnection->setNodeToPort(*mNode, requiredPort, portIndex);
 
-    // 4) Adjust AprochConnection geometry
+    // 4) Adjust AConnection geometry
 
     mNode->getNodeGraphicsObject().moveConnections();
 
@@ -123,20 +123,20 @@ bool AprochNCInteraction::tryConnect() const
 }
 
 
-/// 1) AprochNode and AprochConnection should be already connected
-/// 2) If so, clear AprochConnection entry in the NodeState
-/// 3) Set AprochConnection end to 'requiring a port'
-bool AprochNCInteraction::disconnect(EPortType portToDisconnect) const
+/// 1) ANode and AConnection should be already connected
+/// 2) If so, clear AConnection entry in the NodeState
+/// 3) Set AConnection end to 'requiring a port'
+bool ANCInteraction::disconnect(EPortType portToDisconnect) const
 {
     PortIndex portIndex = mConnection->getPortIndex(portToDisconnect);
 
-    // clear pointer to AprochConnection in the NodeState
+    // clear pointer to AConnection in the NodeState
     mNode->getEntries(portToDisconnect)[int(portIndex)].clear();
 
     // 4) Propagate invalid data to IN node
     mConnection->propagateEmptyData();
 
-    // clear AprochConnection side
+    // clear AConnection side
     mConnection->clearNode(portToDisconnect);
 
     mConnection->setRequiredPort(portToDisconnect);
@@ -149,13 +149,13 @@ bool AprochNCInteraction::disconnect(EPortType portToDisconnect) const
 
 // ------------------ util functions below
 
-EPortType AprochNCInteraction::getConnectionRequiredPort() const
+EPortType ANCInteraction::getConnectionRequiredPort() const
 {
     return mConnection->getRequiredPort();
 }
 
 
-QPointF AprochNCInteraction::getConnectionEndScenePosition(EPortType portType) const
+QPointF ANCInteraction::getConnectionEndScenePosition(EPortType portType) const
 {
     QPointF endPoint = mConnection->getEndPoint(portType);
 
@@ -163,7 +163,7 @@ QPointF AprochNCInteraction::getConnectionEndScenePosition(EPortType portType) c
 }
 
 
-QPointF AprochNCInteraction::getNodePortScenePosition(EPortType portType, PortIndex portIndex) const
+QPointF ANCInteraction::getNodePortScenePosition(EPortType portType, PortIndex portIndex) const
 {
     QPointF p = mNode->getPortScenePosition(portIndex, portType);
 
@@ -171,7 +171,7 @@ QPointF AprochNCInteraction::getNodePortScenePosition(EPortType portType, PortIn
 }
 
 
-PortIndex AprochNCInteraction::getNodePortIndexUnderScenePoint(EPortType portType, const QPointF &scenePoint) const
+PortIndex ANCInteraction::getNodePortIndexUnderScenePoint(EPortType portType, const QPointF &scenePoint) const
 {
     QTransform sceneTransform =  mNode->getNodeGraphicsObject().sceneTransform();
     PortIndex portIndex = mNode->checkHitScenePoint(portType, scenePoint, sceneTransform);
@@ -180,7 +180,7 @@ PortIndex AprochNCInteraction::getNodePortIndexUnderScenePoint(EPortType portTyp
 }
 
 
-bool AprochNCInteraction::isNodePortEmpty(EPortType portType, PortIndex portIndex) const
+bool ANCInteraction::isNodePortEmpty(EPortType portType, PortIndex portIndex) const
 {
     auto const &entries = mNode->getEntries(portType);
 

@@ -1,8 +1,8 @@
 ﻿#ifndef APROCHNODEDATAMODEL_H
 #define APROCHNODEDATAMODEL_H
 
-#include "AprochPort.h"
-#include "AprochStyle.h"
+#include "APort.h"
+#include "AStyle.h"
 #include "ISerializable.h"
 
 #include <QObject>
@@ -28,7 +28,7 @@ struct SNodeDataType
     }
 };
 
-class AprochConnection;
+class AConnection;
 
 // Class represents data transferred between nodes.
 // @param type is used for comparing the types
@@ -108,23 +108,23 @@ public:
 
     virtual QString validationMessage() const { return QString(""); }
 
-//    virtual AprochNodePainterDelegate* painterDelegate() const { return nullptr; }
+//    virtual ANodePainterDelegate* painterDelegate() const { return nullptr; }
 
 public Q_SLOTS:
 
-    virtual void inputConnectionCreated(const AprochConnection &)
+    virtual void inputConnectionCreated(const AConnection &)
     {
     }
 
-    virtual void inputConnectionDeleted(const AprochConnection &)
+    virtual void inputConnectionDeleted(const AConnection &)
     {
     }
 
-    virtual void outputConnectionCreated(const AprochConnection &)
+    virtual void outputConnectionCreated(const AConnection &)
     {
     }
 
-    virtual void outputConnectionDeleted(const AprochConnection &)
+    virtual void outputConnectionDeleted(const AConnection &)
     {
     }
 
