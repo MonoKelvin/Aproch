@@ -1,21 +1,20 @@
 class ANode {
     /**
      * 创建一个新的节点
-     * @param {object} canvasElement 要把节点放入的画布场景元素
+     * @param {AFlowView} flowView 要把节点放入的视图
      * @param {string} idName 指定html中节点的唯一id
      * @param {string} titleName 节点标题名
      * @param {number} x 节点的 x 坐标
      * @param {number} y 节点的 y 坐标
      * @param {string} titleColor 节点头部颜色
      */
-    constructor(canvasElement, idName, titleName, x = 0, y = 0, titleColor = '#3f3f3f') {
-        if (canvasElement === undefined) {
-            throw 'canvasElement不允许为空!';
+    constructor(flowView, idName, titleName, x = 0, y = 0, titleColor = '#3f3f3f') {
+        if (flowView === null || !(flowView instanceof AFlowView)) {
+            throw 'flowView无效！';
         }
 
         /** UUID，标识每一个节点 */
         this.uuid = getUUID();
-        console.log(this.uuid);
 
         /** 节点的 x 坐标 */
         this.x = x;
@@ -42,16 +41,14 @@ class ANode {
         this.nodeWidget.append(this.nodeTitle);
         this.nodeWidget.append(this.nodeContent);
         this.nodeWidget.innerHTML += '<span class="node-resize-indicator"></span>';
-        canvasElement.appendChild(this.nodeWidget);
+        flowView.addNode(this);
 
         /* 设置位置 */
         this.nodeWidget.style.left = x + 'px';
         this.nodeWidget.style.top = y + 'px';
 
         /* 注册为可移动节点 */
-        $('#' + idName).bg_move({
-            move: '.node-title'
-        });
+        $('#' + idName).addMoveComponent();
     }
 
     /**
@@ -76,13 +73,12 @@ class ANode {
         };
     }
 }
+let node;
 
 function addNode() {
-    let node = new ANode(
-        document.querySelector('#flow-view'),
-        '_' + parseInt(Math.random() * 10000000),
-        'NEW NODE',
-        300,
-        150
-    );
+    node = new ANode(flowView, '_' + parseInt(Math.random() * 10000000), 'NEW NODE', 300, 150);
+}
+
+function removeNode() {
+    flowView.deleteNode(node);
 }

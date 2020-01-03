@@ -1,12 +1,14 @@
 (function() {
-    function b(t, s) {
-        this.t = t;
-        this.c = t.find(s.move).first();
+    function b(nodeWidgets, moveSettings) {
+        this.t = nodeWidgets;
+        this.c = nodeWidgets.find('.' + moveSettings.moveableElement).first();
+        this.isWidthCanChange = moveSettings.isWidthCanChange;
+        this.isHeightCanChange = moveSettings.isHeightCanChange;
         // this.cs = t.find(s.closed).first();
         this.m = false;
         this.s = false;
         this.hide = 5;
-        this.size_bg = s.size;
+        this.size_bg = 20;
         this.init();
     }
     b.prototype = {
@@ -26,7 +28,11 @@
                 t.c_width = 0;
                 t.c_height = 0;
             }
-            t.t.css({ 'max-height': t.w_height - t.c_height, 'max-width': t.w_width - t.c_width, position: 'fixed' });
+            t.t.css({
+                'max-height': t.w_height - t.c_height,
+                'max-width': t.w_width - t.c_width,
+                position: 'fixed'
+            });
             $(window).resize(function() {
                 t.w_width = $(window).width();
                 t.w_height = $(window).height();
@@ -78,6 +84,9 @@
             //     });
             //     return false;
             // });
+            t.t.on('mousedown', () => {
+                return false;
+            });
             t.c.on('mousedown', function(e) {
                 t.m = true;
                 t.x = e.pageX;
@@ -112,53 +121,77 @@
             });
         },
         size: function() {
-            var t = this;
-            t.sz = t.t.find('.node-resize-indicator').first();
-            t.sz.on('mousedown', function(e) {
-                t.s = true;
-                t.old_width = t.t.width();
-                t.old_size_x = e.pageX;
-                t.old_size_y = e.pageY;
-                $(document).on('mousemove', function(e) {
-                    t.new_width = e.pageX - t.old_size_x + t.old_width;
-                    t.t.width(t.new_width);
-                    if (t.t.outerWidth() + t.left >= t.w_width) {
-                        t.t.width(t.w_width - t.left - t.c_width);
-                    }
+                if (!this.isWidthCanChange && !this.isHeightCanChange) {
+                    return;
+                }
+                var t = this;
+                t.resizeIndicator = document.createElement('span');
+                t.resizeIndicator.setAttribute('class', 'resize-indicator');
+                t.t.append(t.resizeIndicator);
+                t.resizeIndicator.onmousedown = function(e) {
+                    t.s = true;
+                    t.old_width = t.t.width();
+                    t.old_size_x = e.pageX;
+                    t.old_size_y = e.pageY;
+                    $(document).on('mousemove', function(e) {
+                        t.new_width = e.pageX - t.old_size_x + t.old_width;
+                        t.t.width(t.new_width);
+                        if (t.t.outerWidth() + t.left >= t.w_width) {
+                            t.t.width(t.w_width - t.left - t.c_width);
+                        }
+                        return false;
+                    });
+                    $(document).on('mouseup', function() {
+                        t.width = t.t.outerWidth();
+                        t.s = false;
+                        $(document).off('mousemove');
+                        $(document).off('mouseup');
+                    });
                     return false;
-                });
-                $(document).on('mouseup', function() {
-                    t.width = t.t.outerWidth();
-                    t.s = false;
-                    $(document).off('mousemove');
-                    $(document).off('mouseup');
-                });
-                return false;
-            });
-        },
-        leave: function(xx, yy) {
-            var t = this;
-            if (
-                xx >= t.t.offset().left &&
-                xx <= t.t.offset().left + t.width &&
-                yy >= t.t.offset().top &&
-                yy <= t.t.offset().top + t.height
-            ) {
-                return false;
-            } else {
-                return true;
+                };
             }
-        }
+            // leave: function(xx, yy) {
+            //     var t = this;
+            //     if (
+            //         xx >= t.t.offset().left &&
+            //         xx <= t.t.offset().left + t.width &&
+            //         yy >= t.t.offset().top &&
+            //         yy <= t.t.offset().top + t.height
+            //     ) {
+            //         return false;
+            //     } else {
+            //         return true;
+            //     }
+            // }
     };
-    var y = {
-        move: '.node-title',
-        // closed: '.close',
-        size: 20
+
+    /** 移动相关设置 */
+    var moveSettings = {
+        /** 可以移动部分的元素名称，用class名 */
+        moveableElement: 'node-title',
+
+        /** 是否可以改变宽度 */
+        isWidthCanChange: true,
+
+        /** 是否可以改变高度 */
+        isHeightCanChange: false
     };
-    $.fn.addMoveComponent = function() {
-        $.extend(y, '.node-title');
+
+    /** 注册移动组件
+     * @note 针对类名来使用，如果只想为一个有id的节点添加，建议使用 @see addMoveComponent();
+     */
+    $.fn.registryMoveComponent = function() {
+        $.extend(moveSettings, 'node-title');
         $(this).each(function() {
-            new b($(this), y);
+            new b($(this), moveSettings);
         });
+    };
+
+    /** 注册移动组件
+     * @note 针对id名来使用，如果想为大量的class为node-widget添加，建议使用 @see registryMoveComponent();
+     */
+    $.fn.addMoveComponent = function() {
+        $.extend(moveSettings, 'node-title');
+        new b($(this), moveSettings);
     };
 })(jQuery);

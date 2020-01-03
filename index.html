@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    <div id="flow-view" class="node-flow-view-bg">
+    <div id="flow-view" class="flow-view">
         <div id="node1" class="node-widget">
             <div class="node-title">加法节点</div>
             <div id="node-content" class="node-content">
@@ -67,11 +67,11 @@
                     <span class="node-port-out port-int"></span>
                 </div>
             </div>
-            <span class="node-resize-indicator"></span>
         </div>
     </div>
 
     <button id="btn-add-port" onclick="addNode();">+++++</button>
+    <button id="btn-add-port" onclick="removeNode();">-----</button>
 
     <script type="text/javascript" src="./vendor/jquery/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="./core/draggable-widget.js"></script>
@@ -80,17 +80,17 @@
     <script type="text/javascript" src="./core/AFlowView.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            $("#node1").addMoveComponent();
-        });
+            $(".node-widget").registryMoveComponent();
 
-        // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
-        window.onkeydown = function(e) {
-            var ev = window.event || e;
-            var code = ev.keyCode || ev.which;
-            if (code == 82 && (ev.metaKey || ev.ctrlKey)) {
-                return false;
+            // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
+            window.onkeydown = function(e) {
+                var ev = window.event || e;
+                var code = ev.keyCode || ev.which;
+                if (code == 82 && (ev.metaKey || ev.ctrlKey)) {
+                    return false;
+                }
             }
-        }
+        });
     </script>
 </body>
 
