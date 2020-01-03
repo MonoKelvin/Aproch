@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Node Widget</title>
+    <link rel="stylesheet" href="css/style.default.css">
+    <!-- <link rel="stylesheet" href="vendor/bootstrap-4.3.1/css/bootstrap.min.css"> -->
+</head>
+
+<body class="view-background" style="padding:40px;">
+    <div id="node1" class="node-widget">
+        <div class="node-title">加法节点</div>
+        <div id="node-content" class="node-content">
+            <div class="node-interface">
+                <span class="node-port-in port-exec"></span>
+                <strong class="node-exec-label">exec</strong>
+                <div class="node-port-out port-exec"></div>
+            </div>
+            <div class="node-interface interface-in">
+                <span class="node-port-in port-int"></span>
+                <span class="node-label">只有输入、没有控件</span>
+            </div>
+            <div class="node-interface interface-out">
+                <span class="node-label">只有输出、没有控件</span>
+                <span class="node-port-out port-int"></span>
+            </div>
+            <div class="node-interface">
+                <span class="node-port-in port-int"></span>
+                <span class="node-control-label">int</span>
+                <input class="node-item-input input-int" type="text" placeholder="int" value="100">
+                <span class="node-port-out port-int"></span>
+            </div>
+            <div class="node-interface">
+                <span class="node-control-label">float</span>
+                <input class="node-item-input input-float" type="text" placeholder="int" value="100">
+                <span class="node-port-out port-float"></span>
+            </div>
+            <div class="node-interface">
+                <span class="node-port-in port-double"></span>
+                <span class="node-control-label">double</span>
+                <input class="node-item-input input-double" type="text" placeholder="int" value="100">
+            </div>
+            <div class="node-interface">
+                <span class="node-control-label">string</span>
+                <input class="node-item-input input-string" type="text" placeholder="string" value="this is a string">
+                <span class="node-port-out port-string"></span>
+            </div>
+            <div class="node-interface interface-in">
+                <span class="node-port-in port-bool"></span>
+                <span class="node-label">bool</span>
+                <input type="checkbox">
+                <span class="node-port-out port-bool"></span>
+            </div>
+            <div class="node-interface">
+                <span class="node-port-in port-int"></span>
+                <span class="node-control-label">ComboBox</span>
+                <select class="node-item-selection">
+                    <option value="">A</option>
+                    <option value="">B</option>
+                    <option value="">C</option>
+                    <option value="">A</option>
+                </select>
+                <span class="node-port-out port-int"></span>
+            </div>
+            <button id="btn-add-port" onclick="addInterface();">+</button>
+        </div>
+        <span class="node-resize-indicator"></span>
+    </div>
+
+    <script src="vendor/jquery/jquery-3.4.1.min.js"></script>
+    <!-- <script src="vendor/popper/popper.min.js"></script> -->
+    <script src="vendor/bootstrap-4.3.1/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/bootstrap-4.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="vendor/draggable-widget/draggable-widget.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#node1").bg_move({
+                move: '.node-title',
+            });
+        });
+
+        function addInterface() {
+            document.getElementById("node-content").innerHTML += `<div class="node-interface interface-in">
+                <span class="node-port-in port-int"></span>
+                <span class="node-label">added</span>
+                <span class="node-port-out port-int"></span>
+            </div>`;
+        }
+    </script>
+</body>
+
+</html>

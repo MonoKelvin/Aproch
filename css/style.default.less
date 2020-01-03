@@ -1,0 +1,259 @@
+// app
+@primaryColor: #6fbbf5;
+
+// view
+@viewBgColor: #1d1d1d;
+@gridColor: @viewBgColor + #111;
+@gridBorderColor: @viewBgColor + #444;
+@gridSpacing: 30px;
+
+// node
+@nodeTitleHeight: 32px;
+@nodeTitle: #3f3f3f;
+@nodeBackground: #272727;
+@nodeShadow: #00000080;
+@nodeMinWidth: 160px;
+@textColor: #cccccc;
+@controlHight: 24px;
+@controlBgColor: #3f3f3f;
+@indicateColor: #3f3f3f;
+@controlHoverBgColor: @controlBgColor + #111;
+
+// port
+@portSize: 12px;
+@disport: red;
+@intPort: @primaryColor;
+@floatPort: #e76ff6;
+@doublePort: #5df67e;
+@stringPort: #ebf879;
+@boolPort: #fd7191;
+@execPort: white;
+
+* {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: none;
+}
+
+.view-background {
+    background: -webkit-linear-gradient(top, transparent @gridSpacing - 1px, @gridColor @gridSpacing),
+        -webkit-linear-gradient(left, @viewBgColor @gridSpacing - 1px, @gridColor @gridSpacing);
+    background-size: @gridSpacing @gridSpacing;
+    // transition: zoom 0.5s;
+    // zoom: 1;
+}
+
+.clear-background {
+    background-color: transparent !important;
+}
+
+/********/
+/* Node */
+/********/
+.node-widget {
+    display: inline-block;
+    min-width: @nodeMinWidth;
+    border-radius: 6px;
+    background: @nodeBackground;
+    border: 2px solid transparent;
+    box-shadow: 0 0 15px @nodeShadow;
+    transition: border 0.2s;
+    color: @textColor;
+    font-size: 12px;
+    // overflow: hidden;
+    opacity: 0.8;
+}
+.node-widget:hover {
+    border: 2px solid @primaryColor;
+}
+.node-title {
+    background: @nodeTitle;
+    height: @nodeTitleHeight;
+    color: #fff;
+    font-weight: bold;
+    font-size: 14px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    line-height: @nodeTitleHeight;
+    cursor: move;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.node-content {
+    padding: 4px @portSize - 4px 8px @portSize - 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+// interface
+.node-interface {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+.interface-in {
+    justify-content: flex-start;
+}
+.interface-out {
+    justify-content: flex-end;
+}
+
+// node label and control label
+.node-label,
+.node-control-label,
+.node-exec-label {
+    color: @textColor;
+    font-weight: bold;
+    padding-left: 5px;
+    padding-right: 5px;
+    text-align: center;
+    white-space: nowrap;
+    height: @controlHight;
+    line-height: @controlHight;
+}
+.node-exec-label {
+    width: 100%;
+}
+.node-exec-label,
+.node-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: @controlHight - 6px;
+    line-height: @controlHight - 6px;
+}
+.node-control-label {
+    background: @controlBgColor + #111;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+/********/
+/* Port */
+/********/
+.node-port-in,
+.node-port-out {
+    min-width: @portSize;
+    min-height: @portSize;
+    border-radius: 50%;
+    background-color: @disport;
+    border: 2px solid @nodeBackground;
+    // box-shadow: 0 0 0 0.15rem @disport inset, 0 0 0 0.25rem @nodeBackground inset;
+    transition: all 0.2s;
+    position: absolute;
+}
+.node-port-in {
+    left: -@portSize + 2px;
+}
+.node-port-out {
+    right: -@portSize + 2px;
+}
+// int
+.port-int,
+.port-int:active {
+    // background: @nodeBackground;
+    // box-shadow: 0 0 0 0.15rem @intPort inset, 0 0 0 0.25rem @nodeBackground inset;
+    background: @intPort;
+}
+.port-int:hover {
+    background-color: @intPort - #444;
+}
+// float
+.port-float,
+.port-float:active {
+    background-color: @floatPort;
+}
+.port-float:hover {
+    background-color: @floatPort - #444;
+}
+// double
+.port-double,
+.port-double:active {
+    background-color: @doublePort;
+}
+.port-double:hover {
+    background-color: @doublePort - #444;
+}
+// string
+.port-string,
+.port-string:active {
+    background-color: @stringPort;
+}
+.port-string:hover {
+    background-color: @stringPort - #444;
+}
+// bool
+.port-bool,
+.port-bool:active {
+    background-color: @boolPort;
+}
+.port-bool:hover {
+    background-color: @boolPort - #444;
+}
+// exec
+.port-exec,
+.port-exec:active {
+    background-color: @execPort;
+}
+.port-exec:hover {
+    background-color: @execPort - #444;
+}
+
+// Resize indicator
+.node-resize-indicator {
+    color: @indicateColor;
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    border-top: 10px solid transparent;
+    border-right: 10px solid #3f3f3f;
+    cursor: nw-resize;
+}
+
+/***********************/
+/* Data Model Controls */
+/***********************/
+.node-item-input,
+.node-item-selection {
+    flex: 1 1 auto;
+    color: @textColor;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    min-width: 0;
+    background: @controlBgColor;
+    height: @controlHight;
+    transition: all 0.3s;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.node-item-selection:hover,
+.node-item-input:hover {
+    color: #fff;
+    background: @controlHoverBgColor;
+}
+.node-item-selection {
+    appearance: none;
+    option {
+        margin: 100px;
+        width: 140px;
+        height: 40px;
+        border: 1px solid #cccccc;
+        position: relative;
+    }
+    option select {
+        border: none;
+        outline: none;
+        width: 100%;
+        height: 40px;
+        line-height: 40px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding-left: 20px;
+    }
+}
