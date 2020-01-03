@@ -151,12 +151,12 @@
         }
     };
     var y = {
-        move: '.title',
+        move: '.node-title',
         // closed: '.close',
-        size: 8
+        size: 20
     };
-    $.fn.bg_move = function(bg) {
-        $.extend(y, bg);
+    $.fn.addMoveComponent = function() {
+        $.extend(y, '.node-title');
         $(this).each(function() {
             new b($(this), y);
         });

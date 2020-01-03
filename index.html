@@ -10,79 +10,86 @@
     <!-- <link rel="stylesheet" href="vendor/bootstrap-4.3.1/css/bootstrap.min.css"> -->
 </head>
 
-<body class="node-flow-view-bg" style="padding:40px;">
-    <div id="node1" class="node-widget">
-        <div class="node-title">加法节点</div>
-        <div id="node-content" class="node-content">
-            <div class="node-interface">
-                <span class="node-port-in port-exec"></span>
-                <strong class="node-exec-label">exec</strong>
-                <div class="node-port-out port-exec"></div>
+<body>
+    <div id="flow-view" class="node-flow-view-bg">
+        <div id="node1" class="node-widget">
+            <div class="node-title">加法节点</div>
+            <div id="node-content" class="node-content">
+                <div class="node-interface">
+                    <span class="node-port-in port-exec"></span>
+                    <strong class="node-exec-label">EXEC</strong>
+                    <div class="node-port-out port-exec"></div>
+                </div>
+                <div class="node-interface interface-in">
+                    <span class="node-port-in port-int"></span>
+                    <span class="node-label">只有输入、没有控件</span>
+                </div>
+                <div class="node-interface interface-out">
+                    <span class="node-label">只有输出、没有控件</span>
+                    <span class="node-port-out port-int"></span>
+                </div>
+                <div class="node-interface">
+                    <span class="node-port-in port-int"></span>
+                    <span class="node-control-label">int</span>
+                    <input class="node-item-input input-int" type="text" placeholder="int" value="100">
+                    <span class="node-port-out port-int"></span>
+                </div>
+                <div class="node-interface">
+                    <span class="node-control-label">float</span>
+                    <input class="node-item-input input-float" type="text" placeholder="int" value="100">
+                    <span class="node-port-out port-float"></span>
+                </div>
+                <div class="node-interface">
+                    <span class="node-port-in port-double"></span>
+                    <span class="node-control-label">double</span>
+                    <input class="node-item-input input-double" type="text" placeholder="int" value="100">
+                </div>
+                <div class="node-interface">
+                    <span class="node-control-label">string</span>
+                    <input class="node-item-input input-string" type="text" placeholder="string" value="this is a string">
+                    <span class="node-port-out port-string"></span>
+                </div>
+                <div class="node-interface interface-in">
+                    <span class="node-port-in port-bool"></span>
+                    <span class="node-label">bool</span>
+                    <input type="checkbox">
+                    <span class="node-port-out port-bool"></span>
+                </div>
+                <div class="node-interface">
+                    <span class="node-port-in port-int"></span>
+                    <span class="node-control-label">ComboBox</span>
+                    <select class="node-item-selection">
+                        <option value="">A</option>
+                        <option value="">B</option>
+                        <option value="">C</option>
+                        <option value="">A</option>
+                    </select>
+                    <span class="node-port-out port-int"></span>
+                </div>
             </div>
-            <div class="node-interface interface-in">
-                <span class="node-port-in port-int"></span>
-                <span class="node-label">只有输入、没有控件</span>
-            </div>
-            <div class="node-interface interface-out">
-                <span class="node-label">只有输出、没有控件</span>
-                <span class="node-port-out port-int"></span>
-            </div>
-            <div class="node-interface">
-                <span class="node-port-in port-int"></span>
-                <span class="node-control-label">int</span>
-                <input class="node-item-input input-int" type="text" placeholder="int" value="100">
-                <span class="node-port-out port-int"></span>
-            </div>
-            <div class="node-interface">
-                <span class="node-control-label">float</span>
-                <input class="node-item-input input-float" type="text" placeholder="int" value="100">
-                <span class="node-port-out port-float"></span>
-            </div>
-            <div class="node-interface">
-                <span class="node-port-in port-double"></span>
-                <span class="node-control-label">double</span>
-                <input class="node-item-input input-double" type="text" placeholder="int" value="100">
-            </div>
-            <div class="node-interface">
-                <span class="node-control-label">string</span>
-                <input class="node-item-input input-string" type="text" placeholder="string" value="this is a string">
-                <span class="node-port-out port-string"></span>
-            </div>
-            <div class="node-interface interface-in">
-                <span class="node-port-in port-bool"></span>
-                <span class="node-label">bool</span>
-                <input type="checkbox">
-                <span class="node-port-out port-bool"></span>
-            </div>
-            <div class="node-interface">
-                <span class="node-port-in port-int"></span>
-                <span class="node-control-label">ComboBox</span>
-                <select class="node-item-selection">
-                    <option value="">A</option>
-                    <option value="">B</option>
-                    <option value="">C</option>
-                    <option value="">A</option>
-                </select>
-                <span class="node-port-out port-int"></span>
-            </div>
+            <span class="node-resize-indicator"></span>
         </div>
-        <span class="node-resize-indicator"></span>
     </div>
 
     <button id="btn-add-port" onclick="addNode();">+++++</button>
 
     <script type="text/javascript" src="./vendor/jquery/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="./vendor/draggable-widget/draggable-widget.js"></script>
-    <script type="module" src="./core/ANode.js"></script>
+    <script type="text/javascript" src="./core/draggable-widget.js"></script>
+    <script type="text/javascript" src="./core/utilities.js"></script>
+    <script type="text/javascript" src="./core/ANode.js"></script>
+    <script type="text/javascript" src="./core/AFlowView.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            $("#node1").bg_move({
-                move: '.node-title',
-            });
+            $("#node1").addMoveComponent();
         });
 
-        function addNode() {
-            let node = new ANode();
+        // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
+        window.onkeydown = function(e) {
+            var ev = window.event || e;
+            var code = ev.keyCode || ev.which;
+            if (code == 82 && (ev.metaKey || ev.ctrlKey)) {
+                return false;
+            }
         }
     </script>
 </body>

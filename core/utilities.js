@@ -1,4 +1,4 @@
-export function getUUID() {
+function getUUID() {
     let s = [];
     let hexDigits = '0123456789abcdef';
     for (let i = 0; i < 36; i++) {
@@ -10,4 +10,24 @@ export function getUUID() {
 
     let uuid = s.join('');
     return uuid;
+}
+
+function hexToRGB(hex, alpha) {
+    var r = parseInt(hex.slice(1, 3), 16),
+        g = parseInt(hex.slice(3, 5), 16),
+        b = parseInt(hex.slice(5, 7), 16);
+    return [r, g, b];
+}
+
+function rgbToHex(r, g, b) {
+    if (r === undefined) {
+        return false;
+    }
+    return (
+        '#' +
+        ((1 << 24) + (r << 16) + (g << 8) + b)
+        .toString(16)
+        .slice(1)
+        .toUpperCase()
+    );
 }

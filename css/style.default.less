@@ -8,19 +8,20 @@
 @gridSpacing: 30px;
 
 // node
-@nodeTitleHeight: 32px;
+@nodeTitleHeight: 28px;
+@nodeFontSize: 8px;
 @nodeTitle: #3f3f3f;
 @nodeBackground: #272727;
 @nodeShadow: #00000080;
-@nodeMinWidth: 160px;
+@nodeMinWidth: 150px;
 @textColor: #cccccc;
-@controlHight: 24px;
+@controlHight: 22px;
 @controlBgColor: #3f3f3f;
 @indicateColor: #3f3f3f;
 @controlHoverBgColor: @controlBgColor + #111;
 
 // port
-@portSize: 12px;
+@portSize: 10px;
 @disport: red;
 @intPort: @primaryColor;
 @floatPort: #e76ff6;
@@ -40,8 +41,14 @@
     background: -webkit-linear-gradient(top, transparent @gridSpacing - 1px, @gridColor @gridSpacing),
         -webkit-linear-gradient(left, @viewBgColor @gridSpacing - 1px, @gridColor @gridSpacing);
     background-size: @gridSpacing @gridSpacing;
-    transition: zoom 0.5s;
-    zoom: 1;
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    right: 0;
+    left: 0;
+    padding: 20px;
+    cursor: grab;
+    overflow: hidden;
 }
 
 .clear-background {
@@ -52,6 +59,7 @@
 /* Node */
 /********/
 .node-widget {
+    position: fixed;
     display: inline-block;
     min-width: @nodeMinWidth;
     border-radius: 6px;
@@ -60,9 +68,10 @@
     box-shadow: 0 0 15px @nodeShadow;
     transition: border 0.2s;
     color: @textColor;
-    font-size: 12px;
+    font-size: @nodeFontSize;
     // overflow: hidden;
-    opacity: 0.8;
+    opacity: 0.9;
+    cursor: default;
 }
 .node-widget:hover {
     border: 2px solid @primaryColor;
@@ -72,7 +81,7 @@
     height: @nodeTitleHeight;
     color: #fff;
     font-weight: bold;
-    font-size: 14px;
+    font-size: @nodeFontSize + 4px;
     padding-left: 10px;
     padding-right: 10px;
     border-top-left-radius: 5px;
@@ -84,7 +93,7 @@
     white-space: nowrap;
 }
 .node-content {
-    padding: 4px @portSize - 4px 8px @portSize - 4px;
+    padding: 4px @portSize - 2px 8px @portSize - 2px;
     display: flex;
     flex-direction: column;
 }
@@ -94,8 +103,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 3px;
-    margin-bottom: 3px;
+    margin-top: 2px;
+    margin-bottom: 2px;
 }
 .interface-in {
     justify-content: flex-start;
@@ -210,8 +219,8 @@
     position: absolute;
     right: 2px;
     bottom: 2px;
-    border-top: 10px solid transparent;
-    border-right: 10px solid #3f3f3f;
+    border-top: 8px solid transparent;
+    border-right: 8px solid #3f3f3f;
     cursor: nw-resize;
 }
 
@@ -224,6 +233,8 @@
     color: @textColor;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
     min-width: 0;
     background: @controlBgColor;
     height: @controlHight;
