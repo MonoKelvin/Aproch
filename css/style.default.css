@@ -4,9 +4,11 @@
   outline: none;
   border: none;
 }
-.view-background {
+.node-flow-view-bg {
   background: -webkit-linear-gradient(top, transparent 29px, #2e2e2e 30px), -webkit-linear-gradient(left, #1d1d1d 29px, #2e2e2e 30px);
   background-size: 30px 30px;
+  transition: zoom 0.5s;
+  zoom: 1;
 }
 .clear-background {
   background-color: transparent !important;

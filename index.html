@@ -10,7 +10,7 @@
     <!-- <link rel="stylesheet" href="vendor/bootstrap-4.3.1/css/bootstrap.min.css"> -->
 </head>
 
-<body class="view-background" style="padding:40px;">
+<body class="node-flow-view-bg" style="padding:40px;">
     <div id="node1" class="node-widget">
         <div class="node-title">加法节点</div>
         <div id="node-content" class="node-content">
@@ -65,16 +65,15 @@
                 </select>
                 <span class="node-port-out port-int"></span>
             </div>
-            <button id="btn-add-port" onclick="addInterface();">+</button>
         </div>
         <span class="node-resize-indicator"></span>
     </div>
 
-    <script src="vendor/jquery/jquery-3.4.1.min.js"></script>
-    <!-- <script src="vendor/popper/popper.min.js"></script> -->
-    <script src="vendor/bootstrap-4.3.1/js/bootstrap.bundle.min.js"></script>
-    <script src="vendor/bootstrap-4.3.1/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="vendor/draggable-widget/draggable-widget.js"></script>
+    <button id="btn-add-port" onclick="addNode();">+++++</button>
+
+    <script type="text/javascript" src="./vendor/jquery/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="./vendor/draggable-widget/draggable-widget.js"></script>
+    <script type="module" src="./core/ANode.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             $("#node1").bg_move({
@@ -82,12 +81,8 @@
             });
         });
 
-        function addInterface() {
-            document.getElementById("node-content").innerHTML += `<div class="node-interface interface-in">
-                <span class="node-port-in port-int"></span>
-                <span class="node-label">added</span>
-                <span class="node-port-out port-int"></span>
-            </div>`;
+        function addNode() {
+            let node = new ANode();
         }
     </script>
 </body>
