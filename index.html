@@ -12,7 +12,9 @@
 
 <body>
     <aproch-flow-view id="flow-view" name="flow-view" class="flow-view">
-        <aproch-node view="flow-view" />
+        <aproch-node view="flow-view">
+            <aproch-interface in-port="" widget="input" />
+        </aproch-node>
         <div id="node1" class="node-widget">
             <div class="node-title">加法节点</div>
             <div id="node-content" class="node-content">
@@ -73,10 +75,8 @@
 
     <script type="text/javascript" src="./vendor/jquery/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="./core/draggable-widget.js"></script>
-    <script type="text/javascript" src="./core/utilities.js"></script>
-    <script type="text/javascript" src="./core/AFlowView.js"></script>
-    <script type="text/javascript" src="./core/ANode.js"></script>
-    <script type="text/javascript">
+    <script type="model" src="./core/Aproch.js"></script>
+    <script>
         $(document).ready(function() {
             $(".node-widget").registryMoveComponent();
 
