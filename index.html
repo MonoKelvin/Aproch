@@ -11,7 +11,8 @@
 </head>
 
 <body>
-    <div id="flow-view" class="flow-view">
+    <aproch-flow-view id="flow-view" name="flow-view" class="flow-view">
+        <aproch-node view="flow-view" />
         <div id="node1" class="node-widget">
             <div class="node-title">加法节点</div>
             <div id="node-content" class="node-content">
@@ -68,16 +69,13 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <button id="btn-add-port" onclick="addNode();">+++++</button>
-    <button id="btn-add-port" onclick="removeNode();">-----</button>
+    </aproch-flow-view>
 
     <script type="text/javascript" src="./vendor/jquery/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="./core/draggable-widget.js"></script>
     <script type="text/javascript" src="./core/utilities.js"></script>
-    <script type="text/javascript" src="./core/ANode.js"></script>
     <script type="text/javascript" src="./core/AFlowView.js"></script>
+    <script type="text/javascript" src="./core/ANode.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             $(".node-widget").registryMoveComponent();

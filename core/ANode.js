@@ -1,4 +1,4 @@
-class ANode {
+class ANode extends HTMLElement {
     /**
      * 创建一个新的节点
      * @param {AFlowView} flowView 要把节点放入的视图
@@ -9,8 +9,12 @@ class ANode {
      * @param {string} titleColor 节点头部颜色
      */
     constructor(flowView, idName, titleName, x = 0, y = 0, titleColor = '#3f3f3f') {
+        super();
+
+        flowView = document.querySelector('#' + this.getAttribute('view'));
+
         if (flowView === null || !(flowView instanceof AFlowView)) {
-            throw 'flowView无效！';
+            throw 'flowView无效！：\n' + flowView;
         }
 
         /** UUID，标识每一个节点 */
@@ -41,6 +45,8 @@ class ANode {
         this.nodeWidget.append(this.nodeTitle);
         this.nodeWidget.append(this.nodeContent);
         this.nodeWidget.innerHTML += '<span class="node-resize-indicator"></span>';
+
+        /** 添加到视图 */
         flowView.addNode(this);
 
         /* 设置位置 */
@@ -73,12 +79,5 @@ class ANode {
         };
     }
 }
-let node;
 
-function addNode() {
-    node = new ANode(flowView, '_' + parseInt(Math.random() * 10000000), 'NEW NODE', 300, 150);
-}
-
-function removeNode() {
-    flowView.deleteNode(node);
-}
+customElements.define('aproch-node', ANode);

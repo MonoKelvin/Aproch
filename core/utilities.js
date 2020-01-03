@@ -31,3 +31,17 @@ function rgbToHex(r, g, b) {
         .toUpperCase()
     );
 }
+
+function clearEventBubble(evt) {
+    if (evt.stopPropagation) {
+        evt.stopPropagation();
+    } else {
+        evt.cancelBubble = true;
+    }
+
+    if (evt.preventDefault) {
+        evt.preventDefault();
+    } else {
+        evt.returnValue = false;
+    }
+}
