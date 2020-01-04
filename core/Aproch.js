@@ -6,9 +6,13 @@ var EPortType = {
 };
 
 var EWidgetType = {
+    Label: 'label',
     Input: 'input',
     Check: 'check',
-    Label: 'label'
+    Vector: 'vector',
+    Matrix: 'matrix',
+    Image: 'image',
+    File: 'file'
 };
 
 class AFlowView extends HTMLElement {
@@ -129,7 +133,6 @@ class AFlowView extends HTMLElement {
                             count++;
                         }
                     }
-                    console.log(selList instanceof ANode);
                 }
 
                 selList = null;
@@ -148,13 +151,17 @@ class AFlowView extends HTMLElement {
     /**
      * 添加一个节点
      * @param {ANode} node 要加入场景的节点
+     * @param {number} x 加入时的x坐标
+     * @param {number} y 加入时的y坐标
      */
-    addNode(node) {
+    addNode(node, x = 0, y = 0) {
         if (node === null || !(node instanceof ANode)) {
             throw '节点无效！';
         }
 
         this.append(node);
+
+        node.setPosition(x, y);
     }
 
     /**
@@ -175,25 +182,38 @@ class AFlowView extends HTMLElement {
  * <aproch-node name="my node" title-color="#123465"></aproch-node>
  */
 class ANode extends HTMLElement {
-    /**
-     * 创建一个新的节点
-     * @param {string} titleName 节点标题名
-     * @param {number} x 节点的 x 坐标
-     * @param {number} y 节点的 y 坐标
-     * @param {string} titleColor 节点头部颜色
-     */
-    constructor(name, x = 0, y = 0) {
+    constructor() {
         super();
 
         /** UUID，标识每一个节点 */
         this.uuid = getUUID();
 
         /** 节点的 x 坐标 */
-        this.x = x;
+        this.x = 0;
 
         /** 节点的 y 坐标 */
-        this.y = y;
+        this.y = 0;
 
+        /** 节点头部元素 */
+        this.nodeTitle = null;
+
+        /** 节点内容，放置所有接口的容器 */
+        this.nodeContent = null;
+
+        /** 包含的所有接口 */
+        this.interfaces = [];
+
+        /** 管理的所有连线 */
+        // this.connections = [];
+
+        /** 数据模型 */
+        // this.dataModel = null;
+    }
+
+    /**
+     * 元素被插入文档中被调用
+     */
+    connectedCallback() {
         /** 节点头部元素 */
         this.nodeTitle = document.createElement('div');
 
@@ -204,17 +224,40 @@ class ANode extends HTMLElement {
         this.setAttribute('class', 'node-widget');
         this.nodeTitle.setAttribute('class', 'node-title');
         this.nodeContent.setAttribute('class', 'node-content');
-        this.nodeTitle.innerHTML = this.getAttribute('name') ? this.getAttribute('name') : name;
-        this.nodeTitle.style.background = this.getAttribute('title-color');
+
+        /* 添加称为子组件 */
         this.append(this.nodeTitle);
         this.append(this.nodeContent);
 
         /* 设置位置 */
-        this.style.left = x + 'px';
-        this.style.top = y + 'px';
+        this.setPosition(0, 0);
 
         /* 注册为可移动节点*/
         $(this).addMoveComponent();
+    }
+
+    /**
+     * 元素被移除时调用
+     */
+    disconnectedCallback() {
+        this.interfaces.length = 0;
+        this.interfaces = null;
+        delete this.interfaces;
+    }
+
+    /**
+     * 设置节点的名称
+     * @param {string} name 节点的名称，这个名称会显示在标题
+     */
+    setName(name) {
+        this.nodeTitle.innerHTML = name;
+    }
+
+    /**
+     * 获得节点的名称，也就是节点标题显示的文字
+     */
+    getName() {
+        return this.nodeTitle.innerHTML;
     }
 
     /**
@@ -238,6 +281,40 @@ class ANode extends HTMLElement {
             y: this.style.top
         };
     }
+
+    /**
+     * 设置节点在视图中的位置
+     * @param {number} x x坐标
+     * @param {number} y y坐标
+     */
+    setPosition(x, y) {
+        /* 设置位置 */
+        this.style.left = x.toString() + 'px';
+        this.style.top = y.toString() + 'px';
+    }
+
+    /**
+     * 添加接口
+     * @param {AInterface} itf 要添加的接口
+     */
+    addInterface(itf) {
+        if (this.nodeContent) {
+            this.nodeContent.appendChild(itf);
+        }
+    }
+
+    /**
+     * 获得接口
+     */
+    // getInterfaces() {
+    //     var result = [];
+    //     this.children().forEach(element => {
+    //         if (element instanceof AInterface) {
+    //             result.push(element);
+    //         }
+    //     });
+    //     return result;
+    // }
 }
 
 /** <aproch-interface
@@ -253,7 +330,7 @@ class ANode extends HTMLElement {
  * @example
  * in-port 是否有输入端口： true | 声明(true) | 不声明(false);
  * out-port 是否有输出端口： true | 声明(true) | 不声明(false);
- * input-type 输入类型，只有当widget是input时才有效： int | float | double | number | string | bool;
+ * input-type 输入类型，只有当widget是input时才有效： int | float | number | string | bool;
  * min-value 最小值，只有当widget是input时才有效：类型随input-type
  * max-value 最大值，只有当widget是input时才有效：类型随input-type
  * d-value 默认值，类型随input-type
@@ -264,22 +341,56 @@ class AInterface extends HTMLElement {
     constructor() {
         super();
 
-        if (this.getAttribute('in-port')) {
+        /** 输入端口（左侧） */
+        this.inPort = undefined;
+
+        /** 输出端口（右侧） */
+        this.outPort = undefined;
+    }
+
+    connectedCallback() {
+        this.setAttribute('class', 'node-interface interface-out');
+    }
+
+    disconnectedCallback() {
+        removePort(true, true);
+    }
+
+    /**
+     * 移除输入端口，没有输入端口则什么都不做
+     * @param {boolean} isInPort 是否要移除输入端口（左侧）
+     * @param {boolean} isOutPort 是否要移除输出端口（右侧）
+     */
+    removePort(isInPort, isOutPort) {
+        if (isInPort && this.inPort) {
+            this.inPort.remove();
+            this.inPort = null;
+            delete this.inPort;
+        }
+        if (isOutPort && this.outPort) {
+            this.outPort = null;
+            delete this.outPort;
+        }
+    }
+
+    /**
+     * 设置输出输出端口
+     * @param {boolean} isInPort 是否添加输入端口
+     * @param {boolean} isOutPort 是否添加输出端口
+     * @note 当存在输入或输出端口时，可以设置为false以移除端口
+     * @see removePort();
+     */
+    setPort(isInPort, isOutPort) {
+        if (isInPort) {
             this.inPort = new APort(EPortType.INPUT);
             this.append(this.inPort);
         }
-        if (this.getAttribute('out-port')) {
+        if (isOutPort) {
             this.outPort = new APort(EPortType.OUTPUT);
             this.append(this.outPort);
         }
 
-        this.setAttribute('class', 'node-interface interface-out');
-
-        this.addWidget(this.getAttribute('widget'));
-
-        if (this.parentNode.querySelector('.node-content')) {
-            this.parentNode.querySelector('.node-content').appendChild(this);
-        }
+        this.removePort(!isInPort, !isOutPort);
     }
 
     /** 获得端口
@@ -358,3 +469,28 @@ customElements.define('aproch-flow-view', AFlowView);
 customElements.define('aproch-node', ANode);
 customElements.define('aproch-interface', AInterface);
 customElements.define('aproch-port', APort);
+
+function addNodeTest(flowView) {
+    flowView = document.querySelector(flowView);
+    if (flowView === null || !(flowView instanceof AFlowView)) {
+        alert('flowView不是有效的，flowView参数：' + flowView);
+        return;
+    }
+
+    node = document.createElement('aproch-node');
+    flowView.addNode(node);
+    node.setName('My Node');
+
+    itf = document.createElement('aproch-interface');
+    itf.addWidget('input');
+    node.addInterface(itf);
+
+    itf2 = document.createElement('aproch-interface');
+    itf2.setPort(true, true);
+    itf2.addWidget('input');
+    node.addInterface(itf2);
+
+    itf3 = document.createElement('aproch-interface');
+    itf3.addWidget('input');
+    node.addInterface(itf3);
+}

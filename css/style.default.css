@@ -131,13 +131,6 @@
 .port-float:hover {
   background-color: #a32bb2;
 }
-.port-double,
-.port-double:active {
-  background-color: #5df67e;
-}
-.port-double:hover {
-  background-color: #19b23a;
-}
 .port-string,
 .port-string:active {
   background-color: #ebf879;

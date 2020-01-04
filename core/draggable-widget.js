@@ -84,8 +84,8 @@
             //     });
             //     return false;
             // });
-            t.t.on('mousedown', () => {
-                return false;
+            t.t.on('mousedown', e => {
+                e.stopPropagation();
             });
             t.c.on('mousedown', function(e) {
                 t.m = true;

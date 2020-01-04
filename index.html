@@ -12,9 +12,6 @@
 
 <body>
     <aproch-flow-view id="flow-view" name="flow-view" class="flow-view">
-        <aproch-node name="my node" title-color="#228866" widget="input">
-            <aproch-interface in-port="" widget="input" />
-        </aproch-node>
         <!-- <div id="node1" class="node-widget">
             <div class="node-title">加法节点</div>
             <div id="node-content" class="node-content">
@@ -72,6 +69,8 @@
             </div>
         </div> -->
     </aproch-flow-view>
+    <button style="position: fixed;padding: 4px 10px; left: 20px; top: 20px;" onclick="addNodeTest('#flow-view');">添加节点</button>
+    <button style="position: fixed;padding: 4px 10px; left: 20px; top: 60px;" onclick="deleteNodeTest('#flow-view');">删除节点</button>
 
     <script type="text/javascript" src="./vendor/jquery/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="./core/utilities.js"></script>
