@@ -19,7 +19,7 @@
     </aproch-flow-view>
     <div style="position: fixed; left: 30px">
         <button style="padding: 4px 10px; left: 20px; top: 20px;" onclick="addNodeTest('#fv_1');">添加节点</button>
-        <aproch-input-number></aproch-input-number>
+        <!-- <!-- <aproch-input-number></aproch-input-number> -->
     </div>
     <!-- <button style="position: fixed;padding: 4px 10px; left: 20px; top: 60px;" onclick="deleteNodeTest('#flow-view ');">删除节点</button> svg -->
 
@@ -27,7 +27,10 @@
     <script type="text/javascript" src="./core/utilities.js"></script>
     <script type="text/javascript" src="./core/AWidget.js"></script>
     <script type="text/javascript" src="./core/Aproch.js"></script>
-    <script>
+    <script type="text/javascript">
+        //var FVManager = [];
+        var CurrentFV = document.querySelector('#fv_1');
+
         $(document).ready(function() {
             // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
             window.onkeydown = function(e) {
@@ -38,6 +41,7 @@
                 }
             }
         });
+        addNodeTest('#fv_1');
         // document.querySelector('#svg-id').innerHTML = (AConnection.createPath());
     </script>
 </body>

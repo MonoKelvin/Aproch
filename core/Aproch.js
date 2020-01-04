@@ -1,6 +1,8 @@
 // import { getUUID } from './utilities';
 
 var NodeIDGenerator = 0;
+var InterfaceIDGenerator = 0;
+var PortIDGenerator = 0;
 
 var EPortType = {
     INPUT: 0,
@@ -185,7 +187,11 @@ class AFlowView extends HTMLElement {
         node = null;
     }
 
-    addLinkingConnection(sourcePort) {}
+    addLinkingConnection(sourcePort) {
+        let conn = new AConnection(sourcePort.attr('id'));
+        let svg = '<svg id="svg-id" xmlns="http://www.w3.org/2000/svg" version="1.1"">' + conn.createPath() + '</svg>';
+        $(this).append(svg);
+    }
 
     /**
      * 为节点或者其他对象附加变换
@@ -387,6 +393,10 @@ class ANode extends HTMLElement {
 
         /* 设置位置 */
         this.setPosition(0, 0);
+
+        this.id = 'node_' + NodeIDGenerator++;
+
+        PortIDGenerator = 0;
     }
 
     /**
@@ -501,6 +511,7 @@ class AInterface extends HTMLElement {
     }
 
     connectedCallback() {
+        this.id = 'itf_' + NodeIDGenerator + '_' + InterfaceIDGenerator++;
         this.setAttribute('class', 'node-interface');
     }
 
@@ -585,6 +596,8 @@ class APort extends HTMLElement {
         /** 端口类型，只有输入和输出，其具体可接纳的数据类型由接口 @see `AInterface` 控制 */
         this.portType = type;
 
+        this.id = 'port_' + NodeIDGenerator + '_' + PortIDGenerator++;
+
         if (this.portType == EPortType.INPUT) {
             this.setAttribute('class', 'node-port-in');
         } else {
@@ -592,7 +605,7 @@ class APort extends HTMLElement {
         }
 
         this.onmousedown = function() {
-            AFlowView.createPath($(this));
+            CurrentFV.addLinkingConnection($(this));
         };
     }
 
@@ -657,13 +670,13 @@ function addNodeTest(flowView) {
 
     itf = document.createElement('aproch-interface');
     node.addInterface(itf);
-    itf.setPort(false, true);
+    itf.setPort(true, true);
     label = new ALabelWidget('aproch-label');
     itf.addWidget(label);
 
     itf2 = document.createElement('aproch-interface');
     node.addInterface(itf2);
-    itf2.setPort(false, true);
+    itf2.setPort(true, true);
 
     input = document.createElement('aproch-input-number');
     itf2.addWidget(input);
