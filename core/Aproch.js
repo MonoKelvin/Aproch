@@ -1,8 +1,14 @@
-import { getUUID } from './utilities';
+// import { getUUID } from './utilities';
 
 var EPortType = {
     INPUT: 0,
     OUTPUT: 1
+};
+
+var EWidgetType = {
+    Input: 'input',
+    Check: 'check',
+    Label: 'label'
 };
 
 class AFlowView extends HTMLElement {
@@ -148,7 +154,7 @@ class AFlowView extends HTMLElement {
             throw '节点无效！';
         }
 
-        this.append(node.nodeWidget);
+        this.append(node);
     }
 
     /**
@@ -165,24 +171,19 @@ class AFlowView extends HTMLElement {
     }
 }
 
+/** 节点
+ * <aproch-node name="my node" title-color="#123465"></aproch-node>
+ */
 class ANode extends HTMLElement {
     /**
      * 创建一个新的节点
-     * @param {AFlowView} flowView 要把节点放入的视图
-     * @param {string} idName 指定html中节点的唯一id
      * @param {string} titleName 节点标题名
      * @param {number} x 节点的 x 坐标
      * @param {number} y 节点的 y 坐标
      * @param {string} titleColor 节点头部颜色
      */
-    constructor(flowView, idName, titleName, x = 0, y = 0, titleColor = '#3f3f3f') {
+    constructor(name, x = 0, y = 0) {
         super();
-
-        flowView = document.querySelector('#' + this.getAttribute('view'));
-
-        if (flowView === null || !(flowView instanceof AFlowView)) {
-            throw 'flowView无效！：\n' + flowView;
-        }
 
         /** UUID，标识每一个节点 */
         this.uuid = getUUID();
@@ -193,9 +194,6 @@ class ANode extends HTMLElement {
         /** 节点的 y 坐标 */
         this.y = y;
 
-        /** 节点控件元素 */
-        this.nodeWidget = document.createElement('div');
-
         /** 节点头部元素 */
         this.nodeTitle = document.createElement('div');
 
@@ -203,25 +201,20 @@ class ANode extends HTMLElement {
         this.nodeContent = document.createElement('div');
 
         /* 初始化节点控件 */
-        this.nodeWidget.setAttribute('class', 'node-widget');
-        this.nodeWidget.id = idName;
+        this.setAttribute('class', 'node-widget');
         this.nodeTitle.setAttribute('class', 'node-title');
         this.nodeContent.setAttribute('class', 'node-content');
-        this.nodeTitle.innerHTML = titleName;
-        this.nodeTitle.style.background = titleColor;
-        this.nodeWidget.append(this.nodeTitle);
-        this.nodeWidget.append(this.nodeContent);
-        this.nodeWidget.innerHTML += '<span class="node-resize-indicator"></span>';
-
-        /** 添加到视图 */
-        flowView.addNode(this);
+        this.nodeTitle.innerHTML = this.getAttribute('name') ? this.getAttribute('name') : name;
+        this.nodeTitle.style.background = this.getAttribute('title-color');
+        this.append(this.nodeTitle);
+        this.append(this.nodeContent);
 
         /* 设置位置 */
-        this.nodeWidget.style.left = x + 'px';
-        this.nodeWidget.style.top = y + 'px';
+        this.style.left = x + 'px';
+        this.style.top = y + 'px';
 
-        /* 注册为可移动节点 */
-        $('#' + idName).addMoveComponent();
+        /* 注册为可移动节点*/
+        $(this).addMoveComponent();
     }
 
     /**
@@ -241,8 +234,8 @@ class ANode extends HTMLElement {
      */
     getPosition() {
         return {
-            x: this.nodeWidget.style.left,
-            y: this.nodeWidget.style.top
+            x: this.style.left,
+            y: this.style.top
         };
     }
 }
@@ -260,16 +253,17 @@ class ANode extends HTMLElement {
  * @example
  * in-port 是否有输入端口： true | 声明(true) | 不声明(false);
  * out-port 是否有输出端口： true | 声明(true) | 不声明(false);
- * widget 嵌入的控件： input   |   selection   |   check    |  label   |    vector2 |
- *               vector3     |   matrix2     |  matrix3   |  matrix4 |   ;
  * input-type 输入类型，只有当widget是input时才有效： int | float | double | number | string | bool;
  * min-value 最小值，只有当widget是input时才有效：类型随input-type
  * max-value 最大值，只有当widget是input时才有效：类型随input-type
  * d-value 默认值，类型随input-type
+ * widget 嵌入的控件:
+ * @see addWidget();
  */
 class AInterface extends HTMLElement {
     constructor() {
-        console.log('this.getAttribute("in-port") :', this.getAttribute('in-port'));
+        super();
+
         if (this.getAttribute('in-port')) {
             this.inPort = new APort(EPortType.INPUT);
             this.append(this.inPort);
@@ -278,7 +272,14 @@ class AInterface extends HTMLElement {
             this.outPort = new APort(EPortType.OUTPUT);
             this.append(this.outPort);
         }
+
         this.setAttribute('class', 'node-interface interface-out');
+
+        this.addWidget(this.getAttribute('widget'));
+
+        if (this.parentNode.querySelector('.node-content')) {
+            this.parentNode.querySelector('.node-content').appendChild(this);
+        }
     }
 
     /** 获得端口
@@ -294,6 +295,36 @@ class AInterface extends HTMLElement {
         }
         return null;
     }
+
+    /** 添加一个控件
+     * @param {EWidgetType} type 要添加widget的名字，一下可选：
+     * input|selection|check|label|vector2|
+     * vector3|matrix2|matrix3|matrix4|;
+     * @return {Element} 返回该控件
+     */
+    addWidget(type) {
+        var widget = null;
+        switch (type) {
+            case EWidgetType.Input:
+                widget = document.createElement('input');
+                widget.setAttribute('class', 'node-item-input input-int');
+                widget.setAttribute('placeholder', 'int');
+                widget.setAttribute('value', '1');
+                this.append(widget);
+                break;
+            case EWidgetType.Label:
+                widget = document.createElement('span');
+                widget.setAttribute('class', 'node-label');
+                this.append(widget);
+                break;
+            default:
+                break;
+        }
+
+        return widget;
+    }
+
+    _inputWidgetBuild() {}
 }
 
 class APort extends HTMLElement {
@@ -302,7 +333,9 @@ class APort extends HTMLElement {
      * @param {EPortType} type 端口类型
      */
     constructor(type) {
-        /** 单口类型，只有输入和输出，其具体可接纳的数据类型由接口 @see `AInterface` 控制 */
+        super();
+
+        /** 端口类型，只有输入和输出，其具体可接纳的数据类型由接口 @see `AInterface` 控制 */
         this.portType = type;
 
         if (this.portType == EPortType.INPUT) {

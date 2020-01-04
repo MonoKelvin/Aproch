@@ -12,10 +12,10 @@
 
 <body>
     <aproch-flow-view id="flow-view" name="flow-view" class="flow-view">
-        <aproch-node view="flow-view">
+        <aproch-node name="my node" title-color="#228866" widget="input">
             <aproch-interface in-port="" widget="input" />
         </aproch-node>
-        <div id="node1" class="node-widget">
+        <!-- <div id="node1" class="node-widget">
             <div class="node-title">加法节点</div>
             <div id="node-content" class="node-content">
                 <div class="node-interface">
@@ -70,16 +70,15 @@
                     <span class="node-port-out port-int"></span>
                 </div>
             </div>
-        </div>
+        </div> -->
     </aproch-flow-view>
 
     <script type="text/javascript" src="./vendor/jquery/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="./core/utilities.js"></script>
     <script type="text/javascript" src="./core/draggable-widget.js"></script>
-    <script type="model" src="./core/Aproch.js"></script>
+    <script type="text/javascript" src="./core/Aproch.js"></script>
     <script>
         $(document).ready(function() {
-            $(".node-widget").registryMoveComponent();
-
             // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
             window.onkeydown = function(e) {
                 var ev = window.event || e;

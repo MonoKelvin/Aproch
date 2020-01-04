@@ -189,6 +189,7 @@
 
     /** 注册移动组件
      * @note 针对id名来使用，如果想为大量的class为node-widget添加，建议使用 @see registryMoveComponent();
+     * @FIXME 如果使用了registryMoveComponent来注册，则不要使用该函数，否则将会出现两个resize-indicator
      */
     $.fn.addMoveComponent = function() {
         $.extend(moveSettings, 'node-title');
