@@ -32,6 +32,9 @@ class AFlowView extends HTMLElement {
         /** 场景中选择的节点 */
         this.selectedNodes = [];
 
+        /** 场景中的连线 */
+        this.connections = [];
+
         /** 注册事件 */
         this.onmousedown = function(evt) {
             let oldX = parseInt($(this).css('left'));
@@ -150,10 +153,6 @@ class AFlowView extends HTMLElement {
 
             return false;
         };
-
-        /** 添加画布，主要是为了绘制连线 */
-        // this.canvas = document.createElement('canvas');
-        // this.append(this.canvas);
     }
 
     /**
@@ -168,9 +167,8 @@ class AFlowView extends HTMLElement {
         }
 
         this.append(node);
-
         node.setPosition(x, y);
-
+        this.attachTransform($(node));
         this.nodes.push(node);
     }
 
@@ -185,6 +183,154 @@ class AFlowView extends HTMLElement {
         }
         node.remove();
         node = null;
+    }
+
+    addLinkingConnection(sourcePort) {}
+
+    /**
+     * 为节点或者其他对象附加变换
+     * @param {any} obj 要添加到该场景中的对象
+     * @param {any} options 相关配置选项
+     */
+    attachTransform(
+        obj,
+        options = {
+            /** 可以移动部分的元素名称，用class名 */
+            moveable: 'node-title',
+            /** 是否可以改变宽度 */
+            isWidthCanChange: true,
+            /** 是否可以改变高度 */
+            isHeightCanChange: false
+        }
+    ) {
+        var t = obj;
+        var m = t.find('.' + options.moveable).first();
+
+        let iwc = options.isWidthCanChange;
+        let ihc = options.isHeightCanChange;
+        let box_sizing = t.css('box-sizing');
+        let top = t.offset().top - $(window).scrollTop();
+        let left = t.offset().left - $(window).scrollLeft();
+        let height = t.outerHeight();
+        let width = t.outerWidth();
+        let w_width = $(window).width();
+        let w_height = $(window).height();
+        let c_width = 0;
+        let c_height = 0;
+
+        if (box_sizing != 'border-box') {
+            c_width = width - t.width();
+            c_height = height - t.height();
+        }
+        t.css({
+            'max-height': w_height - c_height,
+            'max-width': w_width - c_width
+        });
+        $(window).resize(function() {
+            w_width = $(window).width();
+            w_height = $(window).height();
+            if (box_sizing != 'border-box') {
+                c_width = width - t.width();
+                c_height = height - t.height();
+            } else {
+                c_width = 0;
+                c_height = 0;
+            }
+            if (t.width() > w_width - c_width) {
+                t.width(w_width - c_width);
+            }
+            if (t.height() > w_height - c_height) {
+                t.height(w_height - c_height);
+            }
+            t.css({ 'max-height': w_height - c_height, 'max-width': w_width - c_width });
+            height = t.outerHeight();
+            width = t.outerWidth();
+            if (width + left >= w_width) {
+                left = w_width - width;
+                if (parseInt(t.css('left')) < 0) {
+                    t.css('left', -width);
+                } else if (parseInt(t.css('left')) > w_width - width) {
+                    t.css('left', w_width);
+                } else {
+                    t.css('left', left);
+                }
+            }
+            if (height + top >= w_height) {
+                top = w_height - height;
+                if (parseInt(t.css('top')) < 0) {
+                    t.css('top', -height);
+                } else {
+                    t.css('top', top);
+                }
+            }
+        });
+
+        // 移动部分
+        t.on('mousedown', e => {
+            e.stopPropagation();
+        });
+        m.on('mousedown', function(e) {
+            let x = e.pageX;
+            let y = e.pageY;
+
+            height = t.outerHeight();
+            width = t.outerWidth();
+            $(document).on('mousemove', function(e) {
+                let left2 = left + e.pageX - x;
+                let top2 = top + e.pageY - y;
+                t.css({ top: top2, left: left2 });
+                return false;
+            });
+            $(document).on('mouseup', function(e) {
+                top = t.offset().top - $(window).scrollTop();
+                left = t.offset().left - $(window).scrollLeft();
+                $(document).off('mousemove');
+                $(document).off('mouseup');
+            });
+            return false;
+        });
+
+        // 调整尺寸部分
+        if (!iwc && !ihc) {
+            return;
+        }
+        var rs = document.createElement('span');
+        rs.setAttribute('class', 'resize-indicator');
+        t.append(rs);
+        t.css({
+            'min-height': t.height(),
+            'min-width': t.width()
+        });
+        rs.onmousedown = function(e) {
+            let old_width = t.width();
+            let old_height = t.height();
+            let old_size_x = e.pageX;
+            let old_size_y = e.pageY;
+            $(document).on('mousemove', function(e) {
+                if (ihc) {
+                    let new_height = e.pageY - old_size_y + old_height;
+                    t.height(new_height);
+                    if (t.outerHeight() + top >= w_height) {
+                        t.height(w_height - top - c_height);
+                    }
+                }
+                if (iwc) {
+                    let new_width = e.pageX - old_size_x + old_width;
+                    t.width(new_width);
+                    if (t.outerWidth() + left >= w_width) {
+                        t.width(w_width - left - c_width);
+                    }
+                }
+                return false;
+            });
+            $(document).on('mouseup', function() {
+                width = t.outerWidth();
+                height = t.outerHeight();
+                $(document).off('mousemove');
+                $(document).off('mouseup');
+            });
+            return false;
+        };
     }
 }
 
@@ -214,7 +360,7 @@ class ANode extends HTMLElement {
         this.interfaces = [];
 
         /** 管理的所有连线 */
-        // this.connections = [];
+        this.connections = { inputs: [], outputs: [] };
 
         /** 数据模型 */
         // this.dataModel = null;
@@ -241,9 +387,6 @@ class ANode extends HTMLElement {
 
         /* 设置位置 */
         this.setPosition(0, 0);
-
-        /* 注册为可移动节点*/
-        $(this).addMoveComponent();
     }
 
     /**
@@ -358,11 +501,11 @@ class AInterface extends HTMLElement {
     }
 
     connectedCallback() {
-        this.setAttribute('class', 'node-interface interface-out');
+        this.setAttribute('class', 'node-interface');
     }
 
     disconnectedCallback() {
-        removePort(true, true);
+        this.removePort(true, true);
     }
 
     /**
@@ -399,6 +542,11 @@ class AInterface extends HTMLElement {
             this.append(this.outPort);
         }
 
+        if (isInPort && !isOutPort) {
+            $(this).addClass('interface-in');
+        } else if (isOutPort && !isInPort) {
+            $(this).addClass('interface-out');
+        }
         this.removePort(!isInPort, !isOutPort);
     }
 
@@ -444,7 +592,7 @@ class APort extends HTMLElement {
         }
 
         this.onmousedown = function() {
-            AFlowView.createPath();
+            AFlowView.createPath($(this));
         };
     }
 
@@ -508,13 +656,16 @@ function addNodeTest(flowView) {
     node.setName('My Node');
 
     itf = document.createElement('aproch-interface');
-    itf.setPort(true, true);
     node.addInterface(itf);
-
-    // input = document.createElement('aproch-input-number');
-    // input.addEventListener('change', function() {});
-    // itf.addWidget(input);
-
-    label = new ALabelWidget('aproch-label-widget');
+    itf.setPort(false, true);
+    label = new ALabelWidget('aproch-label');
     itf.addWidget(label);
+
+    itf2 = document.createElement('aproch-interface');
+    node.addInterface(itf2);
+    itf2.setPort(false, true);
+
+    input = document.createElement('aproch-input-number');
+    itf2.addWidget(input);
+    // input.addEventListener('change', function() {});
 }

@@ -43,6 +43,7 @@
   position: absolute;
   width: 110px;
   min-width: 110px;
+  min-height: 22px;
   border-radius: 6px;
   background: #272727;
   border: 2px solid transparent;
@@ -85,15 +86,15 @@
   margin-bottom: 2px;
   min-height: 22px;
 }
-.node-interface .input-widget-container {
+.input-widget-container {
   display: flex;
   width: 100%;
   align-items: center;
   justify-content: space-between;
 }
-.node-interface .input-widget-container .node-label,
-.node-interface .input-widget-container .control-label,
-.node-interface .input-widget-container .node-exec-label {
+.input-widget-container .node-label,
+.input-widget-container .control-label,
+.input-widget-container .node-exec-label {
   user-select: none;
   color: #cccccc;
   font-size: 0.7rem;
@@ -105,17 +106,17 @@
   height: 22px;
   line-height: 22px;
 }
-.node-interface .input-widget-container .node-exec-label {
+.input-widget-container .node-exec-label {
   width: 100%;
 }
-.node-interface .input-widget-container .node-exec-label,
-.node-interface .input-widget-container .node-label {
+.input-widget-container .node-exec-label,
+.input-widget-container .node-label {
   overflow: hidden;
   text-overflow: ellipsis;
   height: 16px;
   line-height: 16px;
 }
-.node-interface .input-widget-container .control-label {
+.input-widget-container .control-label {
   background: #505050;
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
