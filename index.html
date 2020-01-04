@@ -11,70 +11,21 @@
 </head>
 
 <body>
-    <aproch-flow-view id="flow-view" name="flow-view" class="flow-view">
-        <!-- <div id="node1" class="node-widget">
-            <div class="node-title">加法节点</div>
-            <div id="node-content" class="node-content">
-                <div class="node-interface">
-                    <span class="node-port-in port-exec"></span>
-                    <strong class="node-exec-label">EXEC</strong>
-                    <div class="node-port-out port-exec"></div>
-                </div>
-                <div class="node-interface interface-in">
-                    <span class="node-port-in port-int"></span>
-                    <span class="node-label">只有输入、没有控件</span>
-                </div>
-                <div class="node-interface interface-out">
-                    <span class="node-label">只有输出、没有控件</span>
-                    <span class="node-port-out port-int"></span>
-                </div>
-                <div class="node-interface">
-                    <span class="node-port-in port-int"></span>
-                    <span class="node-control-label">int</span>
-                    <input class="node-item-input input-int" type="text" placeholder="int" value="100">
-                    <span class="node-port-out port-int"></span>
-                </div>
-                <div class="node-interface">
-                    <span class="node-control-label">float</span>
-                    <input class="node-item-input input-float" type="text" placeholder="int" value="100">
-                    <span class="node-port-out port-float"></span>
-                </div>
-                <div class="node-interface">
-                    <span class="node-port-in port-double"></span>
-                    <span class="node-control-label">double</span>
-                    <input class="node-item-input input-double" type="text" placeholder="int" value="100">
-                </div>
-                <div class="node-interface">
-                    <span class="node-control-label">string</span>
-                    <input class="node-item-input input-string" type="text" placeholder="string" value="this is a string">
-                    <span class="node-port-out port-string"></span>
-                </div>
-                <div class="node-interface interface-in">
-                    <span class="node-port-in port-bool"></span>
-                    <span class="node-label">bool</span>
-                    <input type="checkbox">
-                    <span class="node-port-out port-bool"></span>
-                </div>
-                <div class="node-interface">
-                    <span class="node-port-in port-int"></span>
-                    <span class="node-control-label">ComboBox</span>
-                    <select class="node-item-selection">
-                        <option value="">A</option>
-                        <option value="">B</option>
-                        <option value="">C</option>
-                        <option value="">A</option>
-                    </select>
-                    <span class="node-port-out port-int"></span>
-                </div>
-            </div>
-        </div> -->
+    <aproch-flow-view id="flow-view" name="flow view" class="flow-view">
+        <div style="position: fixed;padding: 4px 10px; left: 20px; top: 60px;">
+            <svg id="svg-id" xmlns="http://www.w3.org/2000/svg" version="1.1" style="padding:4px;">
+            </svg>
+        </div>
     </aproch-flow-view>
-    <button style="position: fixed;padding: 4px 10px; left: 20px; top: 20px;" onclick="addNodeTest('#flow-view');">添加节点</button>
-    <button style="position: fixed;padding: 4px 10px; left: 20px; top: 60px;" onclick="deleteNodeTest('#flow-view');">删除节点</button>
+    <div style="position: fixed; left: 30px">
+        <button style="padding: 4px 10px; left: 20px; top: 20px;" onclick="addNodeTest('#flow-view ');">添加节点</button>
+    </div>
+    <!-- <button style="position: fixed;padding: 4px 10px; left: 20px; top: 60px;" onclick="deleteNodeTest('#flow-view ');">删除节点</button> svg -->
 
     <script type="text/javascript" src="./vendor/jquery/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="./core/utilities.js"></script>
     <script type="text/javascript" src="./core/draggable-widget.js"></script>
+    <script src="./core/AWidget.js"></script>
     <script type="text/javascript" src="./core/Aproch.js"></script>
     <script>
         $(document).ready(function() {
@@ -87,6 +38,7 @@
                 }
             }
         });
+        // document.querySelector('#svg-id').innerHTML = (AConnection.createPath());
     </script>
 </body>
 

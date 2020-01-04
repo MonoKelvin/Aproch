@@ -1,5 +1,7 @@
 // import { getUUID } from './utilities';
 
+var NodeIDGenerator = 0;
+
 var EPortType = {
     INPUT: 0,
     OUTPUT: 1
@@ -47,10 +49,8 @@ class AFlowView extends HTMLElement {
                 }
 
                 var isSelect = true;
-                // var evt = window.event || arguments[0];
-                var startX = evt.offsetX; //.clientX;
-                var startY = evt.offsetY; //.clientY;
-                console.log('evt :', evt);
+                var startX = evt.clientX;
+                var startY = evt.clientY;
                 var selDiv = document.createElement('div');
 
                 selDiv.style.cssText =
@@ -71,8 +71,8 @@ class AFlowView extends HTMLElement {
                         if (selDiv.style.display == 'none') {
                             selDiv.style.display = '';
                         }
-                        _x = evt.offsetX;
-                        _y = evt.offsetY;
+                        _x = evt.clientX;
+                        _y = evt.clientY;
                         selDiv.style.left = Math.min(_x, startX) + 'px';
                         selDiv.style.top = Math.min(_y, startY) + 'px';
                         selDiv.style.width = Math.abs(_x - startX) + 'px';
@@ -115,6 +115,9 @@ class AFlowView extends HTMLElement {
                     let y = em.clientY - evt.clientY;
                     this.style.left = String(oldX + x) + 'px';
                     this.style.top = String(oldY + y) + 'px';
+                    // this.nodes.forEach(function(node) {
+                    //     node.setPosition(oldX + x, oldY + y);
+                    // });
                     return false;
                 };
             }
@@ -127,12 +130,11 @@ class AFlowView extends HTMLElement {
 
                 if (selDiv) {
                     selDiv.remove();
-                    let count = 0;
-                    for (let i = 0; i < selList.length; i++) {
-                        if (selList[i].className.indexOf('seled') != -1) {
-                            count++;
-                        }
-                    }
+                    // for (let i = 0; i < selList.length; i++) {
+                    //     if (selList[i].className.indexOf('seled') != -1) {
+                    //         // count++;
+                    //     }
+                    // }
                 }
 
                 selList = null;
@@ -144,8 +146,14 @@ class AFlowView extends HTMLElement {
                 evt = null;
             };
 
+            this.onmouseleave = this.onmouseup;
+
             return false;
         };
+
+        /** 添加画布，主要是为了绘制连线 */
+        // this.canvas = document.createElement('canvas');
+        // this.append(this.canvas);
     }
 
     /**
@@ -162,6 +170,8 @@ class AFlowView extends HTMLElement {
         this.append(node);
 
         node.setPosition(x, y);
+
+        this.nodes.push(node);
     }
 
     /**
@@ -186,7 +196,7 @@ class ANode extends HTMLElement {
         super();
 
         /** UUID，标识每一个节点 */
-        this.uuid = getUUID();
+        // this.uuid = getUUID();
 
         /** 节点的 x 坐标 */
         this.x = 0;
@@ -289,8 +299,19 @@ class ANode extends HTMLElement {
      */
     setPosition(x, y) {
         /* 设置位置 */
-        this.style.left = x.toString() + 'px';
-        this.style.top = y.toString() + 'px';
+        this.style.left = x + 'px';
+        this.style.top = y + 'px';
+    }
+
+    /**
+     * 增加节点在视图中的位置
+     * @param {number} dx x增量
+     * @param {number} dy y增量
+     * @note 等价于 position = position + (dx, dy)
+     */
+    addPosition(dx, dy) {
+        this.style.left = parseInt($(this).css('left')) + dx + 'px';
+        this.style.top = parseInt($(this).css('top')) + dy + 'px';
     }
 
     /**
@@ -298,8 +319,13 @@ class ANode extends HTMLElement {
      * @param {AInterface} itf 要添加的接口
      */
     addInterface(itf) {
-        if (this.nodeContent) {
-            this.nodeContent.appendChild(itf);
+        if (this.interfaces.indexOf(itf) < 0) {
+            this.interfaces.push(itf);
+            if (this.nodeContent) {
+                this.nodeContent.appendChild(itf);
+            }
+        } else {
+            console.log('接口已经存在，无法重复添加。interface:', itf);
         }
     }
 
@@ -317,25 +343,8 @@ class ANode extends HTMLElement {
     // }
 }
 
-/** <aproch-interface
- *      in-port="true"
- *      out-port=""
- *      widget="input"
- *      input-type="int"
- *      max-value="100"
- *      min-value="10"
- *      d-value="5"
- * />
- *
- * @example
- * in-port 是否有输入端口： true | 声明(true) | 不声明(false);
- * out-port 是否有输出端口： true | 声明(true) | 不声明(false);
- * input-type 输入类型，只有当widget是input时才有效： int | float | number | string | bool;
- * min-value 最小值，只有当widget是input时才有效：类型随input-type
- * max-value 最大值，只有当widget是input时才有效：类型随input-type
- * d-value 默认值，类型随input-type
- * widget 嵌入的控件:
- * @see addWidget();
+/** 序列化选项
+ * <aproch-interface in-port="true" out-port="" ></aproch-interface>
  */
 class AInterface extends HTMLElement {
     constructor() {
@@ -408,31 +417,10 @@ class AInterface extends HTMLElement {
     }
 
     /** 添加一个控件
-     * @param {EWidgetType} type 要添加widget的名字，一下可选：
-     * input|selection|check|label|vector2|
-     * vector3|matrix2|matrix3|matrix4|;
-     * @return {Element} 返回该控件
+     * @param {Element} widget 要添加widget
      */
-    addWidget(type) {
-        var widget = null;
-        switch (type) {
-            case EWidgetType.Input:
-                widget = document.createElement('input');
-                widget.setAttribute('class', 'node-item-input input-int');
-                widget.setAttribute('placeholder', 'int');
-                widget.setAttribute('value', '1');
-                this.append(widget);
-                break;
-            case EWidgetType.Label:
-                widget = document.createElement('span');
-                widget.setAttribute('class', 'node-label');
-                this.append(widget);
-                break;
-            default:
-                break;
-        }
-
-        return widget;
+    addWidget(widget) {
+        this.append(widget);
     }
 
     _inputWidgetBuild() {}
@@ -454,6 +442,10 @@ class APort extends HTMLElement {
         } else {
             this.setAttribute('class', 'node-port-out');
         }
+
+        this.onmousedown = function() {
+            AFlowView.createPath();
+        };
     }
 
     getInterface() {
@@ -463,6 +455,40 @@ class APort extends HTMLElement {
         }
         return i;
     }
+}
+
+/**
+ * 连线类
+ */
+class AConnection {
+    constructor(inPortID, outPortID) {
+        this.inPortID = inPortID;
+
+        this.outPortID = outPortID;
+
+        // this.dataModel = null;
+
+        this.path = '';
+    }
+
+    createPath() {
+        let sp = { x: 0, y: 0 };
+        let ep = { x: 200, y: 100 };
+
+        // let sd = { x: sp.x + 15, y: sp.y };
+        // let ed = { x: ep.x - 15, y: ep.y };
+
+        this.path = '<g><polyline points="';
+        this.path += sp.x + ',' + sp.y + ' ';
+        // this.path += sd.x + ',' + sd.y + ' ';
+        // this.path += ed.x + ',' + ed.y + ' ';
+        this.path += ep.x + ',' + ep.y + ' ';
+        this.path += '" style="fill:none;stroke:white;stroke-width:2"/></g>';
+
+        return this.path;
+    }
+
+    moveEndPoint() {}
 }
 
 customElements.define('aproch-flow-view', AFlowView);
@@ -482,15 +508,13 @@ function addNodeTest(flowView) {
     node.setName('My Node');
 
     itf = document.createElement('aproch-interface');
-    itf.addWidget('input');
+    itf.setPort(true, true);
     node.addInterface(itf);
 
-    itf2 = document.createElement('aproch-interface');
-    itf2.setPort(true, true);
-    itf2.addWidget('input');
-    node.addInterface(itf2);
+    // input = document.createElement('aproch-input-number');
+    // input.addEventListener('change', function() {});
+    // itf.addWidget(input);
 
-    itf3 = document.createElement('aproch-interface');
-    itf3.addWidget('input');
-    node.addInterface(itf3);
+    label = new ALabelWidget('aproch-label-widget');
+    itf.addWidget(label);
 }

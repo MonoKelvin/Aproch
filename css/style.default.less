@@ -14,7 +14,7 @@
 @nodeTitle: #3f3f3f;
 @nodeBackground: #272727;
 @nodeShadow: #00000080;
-@nodeMinWidth: 150px;
+@nodeMinWidth: 110px;
 @textColor: #cccccc;
 @controlHight: 22px;
 @controlBgColor: #3f3f3f;
@@ -43,28 +43,32 @@
     background: -webkit-linear-gradient(top, transparent @gridSpacing - 1px, @gridColor @gridSpacing),
         -webkit-linear-gradient(left, @viewBgColor @gridSpacing - 1px, @gridColor @gridSpacing);
     background-size: @gridSpacing @gridSpacing;
-    overflow: hidden;
+    overflow: hidden !important;
     position: fixed;
+    display: block;
     cursor: grab;
-    width: 100000px;
-    height: 100000px;
-    // left: -5000px;
-    // top: -5000px;
+    width: 100%;
+    height: 100%;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 
-    // .selection-frame {
-    //     position: absolute;
-    //     width: 0px;
-    //     height: 0px;
-    //     font-size: 0px;
-    //     margin: 0px;
-    //     padding: 0px;
-    //     border: 1px dashed #0099ff;
-    //     background-color: #c3d5ed;
-    //     z-index: 1000;
-    //     // filter: alpha;
-    //     opacity: 0.6;
-    //     display: none;
-    // }
+.selection-frame {
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    font-size: 0px;
+    margin: 0px;
+    padding: 0px;
+    border: 1px dashed #aaa;
+    background-color: #4b4b4b;
+    z-index: 1000;
+    // filter: alpha(opacity: 60);
+    opacity: 0.6;
+    display: none;
 }
 
 .clear-background {
@@ -75,6 +79,8 @@
 /* Node */
 /********/
 .node-widget {
+    position: absolute;
+    width: @nodeMinWidth;
     min-width: @nodeMinWidth;
     border-radius: 6px;
     background: @nodeBackground;
@@ -83,7 +89,6 @@
     transition: border 0.2s;
     color: @textColor;
     font-size: @nodeFontSize;
-    // overflow: hidden;
     opacity: 0.9;
     cursor: default;
 }
@@ -119,43 +124,51 @@
     justify-content: space-between;
     margin-top: 2px;
     margin-bottom: 2px;
+    min-height: @controlHight;
+
+    .input-widget-container {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+
+        // node label and control label
+        .node-label,
+        .control-label,
+        .node-exec-label {
+            user-select: none;
+            color: @textColor;
+            font-size: @nodeFontSize;
+            font-weight: bold;
+            padding-left: 5px;
+            padding-right: 5px;
+            text-align: center;
+            white-space: nowrap;
+            height: @controlHight;
+            line-height: @controlHight;
+        }
+        .node-exec-label {
+            width: 100%;
+        }
+        .node-exec-label,
+        .node-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: @controlHight - 6px;
+            line-height: @controlHight - 6px;
+        }
+        .control-label {
+            background: @controlBgColor + #111;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+    }
 }
 .interface-in {
     justify-content: flex-start;
 }
 .interface-out {
     justify-content: flex-end;
-}
-
-// node label and control label
-.node-label,
-.node-control-label,
-.node-exec-label {
-    user-select: none;
-    color: @textColor;
-    font-size: @nodeFontSize;
-    font-weight: bold;
-    padding-left: 5px;
-    padding-right: 5px;
-    text-align: center;
-    white-space: nowrap;
-    height: @controlHight;
-    line-height: @controlHight;
-}
-.node-exec-label {
-    width: 100%;
-}
-.node-exec-label,
-.node-label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    height: @controlHight - 6px;
-    line-height: @controlHight - 6px;
-}
-.node-control-label {
-    background: @controlBgColor + #111;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
 }
 
 /********/
@@ -243,7 +256,14 @@
 /***********************/
 /* Data Model Controls */
 /***********************/
-.node-item-input,
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input {
+    -moz-appearance: textfield;
+}
+.input-widget,
 .node-item-selection {
     flex: 1 1 auto;
     color: @textColor;
@@ -259,7 +279,7 @@
     padding-right: 5px;
 }
 .node-item-selection:hover,
-.node-item-input:hover {
+.input-widget:hover {
     color: #fff;
     background: @controlHoverBgColor;
 }
