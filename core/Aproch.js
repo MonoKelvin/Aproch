@@ -3,6 +3,7 @@
 var NodeIDGenerator = 0;
 var InterfaceIDGenerator = 0;
 var PortIDGenerator = 0;
+var ConnectionIDGenerator = 0;
 
 var EPortType = {
     INPUT: 0,
@@ -37,6 +38,17 @@ class AFlowView extends HTMLElement {
         /** 场景中的连线 */
         this.connections = [];
 
+        this.onwheel = function (evt) {
+            var t = $(this);                      // 视图的jquery对象
+
+            // 按下ctrl放大缩小视图
+            if (evt.ctrlKey == 1) {
+                evt.preventDefault();
+            }
+        }
+
+        this._isLinking = false;
+
         /** 注册事件 */
         this.onmousedown = function (evt) {
             var t = $(this);                      // 视图的jquery对象
@@ -49,13 +61,24 @@ class AFlowView extends HTMLElement {
             let sfY = null;                       // selection-frame 选择框起始y点
             var sfDiv = null;                     // selection-frame 选择框div标签
 
+            // 按下ctrl加选
+            if (evt.ctrlKey == 1) {
+                console.log('ctrl被按下 :');
+                return;
+            }
+
+            // 清空选择集
+            selItems.length = 0;
+            selItems = [];
+
             sfDiv = document.createElement('div');
-            
-            // 按下shift键就多选
+
+            // 视图移动事件
             $(document).on('mousemove', function (em) {
+                // 按下shift键就多选
                 if (evt.shiftKey == 1) {
-                    selItems.length = 0;
-                    selItems = [];
+                    // selItems.length = 0;
+                    // selItems = [];
 
                     sfDiv.style.cssText =
                         'position:absolute;width:0px;height:0px;font-size:0px;margin:0px;padding:0px;border:1px dashed #AAA;background-color:#333;z-index:1000;filter:alpha(opacity:60);opacity:0.6;display:none;';
@@ -82,7 +105,7 @@ class AFlowView extends HTMLElement {
                     let _w = sfDiv.offsetWidth,
                         _h = sfDiv.offsetHeight;
 
-                    for (let i = 0; i < selItems.length; i++) {
+                    for (var i = 0; i < selItems.length; i++) {
                         let sl = selItems[i].offsetWidth + selItems[i].offsetLeft;
                         let st = selItems[i].offsetHeight + selItems[i].offsetTop;
                         if (
@@ -134,6 +157,14 @@ class AFlowView extends HTMLElement {
     }
 
     /**
+     * 清空选择集
+     */
+    clearSelectedItems() {
+        this.selectedItems.length = 0;
+        this.selectedItems = [];
+    }
+
+    /**
      * 添加一个节点
      * @param {ANode} node 要加入场景的节点
      * @param {number} x 加入时的x坐标
@@ -163,10 +194,9 @@ class AFlowView extends HTMLElement {
         node = null;
     }
 
-    addLinkingConnection(sourcePort) {
-        let conn = new AConnection(sourcePort.attr('id'));
-        let svg = '<svg id="svg-id" xmlns="http://www.w3.org/2000/svg" version="1.1"">' + conn.createPath() + '</svg>';
-        $(this).append(svg);
+    addLinkingConnection(sourcePortID) {
+        var conn = new AConnection(sourcePortID, null);
+        this.append(conn);
     }
 
     /**
@@ -580,10 +610,14 @@ class APort extends HTMLElement {
         }
 
         this.onmousedown = function () {
-            CurrentFV.addLinkingConnection($(this));
+            CurrentFV.addLinkingConnection(this.id);
         };
     }
 
+    /**
+     * 获得父端口
+     * @returns {AInterface} 父端口
+     */
     getInterface() {
         var i = this.parentElement();
         if (i === null || !(i instanceof AInterface)) {
@@ -591,46 +625,88 @@ class APort extends HTMLElement {
         }
         return i;
     }
+
+    getPositionInView() {
+        return { x: parseInt($(this).offset().left), y: parseInt($(this).offset().top) };
+    }
 }
 
 /**
  * 连线类
  */
-class AConnection {
+class AConnection extends HTMLElement {
     constructor(inPortID, outPortID) {
+        super();
+
+        /** 输入端口ID，对应节点的输出端口 */
         this.inPortID = inPortID;
 
+        /** 输出端口ID，对应节点的输入端口 */
         this.outPortID = outPortID;
 
         // this.dataModel = null;
 
-        this.path = '';
+        /** 连线在场景中的起点 */
+        // this.sPoint = { x: 0, y: 0 };
+
+        // /** 连线在场景中的终点 */
+        // this.ePoint = { x: 0, y: 0 };
+
+        let s = { x: 0, y: 0 };
+        if (inPortID !== null) {
+            s = document.querySelector('#' + this.inPortID).getPositionInView();
+        }
+        let e = { x: 0, y: 0 };
+        if (outPortID !== null) {
+            e = document.querySelector('#' + this.outPortID).getPositionInView()
+        }
+
+        /** 连线标签 */
+        this.path = {
+            id: "conn_" + ConnectionIDGenerator++,
+            points: {
+                p1: s,
+                p2: e,
+                toString: () => {
+                    return 'points="' + this.p1.x + ',' + this.p1.y + ' ' + this.p2.x + ',' + this.p2.y + '"';
+                }
+            },
+            color: 'white',
+            toString: function () {
+                return '<polyline class="aproch-conn" style="stroke:' + this.color + '" id="' + this.id + '" ' + this.points.toString() + 'style="' + this.style + '" />';
+            }
+        };
     }
 
-    createPath() {
-        let sp = { x: 0, y: 0 };
-        let ep = { x: 200, y: 100 };
+    connectedCallback() {
+        let svg = '<svg id="svg-id" xmlns="http://www.w3.org/2000/svg" version="1.1"">' + this.path.toString() + '</svg>';
 
-        // let sd = { x: sp.x + 15, y: sp.y };
-        // let ed = { x: ep.x - 15, y: ep.y };
-
-        this.path = '<g><polyline points="';
-        this.path += sp.x + ',' + sp.y + ' ';
-        // this.path += sd.x + ',' + sd.y + ' ';
-        // this.path += ed.x + ',' + ed.y + ' ';
-        this.path += ep.x + ',' + ep.y + ' ';
-        this.path += '" style="fill:none;stroke:white;stroke-width:2"/></g>';
-
-        return this.path;
+        this.innerHTML = svg;
     }
 
-    moveEndPoint() { }
+    disconnectedCallback() {
+        //todo: 从节点移除
+
+        this.path = null;
+    }
+
+    updatePosition() {
+        var i = document.querySelector('#' + this.inPortID);
+        var o = document.querySelector('#' + this.outPortID);
+        this.path.points.p1 = i.getPositionInView();
+        this.path.points.p2 = o.getPositionInView();
+    }
+
+    movePosition(isOut = true) {
+
+    }
 }
 
 customElements.define('aproch-flow-view', AFlowView);
 customElements.define('aproch-node', ANode);
 customElements.define('aproch-interface', AInterface);
 customElements.define('aproch-port', APort);
+customElements.define('aproch-connection', AConnection);
 
 function addNodeTest(flowView) {
     flowView = document.querySelector(flowView);
@@ -639,21 +715,22 @@ function addNodeTest(flowView) {
         return;
     }
 
-    node = document.createElement('aproch-node');
+    let node = document.createElement('aproch-node');
     flowView.addNode(node);
     node.setName('My Node');
+    node.setPosition(100, 100);
 
-    itf = document.createElement('aproch-interface');
+    let itf = document.createElement('aproch-interface');
     node.addInterface(itf);
     itf.setPort(true, true);
-    label = new ALabelWidget('aproch-label');
+    let label = new ALabelWidget('aproch-label');
     itf.addWidget(label);
 
-    itf2 = document.createElement('aproch-interface');
+    let itf2 = document.createElement('aproch-interface');
     node.addInterface(itf2);
     itf2.setPort(true, true);
 
-    input = document.createElement('aproch-input-number');
+    let input = document.createElement('aproch-input-number');
     itf2.addWidget(input);
     // input.addEventListener('change', function() {});
 }

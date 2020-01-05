@@ -26,9 +26,9 @@
         //var FVManager = [];
         var CurrentFV = document.querySelector('#fv_1');
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
-            window.onkeydown = function(e) {
+            window.onkeydown = function (e) {
                 var ev = window.event || e;
                 var code = ev.keyCode || ev.which;
                 if (code == 82 && (ev.metaKey || ev.ctrlKey)) {

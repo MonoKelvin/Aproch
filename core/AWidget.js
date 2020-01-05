@@ -65,7 +65,7 @@ class AInputNumberWidget extends IWidget {
         super();
 
         /** 当输入完成时触发的事件 */
-        this.onComplete = function() {};
+        this.onComplete = function () { };
     }
 
     connectedCallback() {
@@ -81,10 +81,10 @@ class AInputNumberWidget extends IWidget {
         this.widget.defaultValue = 0;
         this.widget.type = 'number';
 
-        this.widget.oninput = function(v) {
+        this.widget.oninput = function () {
             this.value = this.value.replace(/[^\-?\d.]/g, '');
         };
-        this.addEventListener('change', function() {
+        this.addEventListener('change', function () {
             if (this.widget.value.trim() === '') {
                 this.widget.value = 0;
             }

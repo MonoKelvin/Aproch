@@ -191,6 +191,13 @@
   cursor: nw-resize;
 }
 /***********************/
+/*      Connection     */
+/***********************/
+.aproch-conn {
+  fill: none;
+  stroke-width: 2;
+}
+/***********************/
 /* Data Model Controls */
 /***********************/
 input::-webkit-outer-spin-button,
