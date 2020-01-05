@@ -3,10 +3,7 @@
 var NodeIDGenerator = 0;
 var InterfaceIDGenerator = 0;
 var PortIDGenerator = 0;
-<<<<<<< HEAD
 var ConnectionIDGenerator = 0;
-=======
->>>>>>> 2def21ee3692401b8bf5b60152d0ac3ddbeedc93
 
 var EPortType = {
     INPUT: 0,
@@ -64,7 +61,6 @@ class AFlowView extends HTMLElement {
             let sfY = null;                       // selection-frame 选择框起始y点
             var sfDiv = null;                     // selection-frame 选择框div标签
 
-<<<<<<< HEAD
             // 按下ctrl加选
             if (evt.ctrlKey == 1) {
                 console.log('ctrl被按下 :');
@@ -93,25 +89,6 @@ class AFlowView extends HTMLElement {
 
                     clearEventBubble(evt);
 
-=======
-            sfDiv = document.createElement('div');
-            
-            // 按下shift键就多选
-            $(document).on('mousemove', function (em) {
-                if (evt.shiftKey == 1) {
-                    selItems.length = 0;
-                    selItems = [];
-
-                    sfDiv.style.cssText =
-                        'position:absolute;width:0px;height:0px;font-size:0px;margin:0px;padding:0px;border:1px dashed #AAA;background-color:#333;z-index:1000;filter:alpha(opacity:60);opacity:0.6;display:none;';
-
-                    t.append(sfDiv);
-                    sfDiv.style.left = startEvtX + 'px';
-                    sfDiv.style.top = startEvtY + 'px';
-
-                    clearEventBubble(evt);
-
->>>>>>> 2def21ee3692401b8bf5b60152d0ac3ddbeedc93
                     if (sfDiv.style.display == 'none') {
                         sfDiv.style.display = '';
                     }
@@ -128,11 +105,7 @@ class AFlowView extends HTMLElement {
                     let _w = sfDiv.offsetWidth,
                         _h = sfDiv.offsetHeight;
 
-<<<<<<< HEAD
                     for (var i = 0; i < selItems.length; i++) {
-=======
-                    for (let i = 0; i < selItems.length; i++) {
->>>>>>> 2def21ee3692401b8bf5b60152d0ac3ddbeedc93
                         let sl = selItems[i].offsetWidth + selItems[i].offsetLeft;
                         let st = selItems[i].offsetHeight + selItems[i].offsetTop;
                         if (
@@ -221,16 +194,9 @@ class AFlowView extends HTMLElement {
         node = null;
     }
 
-<<<<<<< HEAD
     addLinkingConnection(sourcePortID) {
         var conn = new AConnection(sourcePortID, null);
         this.append(conn);
-=======
-    addLinkingConnection(sourcePort) {
-        let conn = new AConnection(sourcePort.attr('id'));
-        let svg = '<svg id="svg-id" xmlns="http://www.w3.org/2000/svg" version="1.1"">' + conn.createPath() + '</svg>';
-        $(this).append(svg);
->>>>>>> 2def21ee3692401b8bf5b60152d0ac3ddbeedc93
     }
 
     /**
@@ -644,11 +610,7 @@ class APort extends HTMLElement {
         }
 
         this.onmousedown = function () {
-<<<<<<< HEAD
             CurrentFV.addLinkingConnection(this.id);
-=======
-            CurrentFV.addLinkingConnection($(this));
->>>>>>> 2def21ee3692401b8bf5b60152d0ac3ddbeedc93
         };
     }
 
@@ -735,13 +697,9 @@ class AConnection extends HTMLElement {
         this.path.points.p2 = o.getPositionInView();
     }
 
-<<<<<<< HEAD
     movePosition(isOut = true) {
 
     }
-=======
-    moveEndPoint() { }
->>>>>>> 2def21ee3692401b8bf5b60152d0ac3ddbeedc93
 }
 
 customElements.define('aproch-flow-view', AFlowView);
@@ -765,11 +723,8 @@ function addNodeTest(flowView) {
     let itf = document.createElement('aproch-interface');
     node.addInterface(itf);
     itf.setPort(true, true);
-<<<<<<< HEAD
+    
     let label = new ALabelWidget('aproch-label');
-=======
-    label = new ALabelWidget('aproch-label');
->>>>>>> 2def21ee3692401b8bf5b60152d0ac3ddbeedc93
     itf.addWidget(label);
 
     let itf2 = document.createElement('aproch-interface');
