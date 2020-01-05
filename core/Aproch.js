@@ -31,127 +31,103 @@ class AFlowView extends HTMLElement {
         /** 场景中所有的节点 */
         this.nodes = [];
 
-        /** 场景中选择的节点 */
-        this.selectedNodes = [];
+        /** 场景中选择的项目 */
+        this.selectedItems = [];
 
         /** 场景中的连线 */
         this.connections = [];
 
         /** 注册事件 */
-        this.onmousedown = function(evt) {
-            let oldX = parseInt($(this).css('left'));
-            let oldY = parseInt($(this).css('top'));
+        this.onmousedown = function (evt) {
+            var t = $(this);                      // 视图的jquery对象
+            var selItems = t[0].selectedItems;    // 视图的选择集对象
+            let oldX = parseInt(t.css('left'));   // 视图起始x点
+            let oldY = parseInt(t.css('top'));    // 视图起始y点
+            let startEvtX = evt.clientX;          // 鼠标点击时起始x点
+            let startEvtY = evt.clientY;          // 鼠标点击时起始y点
+            let sfX = null;                       // selection-frame 选择框起始x点
+            let sfY = null;                       // selection-frame 选择框起始y点
+            var sfDiv = null;                     // selection-frame 选择框div标签
 
+            sfDiv = document.createElement('div');
+            
             // 按下shift键就多选
-            if (evt.shiftKey == 1) {
-                var selList = [];
-                var fileNodes = document.getElementsByTagName('div');
-                for (let i = 0; i < fileNodes.length; i++) {
-                    if (fileNodes[i].className.indexOf('node-widget') != -1) {
-                        fileNodes[i].className = 'node-widget';
-                        selList.push(fileNodes[i]);
+            $(document).on('mousemove', function (em) {
+                if (evt.shiftKey == 1) {
+                    selItems.length = 0;
+                    selItems = [];
+
+                    sfDiv.style.cssText =
+                        'position:absolute;width:0px;height:0px;font-size:0px;margin:0px;padding:0px;border:1px dashed #AAA;background-color:#333;z-index:1000;filter:alpha(opacity:60);opacity:0.6;display:none;';
+
+                    t.append(sfDiv);
+                    sfDiv.style.left = startEvtX + 'px';
+                    sfDiv.style.top = startEvtY + 'px';
+
+                    clearEventBubble(evt);
+
+                    if (sfDiv.style.display == 'none') {
+                        sfDiv.style.display = '';
                     }
-                }
+                    sfX = em.clientX;
+                    sfY = em.clientY;
+                    sfDiv.style.left = (Math.min(sfX, startEvtX) - oldX) + 'px';
+                    sfDiv.style.top = (Math.min(sfY, startEvtY) - oldY) + 'px';
+                    sfDiv.style.width = Math.abs(sfX - startEvtX) + 'px';
+                    sfDiv.style.height = Math.abs(sfY - startEvtY) + 'px';
 
-                var isSelect = true;
-                var startX = evt.clientX;
-                var startY = evt.clientY;
-                var selDiv = document.createElement('div');
+                    let _l = sfDiv.offsetLeft,
+                        _t = sfDiv.offsetTop;
 
-                selDiv.style.cssText =
-                    'position:absolute;width:0px;height:0px;font-size:0px;margin:0px;padding:0px;border:1px dashed #AAA;background-color:#333;z-index:1000;filter:alpha(opacity:60);opacity:0.6;display:none;';
+                    let _w = sfDiv.offsetWidth,
+                        _h = sfDiv.offsetHeight;
 
-                this.append(selDiv);
-                selDiv.style.left = startX + 'px';
-                selDiv.style.top = startY + 'px';
-
-                var _x = null;
-                var _y = null;
-                clearEventBubble(evt);
-
-                this.onmousemove = function(evt) {
-                    // evt = window.event || arguments[0];
-
-                    if (isSelect) {
-                        if (selDiv.style.display == 'none') {
-                            selDiv.style.display = '';
-                        }
-                        _x = evt.clientX;
-                        _y = evt.clientY;
-                        selDiv.style.left = Math.min(_x, startX) + 'px';
-                        selDiv.style.top = Math.min(_y, startY) + 'px';
-                        selDiv.style.width = Math.abs(_x - startX) + 'px';
-                        selDiv.style.height = Math.abs(_y - startY) + 'px';
-
-                        // ---------------- 关键算法 ---------------------
-
-                        let _l = selDiv.offsetLeft,
-                            _t = selDiv.offsetTop;
-
-                        let _w = selDiv.offsetWidth,
-                            _h = selDiv.offsetHeight;
-
-                        for (let i = 0; i < selList.length; i++) {
-                            let sl = selList[i].offsetWidth + selList[i].offsetLeft;
-                            let st = selList[i].offsetHeight + selList[i].offsetTop;
-                            if (
-                                sl > _l &&
-                                st > _t &&
-                                selList[i].offsetLeft < _l + _w &&
-                                selList[i].offsetTop < _t + _h
-                            ) {
-                                if (selList[i].className.indexOf('seled') == -1) {
-                                    selList[i].className = selList[i].className + ' seled';
-                                }
-                            } else {
-                                if (selList[i].className.indexOf('seled') != -1) {
-                                    selList[i].className = 'node-widget';
-                                }
+                    for (let i = 0; i < selItems.length; i++) {
+                        let sl = selItems[i].offsetWidth + selItems[i].offsetLeft;
+                        let st = selItems[i].offsetHeight + selItems[i].offsetTop;
+                        if (
+                            sl > _l &&
+                            st > _t &&
+                            selItems[i].offsetLeft < _l + _w &&
+                            selItems[i].offsetTop < _t + _h
+                        ) {
+                            if (selItems[i].className.indexOf('seled') == -1) {
+                                selItems[i].className = selItems[i].className + ' seled';
+                            }
+                        } else {
+                            if (selItems[i].className.indexOf('seled') != -1) {
+                                selItems[i].className = 'node-widget';
                             }
                         }
                     }
-                    clearEventBubble(evt);
-                };
-            } else {
-                this.style.cursor = 'grabbing';
-                this.onmousemove = function(em) {
-                    em.preventDefault();
+                } else {
+                    t.css('cursor', 'grabbing');
                     let x = em.clientX - evt.clientX;
                     let y = em.clientY - evt.clientY;
-                    this.style.left = String(oldX + x) + 'px';
-                    this.style.top = String(oldY + y) + 'px';
-                    // this.nodes.forEach(function(node) {
-                    //     node.setPosition(oldX + x, oldY + y);
-                    // });
-                    return false;
-                };
-            }
+                    t.css('left', String(oldX + x) + 'px');
+                    t.css('top', String(oldY + y) + 'px');
+                }
+                return false;
+            });
 
-            this.onmouseup = function() {
-                this.style.cursor = 'grab';
-                this.onmousemove = null;
+            $(document).on('mouseup', function () {
+                t.css('cursor', 'grab');
 
-                isSelect = false;
-
-                if (selDiv) {
-                    selDiv.remove();
-                    // for (let i = 0; i < selList.length; i++) {
-                    //     if (selList[i].className.indexOf('seled') != -1) {
-                    //         // count++;
-                    //     }
-                    // }
+                if (sfDiv) {
+                    sfDiv.remove();
                 }
 
-                selList = null;
-                _x = null;
-                _y = null;
-                selDiv = null;
-                startX = null;
-                startY = null;
-                evt = null;
-            };
+                oldX = null;
+                oldY = null;
+                startEvtX = null;
+                startEvtY = null;
+                sfX = null;
+                sfY = null;
+                sfDiv = null;
 
-            this.onmouseleave = this.onmouseup;
+                $(document).off('mousemove');
+                $(document).off('mouseup');
+            });
 
             return false;
         };
@@ -170,7 +146,7 @@ class AFlowView extends HTMLElement {
 
         this.append(node);
         node.setPosition(x, y);
-        this.attachTransform($(node));
+        this.attachTransform(node);
         this.nodes.push(node);
     }
 
@@ -209,18 +185,18 @@ class AFlowView extends HTMLElement {
             isHeightCanChange: false
         }
     ) {
-        var t = obj;
+        var t = $(obj);
         var m = t.find('.' + options.moveable).first();
 
         let iwc = options.isWidthCanChange;
         let ihc = options.isHeightCanChange;
         let box_sizing = t.css('box-sizing');
-        let top = t.offset().top - $(window).scrollTop();
-        let left = t.offset().left - $(window).scrollLeft();
+        let top = t.css('top') - $(this).scrollTop();
+        let left = t.css('left') - $(this).scrollLeft();
         let height = t.outerHeight();
         let width = t.outerWidth();
-        let w_width = $(window).width();
-        let w_height = $(window).height();
+        let w_width = $(this).width();
+        let w_height = $(this).height();
         let c_width = 0;
         let c_height = 0;
 
@@ -232,9 +208,9 @@ class AFlowView extends HTMLElement {
             'max-height': w_height - c_height,
             'max-width': w_width - c_width
         });
-        $(window).resize(function() {
-            w_width = $(window).width();
-            w_height = $(window).height();
+        $(this).resize(function () {
+            w_width = $(this).width();
+            w_height = $(this).height();
             if (box_sizing != 'border-box') {
                 c_width = width - t.width();
                 c_height = height - t.height();
@@ -275,21 +251,20 @@ class AFlowView extends HTMLElement {
         t.on('mousedown', e => {
             e.stopPropagation();
         });
-        m.on('mousedown', function(e) {
-            let x = e.pageX;
-            let y = e.pageY;
-
+        m.on('mousedown', function (ed) {
+            left = parseInt(t.css('left'));
+            top = parseInt(t.css('top'));
             height = t.outerHeight();
             width = t.outerWidth();
-            $(document).on('mousemove', function(e) {
-                let left2 = left + e.pageX - x;
-                let top2 = top + e.pageY - y;
+            $(document).on('mousemove', function (e) {
+                let left2 = left + e.pageX - ed.pageX;
+                let top2 = top + e.pageY - ed.pageY;
                 t.css({ top: top2, left: left2 });
                 return false;
             });
-            $(document).on('mouseup', function(e) {
-                top = t.offset().top - $(window).scrollTop();
-                left = t.offset().left - $(window).scrollLeft();
+            $(document).on('mouseup', function (e) {
+                top = t.offset().top - $(this).scrollTop();
+                left = t.offset().left - $(this).scrollLeft();
                 $(document).off('mousemove');
                 $(document).off('mouseup');
             });
@@ -307,12 +282,12 @@ class AFlowView extends HTMLElement {
             'min-height': t.height(),
             'min-width': t.width()
         });
-        rs.onmousedown = function(e) {
+        rs.onmousedown = function (e) {
             let old_width = t.width();
             let old_height = t.height();
             let old_size_x = e.pageX;
             let old_size_y = e.pageY;
-            $(document).on('mousemove', function(e) {
+            $(document).on('mousemove', function (e) {
                 if (ihc) {
                     let new_height = e.pageY - old_size_y + old_height;
                     t.height(new_height);
@@ -329,7 +304,7 @@ class AFlowView extends HTMLElement {
                 }
                 return false;
             });
-            $(document).on('mouseup', function() {
+            $(document).on('mouseup', function () {
                 width = t.outerWidth();
                 height = t.outerHeight();
                 $(document).off('mousemove');
@@ -582,7 +557,7 @@ class AInterface extends HTMLElement {
         this.append(widget);
     }
 
-    _inputWidgetBuild() {}
+    _inputWidgetBuild() { }
 }
 
 class APort extends HTMLElement {
@@ -604,7 +579,7 @@ class APort extends HTMLElement {
             this.setAttribute('class', 'node-port-out');
         }
 
-        this.onmousedown = function() {
+        this.onmousedown = function () {
             CurrentFV.addLinkingConnection($(this));
         };
     }
@@ -649,7 +624,7 @@ class AConnection {
         return this.path;
     }
 
-    moveEndPoint() {}
+    moveEndPoint() { }
 }
 
 customElements.define('aproch-flow-view', AFlowView);
