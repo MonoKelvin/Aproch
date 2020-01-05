@@ -194,6 +194,9 @@
 /*      Connection     */
 /***********************/
 .aproch-conn {
+  position: absolute;
+}
+.aproch-conn .conn-path {
   fill: none;
   stroke-width: 2;
 }

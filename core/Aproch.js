@@ -47,12 +47,10 @@ class AFlowView extends HTMLElement {
             }
         }
 
-        this._isLinking = false;
-
         /** 注册事件 */
         this.onmousedown = function (evt) {
             var t = $(this);                      // 视图的jquery对象
-            var selItems = t[0].selectedItems;    // 视图的选择集对象
+            var tdom = t[0];                      // 视图的dom对象
             let oldX = parseInt(t.css('left'));   // 视图起始x点
             let oldY = parseInt(t.css('top'));    // 视图起始y点
             let startEvtX = evt.clientX;          // 鼠标点击时起始x点
@@ -68,17 +66,18 @@ class AFlowView extends HTMLElement {
             }
 
             // 清空选择集
-            selItems.length = 0;
-            selItems = [];
+            tdom.selectedItems.length = 0;
+            tdom.selectedItems = [];
 
             sfDiv = document.createElement('div');
 
             // 视图移动事件
             $(document).on('mousemove', function (em) {
+                
                 // 按下shift键就多选
                 if (evt.shiftKey == 1) {
-                    // selItems.length = 0;
-                    // selItems = [];
+                    // tdom.selectedItems.length = 0;
+                    // tdom.selectedItems = [];
 
                     sfDiv.style.cssText =
                         'position:absolute;width:0px;height:0px;font-size:0px;margin:0px;padding:0px;border:1px dashed #AAA;background-color:#333;z-index:1000;filter:alpha(opacity:60);opacity:0.6;display:none;';
@@ -105,21 +104,21 @@ class AFlowView extends HTMLElement {
                     let _w = sfDiv.offsetWidth,
                         _h = sfDiv.offsetHeight;
 
-                    for (var i = 0; i < selItems.length; i++) {
-                        let sl = selItems[i].offsetWidth + selItems[i].offsetLeft;
-                        let st = selItems[i].offsetHeight + selItems[i].offsetTop;
+                    for (var i = 0; i < tdom.selectedItems.length; i++) {
+                        let sl = tdom.selectedItems[i].offsetWidth + tdom.selectedItems[i].offsetLeft;
+                        let st = tdom.selectedItems[i].offsetHeight + tdom.selectedItems[i].offsetTop;
                         if (
                             sl > _l &&
                             st > _t &&
-                            selItems[i].offsetLeft < _l + _w &&
-                            selItems[i].offsetTop < _t + _h
+                            tdom.selectedItems[i].offsetLeft < _l + _w &&
+                            tdom.selectedItems[i].offsetTop < _t + _h
                         ) {
-                            if (selItems[i].className.indexOf('seled') == -1) {
-                                selItems[i].className = selItems[i].className + ' seled';
+                            if (tdom.selectedItems[i].className.indexOf('seled') == -1) {
+                                tdom.selectedItems[i].className = tdom.selectedItems[i].className + ' seled';
                             }
                         } else {
-                            if (selItems[i].className.indexOf('seled') != -1) {
-                                selItems[i].className = 'node-widget';
+                            if (tdom.selectedItems[i].className.indexOf('seled') != -1) {
+                                tdom.selectedItems[i].className = 'node-widget';
                             }
                         }
                     }
@@ -195,8 +194,16 @@ class AFlowView extends HTMLElement {
     }
 
     addLinkingConnection(sourcePortID) {
-        var conn = new AConnection(sourcePortID, null);
-        this.append(conn);
+        var conn = new AConnection();
+        
+        // 设置起始地固定点
+        let p = document.querySelector('#' + sourcePortID).getPositionInView();
+        conn.path.r.l = p.x + parseInt($(this).css('left'));
+        conn.path.r.t = p.y + parseInt($(this).css('top'));
+
+        $(this).prepend(conn);
+
+        return conn;
     }
 
     /**
@@ -609,9 +616,31 @@ class APort extends HTMLElement {
             this.setAttribute('class', 'node-port-out');
         }
 
-        this.onmousedown = function () {
-            CurrentFV.addLinkingConnection(this.id);
-        };
+        // 点击时创建连线
+        $(this).on('mousedown', function(ed){
+            var conn = CurrentFV.addLinkingConnection(this.id);
+            $(document).css('cursor', 'crosshair');
+            
+            $(document).on('mousemove', function(em){
+                conn.moveLinkingPoint({x:ed.clientX, y:ed.clientY}, {x:em.clientX, y: em.clientY});
+            });
+            
+            $(document).on('mouseup', function(evt){
+                $(document).css('cursor', 'default');
+                
+                conn.remove();
+                
+                $(document).off('mousemove');
+                $(document).off('mouseup');
+            });
+        });
+
+        $(this).on('mousemove', function(em){
+            if(em.target === this) {
+                console.log('it is me');
+            }
+            return false;
+        });
     }
 
     /**
@@ -627,7 +656,8 @@ class APort extends HTMLElement {
     }
 
     getPositionInView() {
-        return { x: parseInt($(this).offset().left), y: parseInt($(this).offset().top) };
+        var t = $(this);
+        return { x: t.offset().left + t.width() / 2, y: t.offset().top + t.height() / 2 };
     }
 }
 
@@ -646,59 +676,73 @@ class AConnection extends HTMLElement {
 
         // this.dataModel = null;
 
-        /** 连线在场景中的起点 */
-        // this.sPoint = { x: 0, y: 0 };
-
-        // /** 连线在场景中的终点 */
-        // this.ePoint = { x: 0, y: 0 };
-
-        let s = { x: 0, y: 0 };
-        if (inPortID !== null) {
-            s = document.querySelector('#' + this.inPortID).getPositionInView();
-        }
-        let e = { x: 0, y: 0 };
-        if (outPortID !== null) {
-            e = document.querySelector('#' + this.outPortID).getPositionInView()
-        }
-
         /** 连线标签 */
         this.path = {
             id: "conn_" + ConnectionIDGenerator++,
-            points: {
-                p1: s,
-                p2: e,
-                toString: () => {
-                    return 'points="' + this.p1.x + ',' + this.p1.y + ' ' + this.p2.x + ',' + this.p2.y + '"';
-                }
-            },
+            p1y: 0,
+            p2y: 0,
+            r: { l:0, t:0, w:0, h:0 },
             color: 'white',
             toString: function () {
-                return '<polyline class="aproch-conn" style="stroke:' + this.color + '" id="' + this.id + '" ' + this.points.toString() + 'style="' + this.style + '" />';
+                return '<polyline class="conn-path" style="stroke:' + this.color + '" id="' + this.id + '" points="0,' + this.p1y + ' ' + this.r.w + ',' + this.p2y + '"/>';
             }
         };
     }
 
     connectedCallback() {
-        let svg = '<svg id="svg-id" xmlns="http://www.w3.org/2000/svg" version="1.1"">' + this.path.toString() + '</svg>';
-
-        this.innerHTML = svg;
+        this.setAttribute('class', 'aproch-conn');
     }
 
     disconnectedCallback() {
         //todo: 从节点移除
 
+        this.inPortID = null;
+        this.outPortID = null;
         this.path = null;
     }
 
-    updatePosition() {
-        var i = document.querySelector('#' + this.inPortID);
-        var o = document.querySelector('#' + this.outPortID);
-        this.path.points.p1 = i.getPositionInView();
-        this.path.points.p2 = o.getPositionInView();
+    _update() {
     }
 
-    movePosition(isOut = true) {
+    // updatePosition() {
+    //     var i = document.querySelector('#' + this.inPortID);
+    //     var o = document.querySelector('#' + this.outPortID);
+    //     this.path.points.p1 = i.getPositionInView();
+    //     this.path.points.p2 = o.getPositionInView();
+    // }
 
+    moveLinkingPoint(fixed, move) {
+        this.path.r.w = Math.abs(fixed.x - move.x);
+        this.path.r.h = Math.abs(fixed.y - move.y);
+        
+        if(fixed.x < move.x) {
+            this.path.r.l = fixed.x;
+        } else {
+            this.path.r.l = move.x;
+        }
+        if(fixed.y < move.y) {
+            this.path.r.t = fixed.y;
+            if(fixed.x > move.x) {
+                this.path.p1y = this.path.r.h;
+                this.path.p2y = 0;
+            } else {
+                this.path.p1y = 0;
+                this.path.p2y = this.path.r.h;
+            }
+        } else {
+            this.path.r.t = move.y;
+            if(fixed.x < move.x) {
+                this.path.p1y = this.path.r.h;
+                this.path.p2y = 0;
+            } else {
+                this.path.p1y = 0;
+                this.path.p2y = this.path.r.h;
+            }
+        }
+        
+        this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="'+this.path.r.w+'" height="'+this.path.r.h+'">' + this.path.toString() + '</svg>';
+        this.style.left = this.path.r.l + 'px';
+        this.style.top = this.path.r.t + 'px';
     }
 }
 
@@ -723,7 +767,7 @@ function addNodeTest(flowView) {
     let itf = document.createElement('aproch-interface');
     node.addInterface(itf);
     itf.setPort(true, true);
-    
+
     let label = new ALabelWidget('aproch-label');
     itf.addWidget(label);
 
