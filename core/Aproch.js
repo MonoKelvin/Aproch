@@ -47,6 +47,13 @@ class AFlowView extends HTMLElement {
             }
         }
 
+        // 右键菜单事件
+        this.oncontextmenu = function (e) {
+            e.preventDefault();
+            // todo: 弹出菜单
+            return false;
+        };
+
         /** 注册事件 */
         this.onmousedown = function (evt) {
             var t = $(this);                      // 视图的jquery对象
@@ -73,7 +80,7 @@ class AFlowView extends HTMLElement {
 
             // 视图移动事件
             $(document).on('mousemove', function (em) {
-                
+
                 // 按下shift键就多选
                 if (evt.shiftKey == 1) {
                     // tdom.selectedItems.length = 0;
@@ -153,6 +160,13 @@ class AFlowView extends HTMLElement {
 
             return false;
         };
+
+        // 基本按键事件
+        // let t = $(this);
+        $(this).on('keypress', function (k) {
+            k.preventDefault();
+            console.log('k :', k);
+        });
     }
 
     /**
@@ -195,7 +209,7 @@ class AFlowView extends HTMLElement {
 
     addLinkingConnection(sourcePortID) {
         var conn = new AConnection();
-        
+
         // 设置起始地固定点
         let p = document.querySelector('#' + sourcePortID).getPositionInView();
         conn.path.r.l = p.x + parseInt($(this).css('left'));
@@ -245,7 +259,10 @@ class AFlowView extends HTMLElement {
             'max-height': w_height - c_height,
             'max-width': w_width - c_width
         });
-        $(this).resize(function () {
+        t.on('mousedown', e => {
+            e.stopPropagation();
+        });
+        t.resize(function () {
             w_width = $(this).width();
             w_height = $(this).height();
             if (box_sizing != 'border-box') {
@@ -285,9 +302,6 @@ class AFlowView extends HTMLElement {
         });
 
         // 移动部分
-        t.on('mousedown', e => {
-            e.stopPropagation();
-        });
         m.on('mousedown', function (ed) {
             left = parseInt(t.css('left'));
             top = parseInt(t.css('top'));
@@ -617,26 +631,26 @@ class APort extends HTMLElement {
         }
 
         // 点击时创建连线
-        $(this).on('mousedown', function(ed){
+        $(this).on('mousedown', function (ed) {
             var conn = CurrentFV.addLinkingConnection(this.id);
             $(document).css('cursor', 'crosshair');
-            
-            $(document).on('mousemove', function(em){
-                conn.moveLinkingPoint({x:ed.clientX, y:ed.clientY}, {x:em.clientX, y: em.clientY});
+
+            $(document).on('mousemove', function (em) {
+                conn.moveLinkingPoint({ x: ed.clientX, y: ed.clientY }, { x: em.clientX, y: em.clientY });
             });
-            
-            $(document).on('mouseup', function(evt){
+
+            $(document).on('mouseup', function (evt) {
                 $(document).css('cursor', 'default');
-                
+
                 conn.remove();
-                
+
                 $(document).off('mousemove');
                 $(document).off('mouseup');
             });
         });
 
-        $(this).on('mousemove', function(em){
-            if(em.target === this) {
+        $(this).on('mousemove', function (em) {
+            if (em.target === this) {
                 console.log('it is me');
             }
             return false;
@@ -681,7 +695,7 @@ class AConnection extends HTMLElement {
             id: "conn_" + ConnectionIDGenerator++,
             p1y: 0,
             p2y: 0,
-            r: { l:0, t:0, w:0, h:0 },
+            r: { l: 0, t: 0, w: 0, h: 0 },
             color: 'white',
             toString: function () {
                 return '<polyline class="conn-path" style="stroke:' + this.color + '" id="' + this.id + '" points="0,' + this.p1y + ' ' + this.r.w + ',' + this.p2y + '"/>';
@@ -714,15 +728,15 @@ class AConnection extends HTMLElement {
     moveLinkingPoint(fixed, move) {
         this.path.r.w = Math.abs(fixed.x - move.x);
         this.path.r.h = Math.abs(fixed.y - move.y);
-        
-        if(fixed.x < move.x) {
+
+        if (fixed.x < move.x) {
             this.path.r.l = fixed.x;
         } else {
             this.path.r.l = move.x;
         }
-        if(fixed.y < move.y) {
+        if (fixed.y < move.y) {
             this.path.r.t = fixed.y;
-            if(fixed.x > move.x) {
+            if (fixed.x > move.x) {
                 this.path.p1y = this.path.r.h;
                 this.path.p2y = 0;
             } else {
@@ -731,7 +745,7 @@ class AConnection extends HTMLElement {
             }
         } else {
             this.path.r.t = move.y;
-            if(fixed.x < move.x) {
+            if (fixed.x < move.x) {
                 this.path.p1y = this.path.r.h;
                 this.path.p2y = 0;
             } else {
@@ -739,8 +753,8 @@ class AConnection extends HTMLElement {
                 this.path.p2y = this.path.r.h;
             }
         }
-        
-        this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="'+this.path.r.w+'" height="'+this.path.r.h+'">' + this.path.toString() + '</svg>';
+
+        this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="' + this.path.r.w + '" height="' + this.path.r.h + '">' + this.path.toString() + '</svg>';
         this.style.left = this.path.r.l + 'px';
         this.style.top = this.path.r.t + 'px';
     }
