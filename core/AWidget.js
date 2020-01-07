@@ -71,26 +71,25 @@ export class ALabelWidget extends IWidget {
 }
 
 export class AInputNumberWidget extends IWidget {
-    constructor() {
+    constructor(label, defValue = 0, minValue = -Number.MAX_VALUE, maxValue = Number.MAX_VALUE) {
         super();
 
         /** 当输入完成时触发的事件 */
         this.onComplete = function () { };
-    }
 
-    connectedCallback() {
         this.setAttribute('class', 'input-widget-container');
+        this.setLabel(label);
 
-        this.setLabel('输入');
-
+        /* 设置输入控件属性 */
         this.widget = document.createElement('input');
         this.widget.setAttribute('class', 'input-widget');
         this.widget.value = 0;
-        this.widget.max = Number.MAX_VALUE;
-        this.widget.min = -Number.MAX_VALUE;
-        this.widget.defaultValue = 0;
+        this.widget.min = minValue;
+        this.widget.max = maxValue;
+        this.widget.defaultValue = defValue;
         this.widget.type = 'number';
 
+        /* 设置事件 */
         this.widget.oninput = function () {
             this.value = this.value.replace(/[^\-?\d.]/g, '');
         };
@@ -102,9 +101,11 @@ export class AInputNumberWidget extends IWidget {
             this.widget.blur();
         });
 
+        /* 添加元素 */
         this.append(this.label);
         this.append(this.widget);
     }
+
 
     disconnectedCallback() {
         this.destroyWidgets();

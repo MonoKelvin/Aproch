@@ -153,10 +153,10 @@ export class AFlowView extends HTMLElement {
 
         // 基本按键事件
         // let t = $(this);
-        $(this).on('keypress', function (k) {
-            k.preventDefault();
-            console.log('k :', k);
-        });
+        // $(this).on('keypress', function (k) {
+        //     k.preventDefault();
+        //     console.log('k :', k);
+        // });
     }
 
     /**
@@ -198,14 +198,12 @@ export class AFlowView extends HTMLElement {
     }
 
     addLinkingConnection(sourcePortID) {
-        var conn = new AConnection();
+        var conn = new AConnection(this);
 
         // 设置起始地固定点
         let p = document.querySelector('#' + sourcePortID).getPositionInView();
         conn.path.r.l = p.x + parseInt($(this).css('left'));
         conn.path.r.t = p.y + parseInt($(this).css('top'));
-
-        $(this).prepend(conn);
 
         return conn;
     }
@@ -360,23 +358,23 @@ export class AFlowView extends HTMLElement {
  * <aproch-node name="my node" title-color="#123465"></aproch-node>
  */
 export class ANode extends HTMLElement {
-    constructor() {
+    constructor(flowView, x = 0, y = 0, name = "New Node") {
         super();
 
         /** UUID，标识每一个节点 */
         // this.uuid = getUUID();
 
         /** 节点的 x 坐标 */
-        this.x = 0;
+        this.x = x;
 
         /** 节点的 y 坐标 */
-        this.y = 0;
+        this.y = y;
 
         /** 节点头部元素 */
-        this.nodeTitle = null;
+        this.nodeTitle = document.createElement('div');
 
         /** 节点内容，放置所有接口的容器 */
-        this.nodeContent = null;
+        this.nodeContent = document.createElement('div');
 
         /** 包含的所有接口 */
         this.interfaces = [];
@@ -393,32 +391,24 @@ export class ANode extends HTMLElement {
          * ]
          */
         this.dataModelMap = [];
-    }
-
-    /**
-     * 元素被插入文档中被调用
-     */
-    connectedCallback() {
-        /** 节点头部元素 */
-        this.nodeTitle = document.createElement('div');
-
-        /** 节点内容，放置所有接口的容器 */
-        this.nodeContent = document.createElement('div');
 
         /* 初始化节点控件 */
         this.setAttribute('class', 'node-widget');
         this.nodeTitle.setAttribute('class', 'node-title');
+        this.nodeTitle.innerHTML = name;
         this.nodeContent.setAttribute('class', 'node-content');
 
         /* 添加称为子组件 */
         this.append(this.nodeTitle);
         this.append(this.nodeContent);
 
-        /* 设置位置 */
-        this.setPosition(0, 0);
-
+        /* 添加到场景 */
+        flowView.addNode(this);
+        
         this.id = 'node_' + NodeIDGenerator++;
+        this.setPosition(this.x, this.y);
 
+        // 端口ID清零
         PortIDGenerator = 0;
     }
 
@@ -427,8 +417,10 @@ export class ANode extends HTMLElement {
      */
     disconnectedCallback() {
         this.interfaces.length = 0;
-        this.interfaces = null;
         delete this.interfaces;
+
+        this.dataModelMap.length = 0;
+        delete this.dataModelMap;
     }
 
     /**
@@ -534,7 +526,7 @@ export class ANode extends HTMLElement {
  * <aproch-interface in-port="true" out-port="" ></aproch-interface>
  */
 export class AInterface extends HTMLElement {
-    constructor() {
+    constructor(node, isIn, isOut) {
         super();
 
         /** 输入端口（左侧） */
@@ -542,9 +534,14 @@ export class AInterface extends HTMLElement {
 
         /** 输出端口（右侧） */
         this.outPort = undefined;
-    }
 
-    connectedCallback() {
+        /** 接口的数据控件 */
+        this.widget = null;
+
+        node.addInterface(this);
+
+        this.setPort(isIn, isOut);
+
         this.id = 'itf_' + NodeIDGenerator + '_' + InterfaceIDGenerator++;
         this.setAttribute('class', 'node-interface');
     }
@@ -578,11 +575,11 @@ export class AInterface extends HTMLElement {
      * @see removePort();
      */
     setPort(isInPort, isOutPort) {
-        if (isInPort) {
+        if (isInPort && !this.inPort) {
             this.inPort = new APort(EPortType.INPUT);
             this.append(this.inPort);
         }
-        if (isOutPort) {
+        if (isOutPort && !this.outPort) {
             this.outPort = new APort(EPortType.OUTPUT);
             this.append(this.outPort);
         }
@@ -612,7 +609,15 @@ export class AInterface extends HTMLElement {
     /** 添加一个控件
      * @param {Element} widget 要添加widget
      */
-    addWidget(widget) {
+    setWidget(widget) {
+        if(!widget || $.inArray(widget,$(this).children()) > -1) {
+            return;
+        }
+        if(this.widget) {
+            this.widget.remove();
+            this.widget = null;
+        }
+        this.widget = widget;
         this.append(widget);
     }
 
@@ -725,7 +730,7 @@ export class APort extends HTMLElement {
  * 连线类
  */
 export class AConnection extends HTMLElement {
-    constructor(inPortID, outPortID) {
+    constructor(flowView, inPortID, outPortID) {
         super();
 
         /** 输入端口ID，对应节点的输出端口 */
@@ -747,10 +752,10 @@ export class AConnection extends HTMLElement {
                 return '<polyline class="conn-path" style="stroke:' + this.color + '" id="' + this.id + '" points="0,' + this.p1y + ' ' + this.r.w + ',' + this.p2y + '"/>';
             }
         };
-    }
 
-    connectedCallback() {
         this.setAttribute('class', 'aproch-conn');
+
+        $(flowView).prepend(this);
     }
 
     disconnectedCallback() {

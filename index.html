@@ -13,18 +13,12 @@
 <body>
     <aproch-flow-view id="fv_1" name="flow view" class="flow-view">
     </aproch-flow-view>
-    <div style="position: fixed; left: 30px; top:30px;">
-        <button style="padding: 4px 10px; left: 20px; top: 20px;" onclick="addNodeTest('#fv_1');">添加节点</button>
-        <!-- <aproch-input-number></aproch-input-number> -->
-    </div>
 
     <script type="text/javascript" src="./vendor/jquery/jquery-3.4.1.min.js"></script>
-    <!-- <script type="module" src="./core/AWidget.js"></script> -->
-    <!-- <script type="module" src="./core/Aproch.js"></script> -->
     <script type="module">
         // import * as a from './core/TypeConverter.js'
-        import {ALabelWidget, AInputNumberWidget} from './core/AWidget.js'
-        import {AFlowView, ANode, AConnection, AInterface, APort} from './core/Aproch.js'
+        import { ALabelWidget, AInputNumberWidget } from './core/AWidget.js'
+        import { AFlowView, ANode, AConnection, AInterface, APort } from './core/Aproch.js'
 
         //var FVManager = [];
         const CurrentFV = document.querySelector('#fv_1');
@@ -38,7 +32,7 @@
                     return false;
                 }
             }
-            
+
             customElements.define('aproch-label-widget', ALabelWidget);
             customElements.define('aproch-input-number', AInputNumberWidget);
             customElements.define('aproch-flow-view', AFlowView);
@@ -46,37 +40,26 @@
             customElements.define('aproch-interface', AInterface);
             customElements.define('aproch-port', APort);
             customElements.define('aproch-connection', AConnection);
-    
-            addNodeTest('#fv_1', 100, 100);
-            addNodeTest('#fv_1', 500, 100);
+
+            // addNodeTest('#fv_1', 100, 100);
+            // addNodeTest('#fv_1', 500, 100);
+            for (var i = 0; i < 1; i++) {
+                addNodeTest(Math.floor(Math.random() * 1000), Math.floor(Math.random() * 1000));
+            }
         });
 
-        function addNodeTest(flowView, x = 100, y = 100) {
-            flowView = document.querySelector(flowView);
-            if (flowView === null || !(flowView instanceof AFlowView)) {
-                alert('flowView不是有效的，flowView参数：' + flowView);
-                return;
-            }
+        function addNodeTest(x = 100, y = 100) {
 
-            let node = document.createElement('aproch-node');
-            flowView.addNode(node);
-            node.setName('My Node');
-            node.setPosition(x, y);
+            let node = new ANode(CurrentFV, x, y, "My Node");
 
-            let itf = document.createElement('aproch-interface');
-            node.addInterface(itf);
-            itf.setPort(true, true);
+            let itf = new AInterface(node, true, true);
+            let itf2 = new AInterface(node, true, true);
 
-            let label = new ALabelWidget('aproch-label');
-            itf.addWidget(label);
+            let label = new ALabelWidget('label');
+            let input = new AInputNumberWidget('输入控件');
 
-            let itf2 = document.createElement('aproch-interface');
-            node.addInterface(itf2);
-            itf2.setPort(true, true);
-
-            let input = document.createElement('aproch-input-number');
-            itf2.addWidget(input);
-            // input.addEventListener('change', function() {});
+            itf.setWidget(label);
+            itf2.setWidget(input);
         }
     </script>
 </body>
