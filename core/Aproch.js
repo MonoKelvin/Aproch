@@ -632,46 +632,90 @@ class APort extends HTMLElement {
 
         // 点击时创建连线
         $(this).on('mousedown', function (ed) {
-            var conn = CurrentFV.addLinkingConnection(this.id);
-            $(document).css('cursor', 'crosshair');
+            let t = this;
+            let f = { x: ed.clientX, y: ed.clientY };   //鼠标按下的固定点
+            let canLink = false;                        // 是否可连
+
+            // 创建连接线
+            let conn = CurrentFV.addLinkingConnection(this.id);
 
             $(document).on('mousemove', function (em) {
-                conn.moveLinkingPoint({ x: ed.clientX, y: ed.clientY }, { x: em.clientX, y: em.clientY });
+                conn.setLinkingPoint(f, { x: em.clientX, y: em.clientY });
+
+                let tar = em.target;
+
+                // 遇到另一个端口
+                if(tar instanceof APort && tar !== ed.target) {
+                    if(APort.CanLink(t, tar)) {
+                        let p = tar.getPositionInView();
+
+                        // 1.数据类型一致或通过转换器达到一致
+                        conn.setLinkingPoint(f, p);
+
+                        // 2.数据不一致或不可转换则不作任何响应
+                        canLink = true;
+                    }
+                }
+
+                $(document).on('mouseup', function (evt) {
+                    if(!canLink) {
+                        conn.remove();
+                    }
+    
+                    $(document).off('mousemove');
+                    $(document).off('mouseup');
+                });
             });
-
-            $(document).on('mouseup', function (evt) {
-                $(document).css('cursor', 'default');
-
-                conn.remove();
-
-                $(document).off('mousemove');
-                $(document).off('mouseup');
-            });
-        });
-
-        $(this).on('mousemove', function (em) {
-            if (em.target === this) {
-                console.log('it is me');
-            }
-            return false;
         });
     }
 
     /**
-     * 获得父端口
-     * @returns {AInterface} 父端口
+     * 获得端口所在接口，不是juqery对象
+     * @returns {AInterface} 端口所在的接口
      */
     getInterface() {
-        var i = this.parentElement();
-        if (i === null || !(i instanceof AInterface)) {
-            throw '接口为空！此时父元素：' + i;
+        var i = this.parentElement;
+        if (i !== null && i instanceof AInterface) {
+            return i;
         }
-        return i;
+        throw '接口为空！此时父元素：' + i;
+    }
+
+    getNode() {
+        var n = this.offsetParent;
+        if(n !== null && n instanceof ANode) {
+            return n;
+        }
+        throw "父节点为空！node：" + n;
     }
 
     getPositionInView() {
         var t = $(this);
         return { x: t.offset().left + t.width() / 2, y: t.offset().top + t.height() / 2 };
+    }
+
+    /**
+     * 判断给定的两个端口通过类型转换器是否可以相连接
+     * @param {APort} p1 端口1
+     * @param {APort} p2 端口2
+     * @param {ITypeConverter} tv 类型转换器
+     * @returns {boolean} 如果可以相连接则返回true，否则返回false
+     * @note 判断两个节点可连的条件：
+     *  1. 不是`同一个节点`的端口
+     *  2. 端口类型不能一样，即只能`INPUT`对应`OUTPUT`
+     *  3. 该端口所在的接口数据类型一样或可以隐式转换
+     *  4. 实现类型转换的方法返回true
+     */
+    static CanLink(p1, p2, tv = null) {
+        if (p1.getNode() !== p2.getNode() && p1.portType !== p2.portType) {
+            if (ABaseTypeConverter.CanConvert(p1.getInterface(), p2.getInterface())) {
+                return true;
+            } else if (tv && tv.canConvert()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 
@@ -725,7 +769,12 @@ class AConnection extends HTMLElement {
     //     this.path.points.p2 = o.getPositionInView();
     // }
 
-    moveLinkingPoint(fixed, move) {
+    /**
+     * 设置正在连接（只有一端是有端口，另一端还没有端口）的连线
+     * @param {any} fixed 固定点，一般为鼠标点击时的点
+     * @param {any} move 移动点，一般为鼠标移动时的点
+     */
+    setLinkingPoint(fixed, move) {
         this.path.r.w = Math.abs(fixed.x - move.x);
         this.path.r.h = Math.abs(fixed.y - move.y);
 
@@ -754,9 +803,11 @@ class AConnection extends HTMLElement {
             }
         }
 
-        this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="' + this.path.r.w + '" height="' + this.path.r.h + '">' + this.path.toString() + '</svg>';
         this.style.left = this.path.r.l + 'px';
         this.style.top = this.path.r.t + 'px';
+        this.style.width = this.path.r.w + 'px';
+        this.style.height = this.path.r.h + 'px';
+        this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" >' + this.path.toString() + '</svg>';
     }
 }
 
@@ -766,7 +817,7 @@ customElements.define('aproch-interface', AInterface);
 customElements.define('aproch-port', APort);
 customElements.define('aproch-connection', AConnection);
 
-function addNodeTest(flowView) {
+function addNodeTest(flowView, x = 100, y = 100) {
     flowView = document.querySelector(flowView);
     if (flowView === null || !(flowView instanceof AFlowView)) {
         alert('flowView不是有效的，flowView参数：' + flowView);
@@ -776,7 +827,7 @@ function addNodeTest(flowView) {
     let node = document.createElement('aproch-node');
     flowView.addNode(node);
     node.setName('My Node');
-    node.setPosition(100, 100);
+    node.setPosition(x, y);
 
     let itf = document.createElement('aproch-interface');
     node.addInterface(itf);

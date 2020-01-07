@@ -22,7 +22,7 @@
 @controlHoverBgColor: @controlBgColor + #111;
 
 // port
-@portSize: 10px;
+@portSize: 12px;
 @disport: red;
 @intPort: @primaryColor;
 @floatPort: #e76ff6;
@@ -30,6 +30,9 @@
 @stringPort: #ebf879;
 @boolPort: #fd7191;
 @execPort: white;
+
+//connection
+@connLineWidth: 2px;
 
 * {
     margin: 0;
@@ -259,10 +262,19 @@
 /***********************/
 .aproch-conn{
     position: absolute;
-    border: 2px solid red;
+    // border: 1px solid red;   //调试线框
+    min-width: @connLineWidth;
+    min-height: @connLineWidth;
+
+    svg {
+        position: absolute; // 必须写这句
+        width: 100%;
+        height: 100%;
+    }
+
     .conn-path {
         fill: none;
-        stroke-width: 2;    
+        stroke-width: @connLineWidth;
     }
 }
 

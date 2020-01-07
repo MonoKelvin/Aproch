@@ -74,7 +74,7 @@
   white-space: nowrap;
 }
 .node-content {
-  padding: 4px 8px 8px 8px;
+  padding: 4px 10px 8px 10px;
   display: flex;
   flex-direction: column;
 }
@@ -132,8 +132,8 @@
 /********/
 .node-port-in,
 .node-port-out {
-  min-width: 10px;
-  min-height: 10px;
+  min-width: 12px;
+  min-height: 12px;
   border-radius: 50%;
   background-color: red;
   border: 2px solid #272727;
@@ -141,10 +141,10 @@
   position: absolute;
 }
 .node-port-in {
-  left: -8px;
+  left: -10px;
 }
 .node-port-out {
-  right: -8px;
+  right: -10px;
 }
 .port-int,
 .port-int:active {
@@ -195,10 +195,17 @@
 /***********************/
 .aproch-conn {
   position: absolute;
+  min-width: 2px;
+  min-height: 2px;
+}
+.aproch-conn svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 .aproch-conn .conn-path {
   fill: none;
-  stroke-width: 2;
+  stroke-width: 2px;
 }
 /***********************/
 /* Data Model Controls */

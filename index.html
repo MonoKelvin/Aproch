@@ -13,8 +13,8 @@
 <body>
     <aproch-flow-view id="fv_1" name="flow view" class="flow-view">
     </aproch-flow-view>
-    <div style="position: fixed; left: 30px">
-        <!-- <button style="padding: 4px 10px; left: 20px; top: 20px;" onclick="addNodeTest('#fv_1');">添加节点</button> -->
+    <div style="position: fixed; left: 30px; top:30px;">
+        <button style="padding: 4px 10px; left: 20px; top: 20px;" onclick="addNodeTest('#fv_1');">添加节点</button>
         <!-- <aproch-input-number></aproch-input-number> -->
     </div>
 
@@ -36,8 +36,8 @@
                 }
             }
         });
-        addNodeTest('#fv_1');
-        // document.querySelector('#svg-id').innerHTML = (AConnection.createPath());
+        addNodeTest('#fv_1', 100, 100);
+        addNodeTest('#fv_1', 500, 100);
     </script>
 </body>
 
