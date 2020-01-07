@@ -1,4 +1,14 @@
-var EInputType = {
+export const EWidgetType = {
+    Label: 'label',
+    Input: 'input',
+    Check: 'check',
+    Vector: 'vector',
+    Matrix: 'matrix',
+    Image: 'image',
+    File: 'file'
+};
+
+export const EInputType = {
     Int: 'int',
     Float: 'int',
     Number: 'int',
@@ -7,7 +17,7 @@ var EInputType = {
     Bool: 'int'
 };
 
-class IWidget extends HTMLElement {
+export class IWidget extends HTMLElement {
     constructor() {
         super();
 
@@ -44,7 +54,7 @@ class IWidget extends HTMLElement {
     }
 }
 
-class ALabelWidget extends IWidget {
+export class ALabelWidget extends IWidget {
     constructor(label = '数据源') {
         super();
 
@@ -60,7 +70,7 @@ class ALabelWidget extends IWidget {
     }
 }
 
-class AInputNumberWidget extends IWidget {
+export class AInputNumberWidget extends IWidget {
     constructor() {
         super();
 
@@ -105,6 +115,3 @@ class AInputNumberWidget extends IWidget {
         console.log('this.widget.value :', this.widget.value);
     }
 }
-
-customElements.define('aproch-label-widget', ALabelWidget);
-customElements.define('aproch-input-number', AInputNumberWidget);

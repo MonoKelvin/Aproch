@@ -1,15 +1,24 @@
-class ITypeConverter {
+export class ITypeConverter {
     constructor() {
-        this.canConvert = () => { return false };
+        
+    }
+
+    static CanConvert(dm1, dm2) {
+        return false;
+    }
+
+    static ConvertTo(dm1) {
+        // return IDataModel();
     }
 }
 
-class ABaseTypeConverter extends ITypeConverter {
+export class ABaseTypeConverter extends ITypeConverter {
     constructor(){
         super();
 
-        this.canConvert = function() {
-            return true;
-        };
     }
+
+    static CanConvert() {
+        return true;
+    };
 }

@@ -19,12 +19,15 @@
     </div>
 
     <script type="text/javascript" src="./vendor/jquery/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="./core/utilities.js"></script>
-    <script type="text/javascript" src="./core/AWidget.js"></script>
-    <script type="text/javascript" src="./core/Aproch.js"></script>
-    <script type="text/javascript">
+    <!-- <script type="module" src="./core/AWidget.js"></script> -->
+    <!-- <script type="module" src="./core/Aproch.js"></script> -->
+    <script type="module">
+        // import * as a from './core/TypeConverter.js'
+        import {ALabelWidget, AInputNumberWidget} from './core/AWidget.js'
+        import {AFlowView, ANode, AConnection, AInterface, APort} from './core/Aproch.js'
+
         //var FVManager = [];
-        var CurrentFV = document.querySelector('#fv_1');
+        const CurrentFV = document.querySelector('#fv_1');
 
         $(document).ready(function () {
             // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
@@ -35,9 +38,46 @@
                     return false;
                 }
             }
+            
+            customElements.define('aproch-label-widget', ALabelWidget);
+            customElements.define('aproch-input-number', AInputNumberWidget);
+            customElements.define('aproch-flow-view', AFlowView);
+            customElements.define('aproch-node', ANode);
+            customElements.define('aproch-interface', AInterface);
+            customElements.define('aproch-port', APort);
+            customElements.define('aproch-connection', AConnection);
+    
+            addNodeTest('#fv_1', 100, 100);
+            addNodeTest('#fv_1', 500, 100);
         });
-        addNodeTest('#fv_1', 100, 100);
-        addNodeTest('#fv_1', 500, 100);
+
+        function addNodeTest(flowView, x = 100, y = 100) {
+            flowView = document.querySelector(flowView);
+            if (flowView === null || !(flowView instanceof AFlowView)) {
+                alert('flowView不是有效的，flowView参数：' + flowView);
+                return;
+            }
+
+            let node = document.createElement('aproch-node');
+            flowView.addNode(node);
+            node.setName('My Node');
+            node.setPosition(x, y);
+
+            let itf = document.createElement('aproch-interface');
+            node.addInterface(itf);
+            itf.setPort(true, true);
+
+            let label = new ALabelWidget('aproch-label');
+            itf.addWidget(label);
+
+            let itf2 = document.createElement('aproch-interface');
+            node.addInterface(itf2);
+            itf2.setPort(true, true);
+
+            let input = document.createElement('aproch-input-number');
+            itf2.addWidget(input);
+            // input.addEventListener('change', function() {});
+        }
     </script>
 </body>
 

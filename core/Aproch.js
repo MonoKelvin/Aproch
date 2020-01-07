@@ -1,26 +1,16 @@
-// import { getUUID } from './utilities';
+import {ITypeConverter, ABaseTypeConverter} from './TypeConverter.js';
 
 var NodeIDGenerator = 0;
 var InterfaceIDGenerator = 0;
 var PortIDGenerator = 0;
 var ConnectionIDGenerator = 0;
 
-var EPortType = {
+export const EPortType = {
     INPUT: 0,
     OUTPUT: 1
 };
 
-var EWidgetType = {
-    Label: 'label',
-    Input: 'input',
-    Check: 'check',
-    Vector: 'vector',
-    Matrix: 'matrix',
-    Image: 'image',
-    File: 'file'
-};
-
-class AFlowView extends HTMLElement {
+export class AFlowView extends HTMLElement {
     /** 创建一个指定name的节点编辑视图控件
      * @param {string} name 该视图的名称
      */
@@ -369,7 +359,7 @@ class AFlowView extends HTMLElement {
 /** 节点
  * <aproch-node name="my node" title-color="#123465"></aproch-node>
  */
-class ANode extends HTMLElement {
+export class ANode extends HTMLElement {
     constructor() {
         super();
 
@@ -394,8 +384,15 @@ class ANode extends HTMLElement {
         /** 管理的所有连线 */
         this.connections = { inputs: [], outputs: [] };
 
-        /** 数据模型 */
-        // this.dataModel = null;
+        /** 管理所有接口的数据模型集合
+         * @example 
+         * [
+         *      'itf_1_1': new IDataModel(),
+         *      'itf_1_2': new MyDataModel(),
+         *      'itf_1_3': new CustomDataModel(),
+         * ]
+         */
+        this.dataModelMap = [];
     }
 
     /**
@@ -508,6 +505,17 @@ class ANode extends HTMLElement {
         }
     }
 
+    getFlowView() {
+        let fv = null;
+        $.each($(this).parents(), function(_, p){
+            if(p instanceof AFlowView) {
+                fv = p;
+                return;
+            }
+        });
+        return fv;
+    }
+
     /**
      * 获得接口
      */
@@ -525,7 +533,7 @@ class ANode extends HTMLElement {
 /** 序列化选项
  * <aproch-interface in-port="true" out-port="" ></aproch-interface>
  */
-class AInterface extends HTMLElement {
+export class AInterface extends HTMLElement {
     constructor() {
         super();
 
@@ -608,10 +616,12 @@ class AInterface extends HTMLElement {
         this.append(widget);
     }
 
-    _inputWidgetBuild() { }
+    getDataModel() {
+        return this.offsetParent.dataModelMap[this.id];
+    }
 }
 
-class APort extends HTMLElement {
+export class APort extends HTMLElement {
     /**
      * 创建一个端口
      * @param {EPortType} type 端口类型
@@ -637,7 +647,7 @@ class APort extends HTMLElement {
             let canLink = false;                        // 是否可连
 
             // 创建连接线
-            let conn = CurrentFV.addLinkingConnection(this.id);
+            let conn = t.getNode().getFlowView().addLinkingConnection(this.id);
 
             $(document).on('mousemove', function (em) {
                 conn.setLinkingPoint(f, { x: em.clientX, y: em.clientY });
@@ -645,8 +655,8 @@ class APort extends HTMLElement {
                 let tar = em.target;
 
                 // 遇到另一个端口
-                if(tar instanceof APort && tar !== ed.target) {
-                    if(APort.CanLink(t, tar)) {
+                if (tar instanceof APort && tar !== ed.target) {
+                    if (APort.CanLink(t, tar)) {
                         let p = tar.getPositionInView();
 
                         // 1.数据类型一致或通过转换器达到一致
@@ -656,15 +666,15 @@ class APort extends HTMLElement {
                         canLink = true;
                     }
                 }
+            });
 
-                $(document).on('mouseup', function (evt) {
-                    if(!canLink) {
-                        conn.remove();
-                    }
-    
-                    $(document).off('mousemove');
-                    $(document).off('mouseup');
-                });
+            $(document).on('mouseup', function (eu) {
+                if (!canLink) {
+                    conn.remove();
+                }
+
+                $(document).off('mousemove');
+                $(document).off('mouseup');
             });
         });
     }
@@ -674,19 +684,11 @@ class APort extends HTMLElement {
      * @returns {AInterface} 端口所在的接口
      */
     getInterface() {
-        var i = this.parentElement;
-        if (i !== null && i instanceof AInterface) {
-            return i;
-        }
-        throw '接口为空！此时父元素：' + i;
+        return this.parentNode;
     }
 
     getNode() {
-        var n = this.offsetParent;
-        if(n !== null && n instanceof ANode) {
-            return n;
-        }
-        throw "父节点为空！node：" + n;
+        return this.offsetParent;
     }
 
     getPositionInView() {
@@ -708,9 +710,9 @@ class APort extends HTMLElement {
      */
     static CanLink(p1, p2, tv = null) {
         if (p1.getNode() !== p2.getNode() && p1.portType !== p2.portType) {
-            if (ABaseTypeConverter.CanConvert(p1.getInterface(), p2.getInterface())) {
+            if (ABaseTypeConverter.CanConvert(p1.getInerface().getDataModel(), p2.getInerface().getDataModel())) {
                 return true;
-            } else if (tv && tv.canConvert()) {
+            } else if (tv && tv.CanConvert()) {
                 return true;
             }
         }
@@ -722,7 +724,7 @@ class APort extends HTMLElement {
 /**
  * 连线类
  */
-class AConnection extends HTMLElement {
+export class AConnection extends HTMLElement {
     constructor(inPortID, outPortID) {
         super();
 
@@ -809,38 +811,4 @@ class AConnection extends HTMLElement {
         this.style.height = this.path.r.h + 'px';
         this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" >' + this.path.toString() + '</svg>';
     }
-}
-
-customElements.define('aproch-flow-view', AFlowView);
-customElements.define('aproch-node', ANode);
-customElements.define('aproch-interface', AInterface);
-customElements.define('aproch-port', APort);
-customElements.define('aproch-connection', AConnection);
-
-function addNodeTest(flowView, x = 100, y = 100) {
-    flowView = document.querySelector(flowView);
-    if (flowView === null || !(flowView instanceof AFlowView)) {
-        alert('flowView不是有效的，flowView参数：' + flowView);
-        return;
-    }
-
-    let node = document.createElement('aproch-node');
-    flowView.addNode(node);
-    node.setName('My Node');
-    node.setPosition(x, y);
-
-    let itf = document.createElement('aproch-interface');
-    node.addInterface(itf);
-    itf.setPort(true, true);
-
-    let label = new ALabelWidget('aproch-label');
-    itf.addWidget(label);
-
-    let itf2 = document.createElement('aproch-interface');
-    node.addInterface(itf2);
-    itf2.setPort(true, true);
-
-    let input = document.createElement('aproch-input-number');
-    itf2.addWidget(input);
-    // input.addEventListener('change', function() {});
 }
