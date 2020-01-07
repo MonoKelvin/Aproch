@@ -16,12 +16,43 @@
 
     <script type="text/javascript" src="./vendor/jquery/jquery-3.4.1.min.js"></script>
     <script type="module">
-        // import * as a from './core/TypeConverter.js'
+        import { IDataModel } from './core/DataModel.js'
         import { ALabelWidget, AInputNumberWidget } from './core/AWidget.js'
         import { AFlowView, ANode, AConnection, AInterface, APort } from './core/Aproch.js'
 
         //var FVManager = [];
         const CurrentFV = document.querySelector('#fv_1');
+
+        class OutDataModel extends IDataModel {
+            constructor() {
+                super();
+
+                this.ui = new AInputNumberWidget('数据模型测试');
+
+                this.inputData = (data) => {
+                    this.ui.value = data;
+                }
+
+                this.outputData = () => {
+                    console.log('this.toString() :', this.toString());
+                }
+            }
+        }
+        class InDataModel extends IDataModel {
+            constructor() {
+                super();
+
+                this.ui = new ALabelWidget('数据模型测试');
+
+                this.inputData = (data) => {
+                    this.ui.value = data;
+                }
+
+                this.outputData = () => {
+                    console.log('this.toString() :', this.toString());
+                }
+            }
+        }
 
         $(document).ready(function () {
             // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
@@ -41,25 +72,23 @@
             customElements.define('aproch-port', APort);
             customElements.define('aproch-connection', AConnection);
 
-            // addNodeTest('#fv_1', 100, 100);
-            // addNodeTest('#fv_1', 500, 100);
-            for (var i = 0; i < 1; i++) {
-                addNodeTest(Math.floor(Math.random() * 1000), Math.floor(Math.random() * 1000));
-            }
+            let node = new ANode(CurrentFV, 200, 200, "Out Node");
+            let itf = new AInterface(node, false, true);
+            itf.setDataModel(new OutDataModel());
+            
+            let node2 = new ANode(CurrentFV, 400, 200, "In Node");
+            let itf2 = new AInterface(node2, true, false);
+            itf2.setDataModel(new InDataModel());
         });
 
         function addNodeTest(x = 100, y = 100) {
 
             let node = new ANode(CurrentFV, x, y, "My Node");
+            let itf = new AInterface(node, false, true);
 
-            let itf = new AInterface(node, true, true);
-            let itf2 = new AInterface(node, true, true);
+            itf.setDataModel(new MyDataModel());
 
-            let label = new ALabelWidget('label');
-            let input = new AInputNumberWidget('输入控件');
-
-            itf.setWidget(label);
-            itf2.setWidget(input);
+            node._propagationData();
         }
     </script>
 </body>

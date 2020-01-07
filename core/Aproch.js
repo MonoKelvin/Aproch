@@ -1,4 +1,5 @@
 import {ITypeConverter, ABaseTypeConverter} from './TypeConverter.js';
+import { IDataModel } from './DataModel.js';
 
 var NodeIDGenerator = 0;
 var InterfaceIDGenerator = 0;
@@ -358,7 +359,7 @@ export class AFlowView extends HTMLElement {
  * <aproch-node name="my node" title-color="#123465"></aproch-node>
  */
 export class ANode extends HTMLElement {
-    constructor(flowView, x = 0, y = 0, name = "New Node") {
+    constructor(flowView, x = 0, y = 0, name = 'New Node', catagory = 'other') {
         super();
 
         /** UUID，标识每一个节点 */
@@ -382,7 +383,7 @@ export class ANode extends HTMLElement {
         /** 管理的所有连线 */
         this.connections = { inputs: [], outputs: [] };
 
-        /** 管理所有接口的数据模型集合
+        /** 管理所有接口的数据模型映射
          * @example 
          * [
          *      'itf_1_1': new IDataModel(),
@@ -391,6 +392,14 @@ export class ANode extends HTMLElement {
          * ]
          */
         this.dataModelMap = [];
+
+        /** 节点的分类，通过分类名可以在创建时更好地找到该节点，也方便管理 */
+        this.catagory = catagory;
+
+        /** 节点构造器，要实现自己的节点，必须在这个函数里面添加接口和控件，包括数据模型，
+         *  否则无法在场景中添加自定义的节点
+         */
+        this.nodeBuilder = function() { };
 
         /* 初始化节点控件 */
         this.setAttribute('class', 'node-widget');
@@ -416,11 +425,19 @@ export class ANode extends HTMLElement {
      * 元素被移除时调用
      */
     disconnectedCallback() {
+        _propagationData();
+
         this.interfaces.length = 0;
         delete this.interfaces;
 
         this.dataModelMap.length = 0;
         delete this.dataModelMap;
+    }
+
+    _propagationData() {
+        this.dataModelMap.forEach(dm => {
+            dm.dataModel.outputData();
+        });
     }
 
     /**
@@ -535,9 +552,6 @@ export class AInterface extends HTMLElement {
         /** 输出端口（右侧） */
         this.outPort = undefined;
 
-        /** 接口的数据控件 */
-        this.widget = null;
-
         node.addInterface(this);
 
         this.setPort(isIn, isOut);
@@ -607,22 +621,32 @@ export class AInterface extends HTMLElement {
     }
 
     /** 添加一个控件
-     * @param {Element} widget 要添加widget
+     * @param {IDataModel} widget 要添加widget
      */
-    setWidget(widget) {
-        if(!widget || $.inArray(widget,$(this).children()) > -1) {
+    setDataModel(dm) {
+        if(!dm.ui || $.inArray(dm.ui,$(this).children()) > -1) {
             return;
         }
-        if(this.widget) {
-            this.widget.remove();
-            this.widget = null;
+
+        // 如果该数据模型已经存在就移除
+        let d = this.getDataModel();
+        if(d) {
+            d.ui.remove();
+            this.offsetParent.dataModelMap.remove(d);
         }
-        this.widget = widget;
-        this.append(widget);
+
+        this.offsetParent.dataModelMap.push({id: this.id, dataModel: dm});
+        this.append(dm.ui);
     }
 
     getDataModel() {
-        return this.offsetParent.dataModelMap[this.id];
+        let result = null;
+        this.offsetParent.dataModelMap.forEach(map => {
+            if(map.id === this.id) {
+                result = map.dataModel;
+            }
+        });
+        return result;
     }
 }
 
@@ -655,7 +679,7 @@ export class APort extends HTMLElement {
             let conn = t.getNode().getFlowView().addLinkingConnection(this.id);
 
             $(document).on('mousemove', function (em) {
-                conn.setLinkingPoint(f, { x: em.clientX, y: em.clientY });
+                conn._setLinkingPoint(f, { x: em.clientX, y: em.clientY });
 
                 let tar = em.target;
 
@@ -665,7 +689,7 @@ export class APort extends HTMLElement {
                         let p = tar.getPositionInView();
 
                         // 1.数据类型一致或通过转换器达到一致
-                        conn.setLinkingPoint(f, p);
+                        conn._setLinkingPoint(f, p);
 
                         // 2.数据不一致或不可转换则不作任何响应
                         canLink = true;
@@ -676,6 +700,9 @@ export class APort extends HTMLElement {
             $(document).on('mouseup', function (eu) {
                 if (!canLink) {
                     conn.remove();
+                } else {
+                    // 附加连线到节点上
+                    t.offsetParent.connections.inputs.push(conn);
                 }
 
                 $(document).off('mousemove');
@@ -714,6 +741,7 @@ export class APort extends HTMLElement {
      *  4. 实现类型转换的方法返回true
      */
     static CanLink(p1, p2, tv = null) {
+        return true;    //测试
         if (p1.getNode() !== p2.getNode() && p1.portType !== p2.portType) {
             if (ABaseTypeConverter.CanConvert(p1.getInerface().getDataModel(), p2.getInerface().getDataModel())) {
                 return true;
@@ -781,7 +809,7 @@ export class AConnection extends HTMLElement {
      * @param {any} fixed 固定点，一般为鼠标点击时的点
      * @param {any} move 移动点，一般为鼠标移动时的点
      */
-    setLinkingPoint(fixed, move) {
+    _setLinkingPoint(fixed, move) {
         this.path.r.w = Math.abs(fixed.x - move.x);
         this.path.r.h = Math.abs(fixed.y - move.y);
 

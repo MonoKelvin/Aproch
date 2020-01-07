@@ -21,11 +21,9 @@ export class IWidget extends HTMLElement {
     constructor() {
         super();
 
-        this.label = null;
+        this.label = document.createElement('span');
 
         this.widget = null;
-
-        this.label = document.createElement('span');
     }
 
     /**
