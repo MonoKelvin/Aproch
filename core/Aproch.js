@@ -1,5 +1,4 @@
 import { ITypeConverter, ABaseTypeConverter } from './TypeConverter.js';
-import { IDataModel } from './DataModel.js';
 
 var NodeIDGenerator = 0;
 var InterfaceIDGenerator = 0;
@@ -398,12 +397,14 @@ export class ANode extends HTMLElement {
         /* 初始化节点控件 */
         this.setAttribute('class', 'node-widget');
         this.nodeTitle.setAttribute('class', 'node-title');
-        this.nodeTitle.innerHTML = name;
+        this.nodeTitle.innerHTML = dataModel.name;
         this.nodeContent.setAttribute('class', 'node-content');
 
         /* 添加称为子组件 */
         this.append(this.nodeTitle);
         this.append(this.nodeContent);
+
+        this._initDataModel();
 
         /* 添加到场景 */
         flowView.addNode(this);
@@ -433,15 +434,13 @@ export class ANode extends HTMLElement {
     }
 
     _initDataModel() {
-        let itfOption = null;
-
         // 创建接口
         for (let i = 0; i < 1024; i++) {
-            itfOption = this.dataModel.uiBuilder(i++);
-            if (itfOption === null) {
+            var itfOption = this.dataModel.uiBuilder(i);
+            if (!itfOption) {
                 break;
             }
-            new AInterface(node, itfOption);
+            new AInterface(this, i, itfOption);
         }
     }
 
@@ -454,12 +453,12 @@ export class ANode extends HTMLElement {
         this.interfaces.length = 0;
         delete this.interfaces;
 
-        this.dataModelMap.length = 0;
-        delete this.dataModelMap;
+        this.dataModel.length = 0;
+        delete this.dataModel;
     }
 
     _propagationData() {
-        this.dataModelMap.forEach(dm => {
+        this.dataModel.forEach(dm => {
             dm.dataModel.outputData();
         });
     }
@@ -564,7 +563,7 @@ export class ANode extends HTMLElement {
 }
 
 export class AInterface extends HTMLElement {
-    constructor(node, options) {
+    constructor(node, index, options) {
         super();
 
         /** 输入端口（左侧） */
@@ -573,7 +572,12 @@ export class AInterface extends HTMLElement {
         /** 输出端口（右侧） */
         this.outPort = null;
 
-        node.addInterface(this);
+        /** 接口索引 */
+        this.index = index;
+
+        if (node) {
+            node.addInterface(this);
+        }
 
         this.setPort(options.isInPort, options.isOutPort);
 
@@ -658,7 +662,7 @@ export class AInterface extends HTMLElement {
             this.offsetParent.dataModel.widgets.remove(d);
         }
 
-        this.offsetParent.dataModelMap.push({ id: this.id, dataModel: widget });
+        this.offsetParent.dataModel.push({ id: this.id, dataModel: widget });
         this.append(widget.ui);
     }
 

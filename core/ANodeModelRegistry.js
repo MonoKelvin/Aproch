@@ -1,34 +1,31 @@
-import { ANode, AInterface } from './Aproch';
-import { IDataModel } from './DataModel';
+import { ANode } from './Aproch.js';
+import * as DM from '../core/DataModel.js';
 
 export default class ANodeModelRegistry {
     constructor() {
         this.registryTable = {
-            other: new Set()
+            Other: new Set()
         };
     }
 
     /**
      * 注册一个数据模型
      * @param {string} dmClassName 要注册的类名
-     * @param {string} category 注册时的分类
-     * @returns 返回注册后的状态，当返回：
-     * 1：注册成功；
-     * 2：重复注册，不覆盖；
-     * -1：类名为空，不允许注册空类型；
+     * @param {string} category 注册时的分类，如果没有该分类，默认新创建一个
+     * @returns 注册成功返回true，否则为false
+     * @note 如果表中类名已存在，则会被覆盖
      */
     registryDataModel(dmClassName, category = 'other') {
         if (!dmClassName) {
-            return -1;
+            return false;
         }
 
-        if (this.registryTable[category].has(dmClassName)) {
-            return 2;
-        } else {
-            this.registryTable[category].add(dmClassName);
+        if (this.registryTable[category] === undefined) {
+            this.registryTable[category] = new Set();
         }
 
-        return 1;
+        this.registryTable[category].add(dmClassName);
+        return true;
     }
 
     /**
@@ -44,8 +41,8 @@ export default class ANodeModelRegistry {
 
         // 找到数据模型
         this.registryTable[category].forEach((i, _, __) => {
-            if (i.name === name) {
-                eval('dm = new ' + i + '()');
+            if (i === name) {
+                eval('dm = new DM.' + i + '()');
             }
         });
 
@@ -54,17 +51,6 @@ export default class ANodeModelRegistry {
             return null;
         }
 
-        let itfOption = null;
-        let node = new ANode(flowView, dm);
-
-        for (let i = 0; ; i++) {
-            itfOption = dm.uiBuilder(i++);
-            if (itfOption === null) {
-                break;
-            }
-            new AInterface(node, itfOption);
-        }
-
-        return node;
+        return new ANode(flowView, dm);
     }
 }

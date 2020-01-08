@@ -1,43 +1,7 @@
-import { IDataModel } from '../core/DataModel.js';
+import { IDataModel, OutDataModel } from '../core/DataModel.js';
 import { ALabelWidget, AInputNumberWidget } from '../core/AWidget.js';
-import { AFlowView, ANode, AConnection, AInterface, APort, PInterfaceOption } from '../core/Aproch.js';
+import { AFlowView, ANode, AConnection, AInterface, APort} from '../core/Aproch.js';
 import ANodeModelRegistry from '../core/ANodeModelRegistry.js';
-
-//var FVManager = [];
-const CurrentFV = document.querySelector('#fv_1');
-const NodesTable = new ANodeModelRegistry();
-
-class OutDataModel extends IDataModel {
-    constructor() {
-        super();
-
-        this.inputData = (index, data) => {
-            // this.ui.value = data;
-        };
-
-        this.uiBuilder = index => {
-            switch (index) {
-                case 0:
-                    return {
-                        ui: new AInputNumberWidget('测试'),
-                        isInPort: true,
-                        isOutPort: true
-                    };
-                case 1:
-                    return {
-                        ui: new ALabelWidget('label'),
-                        isInPort: true,
-                        isOutPort: false
-                    };
-                default:
-                    break;
-            }
-            return null;
-        };
-
-        this.outputData = index => {};
-    }
-}
 
 $(document).ready(function() {
     // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
@@ -57,5 +21,10 @@ $(document).ready(function() {
     customElements.define('aproch-port', APort);
     customElements.define('aproch-connection', AConnection);
 
+    //var FVManager = [];
+    const CurrentFV = document.querySelector('#fv_1');
+    const NodesTable = new ANodeModelRegistry();
+
     NodesTable.registryDataModel('OutDataModel', 'MyCategory');
+    NodesTable.createNode('OutDataModel', 'MyCategory', CurrentFV);
 });

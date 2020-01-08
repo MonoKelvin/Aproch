@@ -1,3 +1,5 @@
+import { AInputNumberWidget, ALabelWidget } from './AWidget.js';
+
 export class IDataModel {
     constructor() {
         /* 数据变量名，一般各个数据模型的值都不一样 */
@@ -37,6 +39,40 @@ export class IDataModel {
         this.calculate = () => {};
 
         this.inputData = (index, data) => {};
+
+        this.outputData = index => {};
+    }
+}
+
+export class OutDataModel extends IDataModel {
+    constructor() {
+        super();
+
+        this.name = 'My Data Model';
+
+        this.inputData = (index, data) => {
+            // this.ui.value = data;
+        };
+
+        this.uiBuilder = index => {
+            switch (index) {
+                case 0:
+                    return {
+                        ui: new AInputNumberWidget('测试'),
+                        isInPort: true,
+                        isOutPort: true
+                    };
+                case 1:
+                    return {
+                        ui: new ALabelWidget('label'),
+                        isInPort: true,
+                        isOutPort: false
+                    };
+                default:
+                    break;
+            }
+            return null;
+        };
 
         this.outputData = index => {};
     }
