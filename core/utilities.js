@@ -1,4 +1,4 @@
-export export function getUUID() {
+export function getUUID() {
     let s = [];
     let hexDigits = '0123456789abcdef';
     for (let i = 0; i < 36; i++) {
@@ -26,9 +26,9 @@ export function rgbToHex(r, g, b) {
     return (
         '#' +
         ((1 << 24) + (r << 16) + (g << 8) + b)
-        .toString(16)
-        .slice(1)
-        .toUpperCase()
+            .toString(16)
+            .slice(1)
+            .toUpperCase()
     );
 }
 
@@ -44,4 +44,25 @@ export function clearEventBubble(evt) {
     } else {
         evt.returnValue = false;
     }
+}
+
+/**
+ * 通过给定的类（不是字符串，直接写类名）解析类名（给定类名则直接返回）
+ * @param  {class} class对象
+ * @return 类名
+ */
+export function getClassName(clsName) {
+    if (typeof clsName == "string") {
+        return clsName;
+    }
+    var s = clsName.toString();
+    if (s.indexOf('function') == -1) {
+        return null;
+    } else {
+        s = s.replace('function', '');
+        var idx = s.indexOf('(');
+        s = s.substring(0, idx);
+        s = s.replace(" ", "");
+    }
+    return s;
 }

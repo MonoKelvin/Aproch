@@ -1,6 +1,6 @@
 export class ITypeConverter {
     constructor() {
-        
+
     }
 
     static CanConvert(dm1, dm2) {
@@ -20,5 +20,5 @@ export class ABaseTypeConverter extends ITypeConverter {
 
     static CanConvert() {
         return true;
-    };
+    }
 }
