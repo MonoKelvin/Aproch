@@ -13,18 +13,20 @@ $(document).ready(function() {
         }
     };
 
-    customElements.define('aproch-label-widget', ALabelWidget);
-    customElements.define('aproch-input-number', AInputNumberWidget);
-    customElements.define('aproch-flow-view', AFlowView);
-    customElements.define('aproch-node', ANode);
-    customElements.define('aproch-interface', AInterface);
-    customElements.define('aproch-port', APort);
-    customElements.define('aproch-connection', AConnection);
+    customElements.define('a-label-widget', ALabelWidget);
+    customElements.define('a-input-number', AInputNumberWidget);
+    customElements.define('a-flow-view', AFlowView);
+    customElements.define('a-node', ANode);
+    customElements.define('a-interface', AInterface);
+    customElements.define('a-port', APort);
+    customElements.define('a-connection', AConnection);
 
     //var FVManager = [];
     const CurrentFV = document.querySelector('#fv_1');
     const NodesTable = new ANodeModelRegistry();
 
     NodesTable.registryDataModel('OutDataModel', 'MyCategory');
+    NodesTable.registryDataModel('InDataModel', 'MyCategory');
     NodesTable.createNode('OutDataModel', 'MyCategory', CurrentFV);
+    NodesTable.createNode('InDataModel', 'MyCategory', CurrentFV, 300, 200);
 });

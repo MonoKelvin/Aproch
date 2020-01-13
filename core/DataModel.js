@@ -36,7 +36,7 @@ export class IDataModel {
          */
         this.uiBuilder = index => {};
 
-        this.calculate = () => {};
+        this.calculate = (index) => {};
 
         this.inputData = (index, data) => {};
 
@@ -58,13 +58,36 @@ export class OutDataModel extends IDataModel {
             switch (index) {
                 case 0:
                     return {
-                        ui: new AInputNumberWidget('测试'),
-                        isInPort: true,
+                        ui: new AInputNumberWidget('输出'),
+                        isInPort: false,
                         isOutPort: true
                     };
-                case 1:
+                default:
+                    break;
+            }
+            return null;
+        };
+
+        this.outputData = index => {};
+    }
+}
+
+
+export class InDataModel extends IDataModel {
+    constructor() {
+        super();
+
+        this.name = 'My Data Model';
+
+        this.inputData = (index, data) => {
+            // this.ui.value = data;
+        };
+
+        this.uiBuilder = index => {
+            switch (index) {
+                case 0:
                     return {
-                        ui: new ALabelWidget('label'),
+                        ui: new AInputNumberWidget('输入'),
                         isInPort: true,
                         isOutPort: false
                     };

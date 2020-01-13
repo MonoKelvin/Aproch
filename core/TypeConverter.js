@@ -1,9 +1,7 @@
 export class ITypeConverter {
-    constructor() {
+    constructor() {}
 
-    }
-
-    static CanConvert(dm1, dm2) {
+    static CanConvert(itf1, itf2) {
         return false;
     }
 
@@ -13,12 +11,11 @@ export class ITypeConverter {
 }
 
 export class ABaseTypeConverter extends ITypeConverter {
-    constructor(){
+    constructor() {
         super();
-
     }
 
-    static CanConvert() {
+    static CanConvert(itf1, itf2) {
         return true;
     }
 }

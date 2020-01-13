@@ -36,7 +36,7 @@ export default class ANodeModelRegistry {
      * @returns {ANode | null} 返回创建好的节点，如果创建失败则返回null
      * @note 函数返回之前就已经添加到视图（如果视图存在）中去了
      */
-    createNode(name, category, flowView) {
+    createNode(name, category, flowView, x = 0, y = 0) {
         let dm = null;
 
         // 找到数据模型
@@ -51,6 +51,6 @@ export default class ANodeModelRegistry {
             return null;
         }
 
-        return new ANode(flowView, dm);
+        return new ANode(flowView, dm, x, y);
     }
 }

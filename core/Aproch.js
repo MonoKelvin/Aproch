@@ -10,6 +10,8 @@ export const EPortType = {
     OUTPUT: 1
 };
 
+const MAX_INTERFACE_COUNTER = 100;
+
 // export const PInterfaceOption = {
 //     ui: null,
 //     inPort: true,
@@ -199,13 +201,13 @@ export class AFlowView extends HTMLElement {
         console.log('删除了一个无效的节点');
     }
 
-    addLinkingConnection(sourcePortID) {
+    addLinkingConnection(sourcePort) {
         let conn = new AConnection(this);
 
         // 设置起始地固定点
-        let p = document.querySelector('#' + sourcePortID).getPositionInView();
-        conn.path.r.l = p.x + parseInt($(this).css('left'));
-        conn.path.r.t = p.y + parseInt($(this).css('top'));
+        let p = sourcePort.getPositionInView();
+        conn.path.r.l = p.x + parseInt(this.style.left);
+        conn.path.r.t = p.y + parseInt(this.style.top);
 
         return conn;
     }
@@ -356,9 +358,6 @@ export class AFlowView extends HTMLElement {
     }
 }
 
-/** 节点
- * <aproch-node name="my node" title-color="#123465"></aproch-node>
- */
 export class ANode extends HTMLElement {
     constructor(flowView, dataModel, x = 0, y = 0) {
         super();
@@ -366,82 +365,49 @@ export class ANode extends HTMLElement {
         /** UUID，标识每一个节点 */
         // this.uuid = getUUID();
 
-        /** 节点的 x 坐标 */
-        this.x = x;
-
-        /** 节点的 y 坐标 */
-        this.y = y;
-
         /** 节点头部元素 */
         this.nodeTitle = document.createElement('div');
 
         /** 节点内容，放置所有接口的容器 */
         this.nodeContent = document.createElement('div');
 
-        /** 包含的所有接口 */
-        this.interfaces = [];
-
-        /** 管理的所有连线 */
-        this.connections = { inputs: [], outputs: [] };
-
-        /** 管理所有接口的数据模型映射
-         * @example
-         * [
-         *      'itf_1_1': new IDataModel(),
-         *      'itf_1_2': new MyDataModel(),
-         *      'itf_1_3': new CustomDataModel(),
-         * ]
-         */
+        /** 管理的数据模型 */
         this.dataModel = dataModel;
 
-        /* 初始化节点控件 */
+        // 初始化节点控件
         this.setAttribute('class', 'node-widget');
         this.nodeTitle.setAttribute('class', 'node-title');
         this.nodeTitle.innerHTML = dataModel.name;
         this.nodeContent.setAttribute('class', 'node-content');
-
-        /* 添加称为子组件 */
-        this.append(this.nodeTitle);
-        this.append(this.nodeContent);
-
-        this._initDataModel();
-
-        /* 添加到场景 */
-        flowView.addNode(this);
-
         this.id = 'node_' + NodeIDGenerator++;
-        this.setPosition(this.x, this.y);
 
         // 端口ID清零
         PortIDGenerator = 0;
 
-        this.addEventListener('onmousemove', () => {
-            this.connections.inputs.forEach(ic => {
-                ic._update();
-            });
-            this.connections.outputs.forEach(oc => {
-                oc._update();
-            });
-        });
-    }
+        // 添加为子组件
+        this.append(this.nodeTitle);
+        this.append(this.nodeContent);
 
-    attachConnection(conn, port) {
-        if (port.type === EPortType.INPUT) {
-            this.connections.inputs.push(conn);
-        } else {
-            this.connections.outputs.push(conn);
-        }
-    }
-
-    _initDataModel() {
-        // 创建接口
-        for (let i = 0; i < 1024; i++) {
+        // 初始化数据模型，添加接口
+        for (let i = 0; i < MAX_INTERFACE_COUNTER; i++) {
             var itfOption = this.dataModel.uiBuilder(i);
             if (!itfOption) {
                 break;
             }
             new AInterface(this, i, itfOption);
         }
+
+        // 添加到场景并设置位置
+        flowView.addNode(this);
+        this.setPosition(x, y);
+
+        // 更新连线的位置事件
+        this.addEventListener('mousemove', () => {
+            this.getInterfaces().forEach(i => {
+                i.getPort(EPortType.INPUT)._updateConnection();
+                i.getPort(EPortType.OUTPUT)._updateConnection();
+            });
+        });
     }
 
     /**
@@ -449,12 +415,6 @@ export class ANode extends HTMLElement {
      */
     disconnectedCallback() {
         _propagationData();
-
-        this.interfaces.length = 0;
-        delete this.interfaces;
-
-        this.dataModel.length = 0;
-        delete this.dataModel;
     }
 
     _propagationData() {
@@ -491,12 +451,12 @@ export class ANode extends HTMLElement {
     }
 
     /** 获得节点在场景中的位置
-     * @returns {array} {x,y}
+     * @returns 返回坐标对象{x,y}
      */
     getPosition() {
         return {
-            x: this.style.left,
-            y: this.style.top
+            x: parseInt(this.style.left),
+            y: parseInt(this.style.top)
         };
     }
 
@@ -518,8 +478,8 @@ export class ANode extends HTMLElement {
      * @note 等价于 position = position + (dx, dy)
      */
     addPosition(dx, dy) {
-        this.style.left = parseInt($(this).css('left')) + dx + 'px';
-        this.style.top = parseInt($(this).css('top')) + dy + 'px';
+        this.style.left = parseInt(this.style.left) + dx + 'px';
+        this.style.top = parseInt(this.style.top) + dy + 'px';
     }
 
     /**
@@ -527,14 +487,31 @@ export class ANode extends HTMLElement {
      * @param {AInterface} itf 要添加的接口
      */
     addInterface(itf) {
-        if (this.interfaces.indexOf(itf) < 0) {
-            this.interfaces.push(itf);
-            if (this.nodeContent) {
-                this.nodeContent.appendChild(itf);
-            }
-        } else {
-            console.log('接口已经存在，无法重复添加。interface:', itf);
+        try {
+            this.nodeContent.childNodes.forEach(i => {
+                if (i === itf) {
+                    throw new Error('接口已经存在，无法重复添加。interface:', itf);
+                }
+            });
+            this.nodeContent.appendChild(itf);
+        } catch (e) {
+            console.log(e);
         }
+        itf.getNode();
+    }
+
+    /**
+     * 获得所有的接口
+     * @returns {AInterface[]} 接口数组
+     */
+    getInterfaces() {
+        const interfaces = [];
+        this.nodeContent.childNodes.forEach(i => {
+            if (i instanceof AInterface) {
+                interfaces.push(i);
+            }
+        });
+        return interfaces;
     }
 
     getFlowView() {
@@ -547,19 +524,6 @@ export class ANode extends HTMLElement {
         });
         return fv;
     }
-
-    /**
-     * 获得接口
-     */
-    // getInterfaces() {
-    //     let result = [];
-    //     this.children().forEach(element => {
-    //         if (element instanceof AInterface) {
-    //             result.push(element);
-    //         }
-    //     });
-    //     return result;
-    // }
 }
 
 export class AInterface extends HTMLElement {
@@ -650,30 +614,34 @@ export class AInterface extends HTMLElement {
     /** 添加一个控件
      * @param {IWidget} widget 要添加widget
      */
-    setWidget(widget) {
-        if (!widget || $.inArray(widget, $(this).children()) > -1) {
-            return;
-        }
+    // setWidget(widget) {
+    //     if (!widget || $.inArray(widget, $(this).children()) > -1) {
+    //         return;
+    //     }
 
-        // 如果该数据模型已经存在就移除
-        let d = this.getDataModel();
-        if (d) {
-            d.remove();
-            this.offsetParent.dataModel.widgets.remove(d);
-        }
+    //     // 如果该数据模型已经存在就移除
+    //     let d = this.getDataModel();
+    //     if (d) {
+    //         d.remove();
+    //         this.offsetParent.dataModel.widgets.remove(d);
+    //     }
 
-        this.offsetParent.dataModel.push({ id: this.id, dataModel: widget });
-        this.append(widget.ui);
-    }
+    //     this.offsetParent.dataModel.push({ id: this.id, dataModel: widget });
+    //     this.append(widget.ui);
+    // }
 
-    getWidget() {
-        let result = null;
-        this.offsetParent.dataModel.widgets.forEach(w => {
-            if (w.id === this.id) {
-                result = w;
-            }
-        });
-        return result;
+    // getWidget() {
+    //     let result = null;
+    //     this.offsetParent.dataModel.widgets.forEach(w => {
+    //         if (w.id === this.id) {
+    //             result = w;
+    //         }
+    //     });
+    //     return result;
+    // }
+
+    getNode() {
+        return this.offsetParent;
     }
 }
 
@@ -686,11 +654,14 @@ export class APort extends HTMLElement {
         super();
 
         /** 端口类型，只有输入和输出，其具体可接纳的数据类型由接口 @see `AInterface` 控制 */
-        this.port = type;
+        this.type = type;
+
+        /** 管理链接的所有端口 */
+        this.connections = [];
 
         this.id = 'port_' + NodeIDGenerator + '_' + PortIDGenerator++;
 
-        if (this.port == EPortType.INPUT) {
+        if (this.type == EPortType.INPUT) {
             this.setAttribute('class', 'node-port-in');
         } else {
             this.setAttribute('class', 'node-port-out');
@@ -699,21 +670,27 @@ export class APort extends HTMLElement {
         // 点击时创建连线
         $(this).on('mousedown', function(ed) {
             let t = this;
-            let f = { x: ed.clientX, y: ed.clientY }; //鼠标按下的固定点
+            let tp = t.offsetParent;
+            let tar = null;
+            let f = t.getPositionInView();
+            let conn = null;
             let canLink = false; // 是否可连
 
-            // 创建连接线
-            let conn = t
-                .getNode()
-                .getFlowView()
-                .addLinkingConnection(this.id);
+            // 输入端口如果有连线则不创建新连线，而是移动已经存在的那条线
+            if (t.type == EPortType.INPUT && t.connections.length > 0) {
+                conn = t.connections[0];
+            } else {
+                // 创建连接线
+                conn = tp.getFlowView().addLinkingConnection(t);
+            }
 
             $(document).on('mousemove', function(em) {
                 conn._setLinkingPoint(f, { x: em.clientX, y: em.clientY });
 
-                let tar = em.target;
+                tar = em.target;
 
                 // 遇到另一个端口
+                canLink = false;
                 if (tar instanceof APort && tar !== ed.target) {
                     if (APort.CanLink(t, tar)) {
                         let p = tar.getPositionInView();
@@ -732,8 +709,8 @@ export class APort extends HTMLElement {
                     conn.remove();
                 } else {
                     // 附加连线到节点上
-                    t.offsetParent.attachConnection(conn, t.type);
-                    tar.offsetParent.attachConnection(conn, tar.type);
+                    tp.attachConnection(conn, t);
+                    tar.offsetParent.attachConnection(conn, tar);
                 }
 
                 $(document).off('mousemove');
@@ -750,10 +727,24 @@ export class APort extends HTMLElement {
         return this.parentNode;
     }
 
+    attachConnection(conn, port) {
+        if (port.type === EPortType.INPUT) {
+            this.connections.inputs.push(conn);
+            conn.outPort = port;
+        } else {
+            this.connections.outputs.push(conn);
+            conn.inPort = port;
+        }
+    }
+
     getNode() {
         return this.offsetParent;
     }
 
+    /**
+     * 获得端口在视图中的位置
+     * @returns 返回坐标对象{x, y}
+     */
     getPositionInView() {
         let t = $(this);
         return { x: t.offset().left + t.width() / 2, y: t.offset().top + t.height() / 2 };
@@ -772,8 +763,8 @@ export class APort extends HTMLElement {
      *  4. 实现类型转换的方法返回true
      */
     static CanLink(p1, p2, tv = null) {
-        if (p1.getNode() !== p2.getNode() && p1.port !== p2.port) {
-            if (ABaseTypeConverter.CanConvert(p1.getInterface().getDataModel(), p2.getInterface().getDataModel())) {
+        if (p1.getNode() !== p2.getNode() && p1.type !== p2.type) {
+            if (ABaseTypeConverter.CanConvert(p1.getInterface(), p2.getInterface())) {
                 return true;
             } else if (tv && tv.CanConvert()) {
                 return true;
@@ -837,13 +828,6 @@ export class AConnection extends HTMLElement {
     _update() {
         this._setLinkingPoint(this.inPort.getPositionInView(), this.outPort.getPositionInView());
     }
-
-    // updatePosition() {
-    //     let i = document.querySelector('#' + this.inPortID);
-    //     let o = document.querySelector('#' + this.outPortID);
-    //     this.path.points.p1 = i.getPositionInView();
-    //     this.path.points.p2 = o.getPositionInView();
-    // }
 
     /**
      * 设置正在连接（只有一端是有端口，另一端还没有端口）的连线
