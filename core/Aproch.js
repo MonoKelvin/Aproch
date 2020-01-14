@@ -77,7 +77,7 @@ export class AFlowView extends HTMLElement {
             sfDiv = document.createElement('div');
 
             // 视图移动事件
-            $(document).on('mousemove', function(em) {
+            $(document).on('1mousemove', function(em) {
                 // 按下shift键就多选
                 if (evt.shiftKey == 1) {
                     // tdom.selectedItems.length = 0;
@@ -228,12 +228,12 @@ export class AFlowView extends HTMLElement {
             isHeightCanChange: false
         }
     ) {
-        let t = $(obj);
-        let m = t.find('.' + options.moveable).first();
+        const t = $(obj);
+        const m = t.find('.' + options.moveable).first();
 
-        let iwc = options.isWidthCanChange;
-        let ihc = options.isHeightCanChange;
-        let box_sizing = t.css('box-sizing');
+        const iwc = options.isWidthCanChange;
+        const ihc = options.isHeightCanChange;
+        const box_sizing = t.css('box-sizing');
         let top = t.css('top') - $(this).scrollTop();
         let left = t.css('left') - $(this).scrollLeft();
         let height = t.outerHeight();
@@ -303,6 +303,7 @@ export class AFlowView extends HTMLElement {
                 let left2 = left + e.pageX - ed.pageX;
                 let top2 = top + e.pageY - ed.pageY;
                 t.css({ top: top2, left: left2 });
+                t[0]._updateConnectionPosition();
                 return false;
             });
             $(document).on('mouseup', function(e) {
@@ -345,6 +346,7 @@ export class AFlowView extends HTMLElement {
                         t.width(w_width - left - c_width);
                     }
                 }
+                t[0]._updateConnectionPosition();
                 return false;
             });
             $(document).on('mouseup', function() {
@@ -394,20 +396,12 @@ export class ANode extends HTMLElement {
             if (!itfOption) {
                 break;
             }
-            new AInterface(this, i, itfOption);
+            new AInterface(this, itfOption);
         }
 
         // 添加到场景并设置位置
         flowView.addNode(this);
         this.setPosition(x, y);
-
-        // 更新连线的位置事件
-        this.addEventListener('mousemove', () => {
-            this.getInterfaces().forEach(i => {
-                i.getPort(EPortType.INPUT)._updateConnection();
-                i.getPort(EPortType.OUTPUT)._updateConnection();
-            });
-        });
     }
 
     /**
@@ -420,6 +414,24 @@ export class ANode extends HTMLElement {
     _propagationData() {
         this.dataModel.forEach(dm => {
             dm.dataModel.outputData();
+        });
+    }
+
+    /**
+     * 更新连线的位置
+     */
+    _updateConnectionPosition() {
+        this.getInterfaces().forEach(i => {
+            if (i.getPort(EPortType.INPUT)) {
+                i.getPort(EPortType.INPUT).connections.forEach(conn => {
+                    conn._update();
+                });
+            }
+            if (i.getPort(EPortType.OUTPUT)) {
+                i.getPort(EPortType.OUTPUT).connections.forEach(conn => {
+                    conn._update();
+                });
+            }
         });
     }
 
@@ -497,7 +509,6 @@ export class ANode extends HTMLElement {
         } catch (e) {
             console.log(e);
         }
-        itf.getNode();
     }
 
     /**
@@ -527,7 +538,7 @@ export class ANode extends HTMLElement {
 }
 
 export class AInterface extends HTMLElement {
-    constructor(node, index, options) {
+    constructor(node, options) {
         super();
 
         /** 输入端口（左侧） */
@@ -536,18 +547,12 @@ export class AInterface extends HTMLElement {
         /** 输出端口（右侧） */
         this.outPort = null;
 
-        /** 接口索引 */
-        this.index = index;
-
-        if (node) {
-            node.addInterface(this);
-        }
-
-        this.setPort(options.isInPort, options.isOutPort);
-
         this.id = 'itf_' + NodeIDGenerator + '_' + InterfaceIDGenerator++;
         this.setAttribute('class', 'node-interface');
 
+        node.addInterface(this);
+
+        this.setPort(options.isInPort, options.isOutPort);
         this.append(options.ui);
     }
 
@@ -564,11 +569,10 @@ export class AInterface extends HTMLElement {
         if (isInPort && this.inPort) {
             this.inPort.remove();
             this.inPort = null;
-            delete this.inPort;
         }
         if (isOutPort && this.outPort) {
+            this.outPort.remove();
             this.outPort = null;
-            delete this.outPort;
         }
     }
 
@@ -583,17 +587,18 @@ export class AInterface extends HTMLElement {
         if (isInPort && !this.inPort) {
             this.inPort = new APort(EPortType.INPUT);
             this.append(this.inPort);
+            if (!isOutPort) {
+                $(this).addClass('interface-in');
+            }
         }
         if (isOutPort && !this.outPort) {
             this.outPort = new APort(EPortType.OUTPUT);
             this.append(this.outPort);
+            if (!isInPort) {
+                $(this).addClass('interface-out');
+            }
         }
 
-        if (isInPort && !isOutPort) {
-            $(this).addClass('interface-in');
-        } else if (isOutPort && !isInPort) {
-            $(this).addClass('interface-out');
-        }
         this.removePort(!isInPort, !isOutPort);
     }
 
@@ -610,35 +615,6 @@ export class AInterface extends HTMLElement {
         }
         return null;
     }
-
-    /** 添加一个控件
-     * @param {IWidget} widget 要添加widget
-     */
-    // setWidget(widget) {
-    //     if (!widget || $.inArray(widget, $(this).children()) > -1) {
-    //         return;
-    //     }
-
-    //     // 如果该数据模型已经存在就移除
-    //     let d = this.getDataModel();
-    //     if (d) {
-    //         d.remove();
-    //         this.offsetParent.dataModel.widgets.remove(d);
-    //     }
-
-    //     this.offsetParent.dataModel.push({ id: this.id, dataModel: widget });
-    //     this.append(widget.ui);
-    // }
-
-    // getWidget() {
-    //     let result = null;
-    //     this.offsetParent.dataModel.widgets.forEach(w => {
-    //         if (w.id === this.id) {
-    //             result = w;
-    //         }
-    //     });
-    //     return result;
-    // }
 
     getNode() {
         return this.offsetParent;
@@ -669,8 +645,8 @@ export class APort extends HTMLElement {
 
         // 点击时创建连线
         $(this).on('mousedown', function(ed) {
-            let t = this;
-            let tp = t.offsetParent;
+            const t = this;
+            const tp = t.offsetParent;
             let tar = null;
             let f = t.getPositionInView();
             let conn = null;
@@ -679,6 +655,7 @@ export class APort extends HTMLElement {
             // 输入端口如果有连线则不创建新连线，而是移动已经存在的那条线
             if (t.type == EPortType.INPUT && t.connections.length > 0) {
                 conn = t.connections[0];
+                f = t.connections[0].inPort.getPositionInView();
             } else {
                 // 创建连接线
                 conn = tp.getFlowView().addLinkingConnection(t);
@@ -693,7 +670,7 @@ export class APort extends HTMLElement {
                 canLink = false;
                 if (tar instanceof APort && tar !== ed.target) {
                     if (APort.CanLink(t, tar)) {
-                        let p = tar.getPositionInView();
+                        const p = tar.getPositionInView();
 
                         // 1.数据类型一致或通过转换器达到一致
                         conn._setLinkingPoint(f, p);
@@ -709,14 +686,32 @@ export class APort extends HTMLElement {
                     conn.remove();
                 } else {
                     // 附加连线到节点上
-                    tp.attachConnection(conn, t);
-                    tar.offsetParent.attachConnection(conn, tar);
+                    t.attachConnection(conn);
+                    tar.attachConnection(conn);
                 }
 
                 $(document).off('mousemove');
                 $(document).off('mouseup');
             });
         });
+    }
+
+    /**
+     * 获取连接的对立端口
+     * @returns {AConnection[]} 如果是输入端口，那返回结果只有一条连线，否则可能有多条
+     */
+    getOppositePort() {
+        let ports = [];
+        if (this.type === EPortType.INPUT) {
+            if (this.connections.length > 0) {
+                ports.push(this.connections[0].inPort);
+            }
+        } else {
+            this.connections.forEach(c => {
+                ports.push(c.outPort);
+            });
+        }
+        return ports;
     }
 
     /**
@@ -727,14 +722,22 @@ export class APort extends HTMLElement {
         return this.parentNode;
     }
 
-    attachConnection(conn, port) {
-        if (port.type === EPortType.INPUT) {
-            this.connections.inputs.push(conn);
-            conn.outPort = port;
+    /**
+     * 附加连线到该端口上
+     * @param {AConnection} conn 要附加的连线
+     */
+    attachConnection(conn) {
+        this.connections.push(conn);
+        if (this.type === EPortType.INPUT) {
+            conn.outPort = this;
         } else {
-            this.connections.outputs.push(conn);
-            conn.inPort = port;
+            conn.inPort = this;
         }
+    }
+
+    detachConnection(conn) {
+        this.connections.splice(conn);
+        // todo: 更新数据
     }
 
     getNode() {
@@ -758,12 +761,13 @@ export class APort extends HTMLElement {
      * @returns {boolean} 如果可以相连接则返回true，否则返回false
      * @note 判断两个节点可连的条件：
      *  1. 不是`同一个节点`的端口
-     *  2. 端口类型不能一样，即只能`INPUT`对应`OUTPUT`
-     *  3. 该端口所在的接口数据类型一样或可以隐式转换
-     *  4. 实现类型转换的方法返回true
+     *  2. 不能存在连接
+     *  3. 端口类型不能一样，即只能`INPUT`对应`OUTPUT`
+     *  4. 该端口所在的接口数据类型一样或可以隐式转换
+     *  5. 实现类型转换的方法返回true
      */
     static CanLink(p1, p2, tv = null) {
-        if (p1.getNode() !== p2.getNode() && p1.type !== p2.type) {
+        if (p1.getNode() !== p2.getNode() && p1.type !== p2.type && p1.getOppositePort()[0] !== p2) {
             if (ABaseTypeConverter.CanConvert(p1.getInterface(), p2.getInterface())) {
                 return true;
             } else if (tv && tv.CanConvert()) {
@@ -820,7 +824,12 @@ export class AConnection extends HTMLElement {
     }
 
     disconnectedCallback() {
-        //todo: 从节点移除
+        if (this.inPort) {
+            this.inPort.detachConnection(this);
+        }
+        if (this.outPort) {
+            this.outPort.detachConnection(this);
+        }
 
         this.path = null;
     }
