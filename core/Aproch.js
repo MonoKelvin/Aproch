@@ -34,7 +34,7 @@ export class AFlowView extends HTMLElement {
         this.selectedItems = [];
 
         /** 场景中的连线 */
-        this.connections = [];
+        // this.connections = [];
 
         this.onwheel = function(evt) {
             var t = $(this); // 视图的jquery对象
@@ -184,7 +184,7 @@ export class AFlowView extends HTMLElement {
         if (node) {
             this.append(node);
             node.setPosition(x, y);
-            this.attachTransform(node);
+            this.attachTransformForNode(node);
             this.nodes.push(node);
         }
     }
@@ -213,12 +213,12 @@ export class AFlowView extends HTMLElement {
     }
 
     /**
-     * 为节点或者其他对象附加变换
-     * @param {any} obj 要添加到该场景中的对象
+     * 为节点附加变换
+     * @param {any} node 要添加到该场景中的节点
      * @param {any} options 相关配置选项
      */
-    attachTransform(
-        obj,
+    attachTransformForNode(
+        node,
         options = {
             /** 可以移动部分的元素名称，用class名 */
             moveable: 'node-title',
@@ -228,7 +228,7 @@ export class AFlowView extends HTMLElement {
             isHeightCanChange: false
         }
     ) {
-        const t = $(obj);
+        const t = $(node);
         const m = t.find('.' + options.moveable).first();
 
         const iwc = options.isWidthCanChange;
@@ -525,6 +525,10 @@ export class ANode extends HTMLElement {
         return interfaces;
     }
 
+    /**
+     * 获得节点当前所在的视图
+     * @returns {AFlowView} 返回视图类
+     */
     getFlowView() {
         let fv = null;
         $.each($(this).parents(), function(_, p) {

@@ -50,15 +50,21 @@ export class OutDataModel extends IDataModel {
 
         this.name = 'My Data Model';
 
+        this.inputWidget = new AInputNumberWidget('输出');
+
         this.inputData = (index, data) => {
             // this.ui.value = data;
         };
+
+        this.outputData = index => { };
+
+        this.calculate = index => {};
 
         this.uiBuilder = index => {
             switch (index) {
                 case 0:
                     return {
-                        ui: new AInputNumberWidget('输出'),
+                        ui: this.inputWidget,
                         isInPort: false,
                         isOutPort: true
                     };
@@ -67,8 +73,6 @@ export class OutDataModel extends IDataModel {
             }
             return null;
         };
-
-        this.outputData = index => {};
     }
 }
 
@@ -79,15 +83,21 @@ export class InDataModel extends IDataModel {
 
         this.name = 'My Data Model';
 
+        this.label = new ALabelWidget('输入');
+
         this.inputData = (index, data) => {
             // this.ui.value = data;
         };
+
+        this.outputData = index => {};
+
+        this.calculate = index => {};
 
         this.uiBuilder = index => {
             switch (index) {
                 case 0:
                     return {
-                        ui: new AInputNumberWidget('输入'),
+                        ui: this.label,
                         isInPort: true,
                         isOutPort: false
                     };
@@ -96,7 +106,5 @@ export class InDataModel extends IDataModel {
             }
             return null;
         };
-
-        this.outputData = index => {};
     }
 }
