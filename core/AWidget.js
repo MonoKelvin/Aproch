@@ -10,14 +10,14 @@ export const EWidgetType = {
 
 export const EInputType = {
     Int: 'int',
-    Float: 'int',
-    Number: 'int',
-    String: 'int',
-    Text: 'int',
-    Bool: 'int'
+    Float: 'float',
+    Number: 'number',
+    String: 'string',
+    Text: 'text',
+    Bool: 'bool'
 };
 
-export class IWidget extends HTMLElement {
+export class AbstractWidget extends HTMLElement {
     constructor() {
         super();
 
@@ -52,7 +52,7 @@ export class IWidget extends HTMLElement {
     }
 }
 
-export class ALabelWidget extends IWidget {
+export class ALabelWidget extends AbstractWidget {
     constructor(label = '数据源') {
         super();
 
@@ -68,7 +68,7 @@ export class ALabelWidget extends IWidget {
     }
 }
 
-export class AInputNumberWidget extends IWidget {
+export class AInputNumberWidget extends AbstractWidget {
     constructor(label, defValue = 0, minValue = -Number.MAX_VALUE, maxValue = Number.MAX_VALUE) {
         super();
 

@@ -118,8 +118,8 @@
 }
 .input-widget-container .control-label {
   background: #505050;
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
 }
 .interface-in {
   justify-content: flex-start;
@@ -221,8 +221,8 @@ input {
 .node-item-selection {
   flex: 1 1 auto;
   color: #cccccc;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   min-width: 0;

@@ -28,5 +28,7 @@ $(document).ready(function() {
     NodesTable.registryDataModel('OutDataModel', 'MyCategory');
     NodesTable.registryDataModel('InDataModel', 'MyCategory');
     NodesTable.createNode('OutDataModel', 'MyCategory', CurrentFV);
+    NodesTable.createNode('OutDataModel', 'MyCategory', CurrentFV, 500, 100);
     NodesTable.createNode('InDataModel', 'MyCategory', CurrentFV, 300, 200);
+    NodesTable.createNode('InDataModel', 'MyCategory', CurrentFV, 500, 500);
 });
