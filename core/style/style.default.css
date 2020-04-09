@@ -78,6 +78,16 @@
   display: flex;
   flex-direction: column;
 }
+.node-prompt {
+  color: #ffffff;
+  margin-top: 4px;
+  min-height: 24px;
+  border-radius: 2px;
+  padding: 4px;
+}
+.node-prompt i {
+  margin-right: 4px;
+}
 .node-interface {
   display: flex;
   align-items: center;
@@ -257,4 +267,29 @@ input {
   -webkit-appearance: none;
   -moz-appearance: none;
   padding-left: 20px;
+}
+/** Utility */
+.bg-primary {
+  background: #6fbbf5 !important;
+}
+.bg-alert {
+  background: red !important;
+}
+.bg-info {
+  background: #12d60c !important;
+}
+.bg-warning {
+  background: #ccb805 !important;
+}
+.color-primary {
+  color: #6fbbf5 !important;
+}
+.color-alert {
+  color: red !important;
+}
+.color-info {
+  color: #12d60c !important;
+}
+.color-warning {
+  color: #ccb805 !important;
 }

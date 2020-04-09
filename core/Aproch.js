@@ -7,7 +7,7 @@ var ConnectionIDGenerator = 0;
 
 export const EPortType = {
     INPUT: 0,
-    OUTPUT: 1
+    OUTPUT: 1,
 };
 
 const MAX_INTERFACE_COUNTER = 100;
@@ -36,7 +36,7 @@ export class AFlowView extends HTMLElement {
         /** 场景中的连线 */
         // this.connections = [];
 
-        this.onwheel = function(evt) {
+        this.onwheel = function (evt) {
             var t = $(this); // 视图的jquery对象
 
             // 按下ctrl放大缩小视图
@@ -46,14 +46,14 @@ export class AFlowView extends HTMLElement {
         };
 
         // 右键菜单事件
-        this.oncontextmenu = function(e) {
+        this.oncontextmenu = function (e) {
             e.preventDefault();
             // todo: 弹出菜单
             return false;
         };
 
         /** 注册事件 */
-        this.onmousedown = function(evt) {
+        this.onmousedown = function (evt) {
             let t = $(this); // 视图的jquery对象
             let tdom = t[0]; // 视图的dom对象
             let oldX = parseInt(t.css('left')); // 视图起始x点
@@ -77,7 +77,7 @@ export class AFlowView extends HTMLElement {
             sfDiv = document.createElement('div');
 
             // 视图移动事件
-            $(document).on('1mousemove', function(em) {
+            $(document).on('mousemove', function (em) {
                 // 按下shift键就多选
                 if (evt.shiftKey == 1) {
                     // tdom.selectedItems.length = 0;
@@ -136,7 +136,7 @@ export class AFlowView extends HTMLElement {
                 return false;
             });
 
-            $(document).on('mouseup', function() {
+            $(document).on('mouseup', function () {
                 t.css('cursor', 'grab');
 
                 if (sfDiv) {
@@ -225,7 +225,7 @@ export class AFlowView extends HTMLElement {
             /** 是否可以改变宽度 */
             isWidthCanChange: true,
             /** 是否可以改变高度 */
-            isHeightCanChange: false
+            isHeightCanChange: false,
         }
     ) {
         const t = $(node);
@@ -249,12 +249,12 @@ export class AFlowView extends HTMLElement {
         }
         t.css({
             'max-height': w_height - c_height,
-            'max-width': w_width - c_width
+            'max-width': w_width - c_width,
         });
-        t.on('mousedown', e => {
+        t.on('mousedown', (e) => {
             e.stopPropagation();
         });
-        t.resize(function() {
+        t.resize(function () {
             w_width = $(this).width();
             w_height = $(this).height();
             if (box_sizing != 'border-box') {
@@ -294,19 +294,19 @@ export class AFlowView extends HTMLElement {
         });
 
         // 移动部分
-        m.on('mousedown', function(ed) {
+        m.on('mousedown', function (ed) {
             left = parseInt(t.css('left'));
             top = parseInt(t.css('top'));
             height = t.outerHeight();
             width = t.outerWidth();
-            $(document).on('mousemove', function(e) {
+            $(document).on('mousemove', function (e) {
                 let left2 = left + e.pageX - ed.pageX;
                 let top2 = top + e.pageY - ed.pageY;
                 t.css({ top: top2, left: left2 });
                 t[0]._updateConnectionPosition();
                 return false;
             });
-            $(document).on('mouseup', function(e) {
+            $(document).on('mouseup', function (e) {
                 top = t.offset().top - $(this).scrollTop();
                 left = t.offset().left - $(this).scrollLeft();
                 $(document).off('mousemove');
@@ -324,14 +324,14 @@ export class AFlowView extends HTMLElement {
         t.append(rs);
         t.css({
             'min-height': t.height(),
-            'min-width': t.width()
+            'min-width': t.width(),
         });
-        rs.onmousedown = function(e) {
+        rs.onmousedown = function (e) {
             let old_width = t.width();
             let old_height = t.height();
             let old_size_x = e.pageX;
             let old_size_y = e.pageY;
-            $(document).on('mousemove', function(e) {
+            $(document).on('mousemove', function (e) {
                 if (ihc) {
                     let new_height = e.pageY - old_size_y + old_height;
                     t.height(new_height);
@@ -349,7 +349,7 @@ export class AFlowView extends HTMLElement {
                 t[0]._updateConnectionPosition();
                 return false;
             });
-            $(document).on('mouseup', function() {
+            $(document).on('mouseup', function () {
                 width = t.outerWidth();
                 height = t.outerHeight();
                 $(document).off('mousemove');
@@ -412,7 +412,7 @@ export class ANode extends HTMLElement {
     }
 
     _propagationData() {
-        this.dataModel.forEach(dm => {
+        this.dataModel.forEach((dm) => {
             dm.dataModel.outputData();
         });
     }
@@ -421,14 +421,14 @@ export class ANode extends HTMLElement {
      * 更新连线的位置
      */
     _updateConnectionPosition() {
-        this.getInterfaces().forEach(i => {
+        this.getInterfaces().forEach((i) => {
             if (i.getPort(EPortType.INPUT)) {
-                i.getPort(EPortType.INPUT).connections.forEach(conn => {
+                i.getPort(EPortType.INPUT).connections.forEach((conn) => {
                     conn._update();
                 });
             }
             if (i.getPort(EPortType.OUTPUT)) {
-                i.getPort(EPortType.OUTPUT).connections.forEach(conn => {
+                i.getPort(EPortType.OUTPUT).connections.forEach((conn) => {
                     conn._update();
                 });
             }
@@ -468,7 +468,7 @@ export class ANode extends HTMLElement {
     getPosition() {
         return {
             x: parseInt(this.style.left),
-            y: parseInt(this.style.top)
+            y: parseInt(this.style.top),
         };
     }
 
@@ -500,7 +500,7 @@ export class ANode extends HTMLElement {
      */
     addInterface(itf) {
         try {
-            this.nodeContent.childNodes.forEach(i => {
+            this.nodeContent.childNodes.forEach((i) => {
                 if (i === itf) {
                     throw new Error('接口已经存在，无法重复添加。interface:', itf);
                 }
@@ -517,7 +517,7 @@ export class ANode extends HTMLElement {
      */
     getInterfaces() {
         const interfaces = [];
-        this.nodeContent.childNodes.forEach(i => {
+        this.nodeContent.childNodes.forEach((i) => {
             if (i instanceof AInterface) {
                 interfaces.push(i);
             }
@@ -531,13 +531,61 @@ export class ANode extends HTMLElement {
      */
     getFlowView() {
         let fv = null;
-        $.each($(this).parents(), function(_, p) {
+        $.each($(this).parents(), function (_, p) {
             if (p instanceof AFlowView) {
                 fv = p;
                 return;
             }
         });
         return fv;
+    }
+
+    /**
+     * 在节点末尾处追加一些有用的提示文本
+     * @param {Object} option 内容对象。可用参数示例：
+     *
+     * ### content: string
+     *  提示的文本内容，支持html格式
+     *
+     * ### type: string
+     *  提示类型，支持一下参数
+     *  * default（默认）
+     *  * alert
+     *  * info
+     *  * warning
+     *
+     * ### delay: string | number
+     *  延迟关闭时间。单位为ms，同时支持以下参数
+     *  * short = 1500ms （默认）
+     *  * long = 3000ms
+     * @return {ANode} 返回自身节点，即可以再次使用该方法
+     */
+    pushPromptText(option) {
+        if (typeof option === 'object') {
+            let prompt = $('<div class="node-prompt"></div>');
+            prompt.html(option.content);
+            prompt.prepend($('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>'));
+
+            if (typeof option.type == 'string') {
+                prompt.addClass('bg-' + option.type);
+            }
+
+            let timeout = 1500;
+            if (option.delay === 'long') {
+                timeout = 3000;
+            } else if (isNaN(parseInt(option.delay))) {
+                timeout = 1500;
+            }
+
+            setTimeout(() => {
+                prompt.remove();
+                prompt = null;
+            }, timeout);
+
+            this.nodeContent.appendChild(prompt[0]);
+        }
+
+        return this;
     }
 }
 
@@ -636,7 +684,12 @@ export class APort extends HTMLElement {
         /** 端口类型，只有输入和输出，其具体可接纳的数据类型由接口 @see `AInterface` 控制 */
         this.type = type;
 
-        /** 管理链接的所有端口 */
+        /** 端口连接连线的数量限制，在此值范围内该端口才能进行连线。
+         * @note 默认输出端口最多连接`无数条`，输入端口最多连接`1条`
+         */
+        this.connectCountLimit = type === EPortType.INPUT ? 1 : Infinity;
+
+        /** 管理连接的所有端口 */
         this.connections = [];
 
         this.id = 'port_' + NodeIDGenerator + '_' + PortIDGenerator++;
@@ -648,7 +701,7 @@ export class APort extends HTMLElement {
         }
 
         // 点击时创建连线
-        $(this).on('mousedown', function(ed) {
+        $(this).on('mousedown', function (ed) {
             const t = this;
             const tp = t.offsetParent;
             let tar = null;
@@ -656,16 +709,27 @@ export class APort extends HTMLElement {
             let conn = null;
             let canLink = false; // 是否可连
 
-            // 输入端口如果有连线则不创建新连线，而是移动已经存在的那条线
+            /*
+                1.输入端口如果有连线则移动已经存在的那条线
+                2.否则如果在限制连线数量的范围内，就创建新的连线
+            */
             if (t.type == EPortType.INPUT && t.connections.length > 0) {
                 conn = t.connections[0];
                 f = t.connections[0].inPort.getPositionInView();
-            } else {
+            } else if (t.getConnectionCount() < t.connectCountLimit) {
                 // 创建连接线
                 conn = tp.getFlowView().addLinkingConnection(t);
+            } else {
+                // 提示数量已达上线值，只针对 connectCountLimit > 1 的情况
+                t.getNode().pushPromptText({
+                    content: '连线数量已达上限：' + t.connectCountLimit,
+                    type: 'alert',
+                    delay: 'long',
+                });
+                return;
             }
 
-            $(document).on('mousemove', function(em) {
+            $(document).on('mousemove', function (em) {
                 conn._setLinkingPoint(f, { x: em.clientX, y: em.clientY });
 
                 tar = em.target;
@@ -685,7 +749,7 @@ export class APort extends HTMLElement {
                 }
             });
 
-            $(document).on('mouseup', function(eu) {
+            $(document).on('mouseup', function (eu) {
                 if (!canLink) {
                     conn.remove();
                 } else {
@@ -711,7 +775,7 @@ export class APort extends HTMLElement {
                 ports.push(this.connections[0].inPort);
             }
         } else {
-            this.connections.forEach(c => {
+            this.connections.forEach((c) => {
                 ports.push(c.outPort);
             });
         }
@@ -744,8 +808,18 @@ export class APort extends HTMLElement {
         // todo: 更新数据
     }
 
+    /**
+     * 获得端口所在的节点
+     */
     getNode() {
         return this.offsetParent;
+    }
+
+    /**
+     * 获得端口上连线的数量
+     */
+    getConnectionCount() {
+        return this.connections.length;
     }
 
     /**
@@ -767,11 +841,18 @@ export class APort extends HTMLElement {
      *  1. 不是`同一个节点`的端口
      *  2. 不能存在连接
      *  3. 端口类型不能一样，即只能`INPUT`对应`OUTPUT`
-     *  4. 该端口所在的接口数据类型一样或可以隐式转换
-     *  5. 实现类型转换的方法返回true
+     *  4. 在输入端口数量限制内（通常输入端口只能连一条）
+     *  5. 该端口所在的接口数据类型一样或可以隐式转换
+     *  6. 实现类型转换的方法返回true
      */
     static CanLink(p1, p2, tv = null) {
-        if (p1.getNode() !== p2.getNode() && p1.type !== p2.type && p1.getOppositePort()[0] !== p2) {
+        if (
+            p1.getNode() !== p2.getNode() &&
+            p1.type !== p2.type &&
+            p1.getOppositePort()[0] !== p2 &&
+            p1.getConnectionCount() < p1.connectCountLimit &&
+            p2.getConnectionCount() < p2.connectCountLimit
+        ) {
             if (ABaseTypeConverter.CanConvert(p1.getInterface(), p2.getInterface())) {
                 return true;
             } else if (tv && tv.CanConvert()) {
@@ -805,7 +886,7 @@ export class AConnection extends HTMLElement {
             p2y: 0,
             r: { l: 0, t: 0, w: 0, h: 0 },
             color: 'white',
-            toString: function() {
+            toString: function () {
                 return (
                     '<polyline class="conn-path" style="stroke:' +
                     this.color +
@@ -819,7 +900,7 @@ export class AConnection extends HTMLElement {
                     this.p2y +
                     '"/>'
                 );
-            }
+            },
         };
 
         this.setAttribute('class', 'aproch-conn');
