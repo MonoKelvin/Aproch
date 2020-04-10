@@ -1,2 +1,2 @@
 # Aproch
-A visual programming application developed with Electron
+基于Electron的可视化编程软件，目前处于开发阶段...
