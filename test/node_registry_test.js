@@ -1,11 +1,11 @@
 import { IDataModel, OutDataModel } from '../core/DataModel.js';
 import { ALabelWidget, AInputNumberWidget } from '../core/AWidget.js';
-import { AFlowView, ANode, AConnection, AInterface, APort} from '../core/Aproch.js';
+import { AFlowView, ANode, AConnection, AInterface, APort } from '../core/Aproch.js';
 import ANodeModelRegistry from '../core/ANodeModelRegistry.js';
 
-$(document).ready(function() {
+$(document).ready(function () {
     // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
-    window.onkeydown = function(e) {
+    window.onkeydown = function (e) {
         var ev = window.event || e;
         var code = ev.keyCode || ev.which;
         if (code == 82 && (ev.metaKey || ev.ctrlKey)) {
@@ -20,6 +20,15 @@ $(document).ready(function() {
     customElements.define('a-interface', AInterface);
     customElements.define('a-port', APort);
     customElements.define('a-connection', AConnection);
+
+    // 获取文本实际像素宽度（返回结果不包含'px'）
+    String.prototype.realTextWidth = function (font) {
+        let currentObj = $('<pre>').hide().appendTo(document.body);
+        $(currentObj).html(this).css('font', font);
+        const width = currentObj.width();
+        currentObj.remove();
+        return width;
+    };
 
     //var FVManager = [];
     const CurrentFV = document.querySelector('#fv_1');

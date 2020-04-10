@@ -48,7 +48,7 @@ export class OutDataModel extends IDataModel {
     constructor() {
         super();
 
-        this.name = 'My Data Model';
+        this.name = 'Output Model';
 
         this.inputWidget = new AInputNumberWidget('输出');
 
@@ -81,7 +81,7 @@ export class InDataModel extends IDataModel {
     constructor() {
         super();
 
-        this.name = 'My Data Model';
+        this.name = 'Input Model';
 
         this.label = new ALabelWidget('输入');
 

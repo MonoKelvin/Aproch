@@ -1,42 +1,4 @@
-// app
-@primaryColor: #6fbbf5;
-@lightColor: #ffffff;
-@alertColor: red;
-@infoColor: #12d60c;
-@warningColor: #ccb805;
-
-// view
-@viewBgColor: #1d1d1d;
-@gridColor: @viewBgColor + #111;
-@gridBorderColor: @viewBgColor + #444;
-@gridSpacing: 30px;
-
-// node
-@nodeTitleHeight: 28px;
-@nodeFontSize: 0.7rem;
-@nodeTitleFontSize: 0.9rem;
-@nodeTitle: #3f3f3f;
-@nodeBackground: #272727;
-@nodeShadow: #00000080;
-@nodeMinWidth: 110px;
-@textColor: #cccccc;
-@controlHight: 22px;
-@controlBgColor: #3f3f3f;
-@indicateColor: #3f3f3f;
-@controlHoverBgColor: @controlBgColor + #111;
-
-// port
-@portSize: 12px;
-@disport: red;
-@intPort: @primaryColor;
-@floatPort: #e76ff6;
-// @doublePort: #5df67e;
-@stringPort: #ebf879;
-@boolPort: #fd7191;
-@execPort: white;
-
-//connection
-@connLineWidth: 2px;
+@import 'variable.less';
 
 * {
     margin: 0;
@@ -73,7 +35,6 @@
     border: 1px dashed #aaa;
     background-color: #4b4b4b;
     z-index: 1000;
-    // filter: alpha(opacity: 60);
     opacity: 0.6;
     display: none;
 }
@@ -94,10 +55,10 @@
     background: @nodeBackground;
     border: 2px solid transparent;
     box-shadow: 0 0 15px @nodeShadow;
-    transition: border 0.2s;
+    transition: border 0.2s ease-in-out;
     color: @textColor;
     font-size: @nodeFontSize;
-    opacity: 0.9;
+    opacity: 0.92;
     cursor: default;
 }
 .node-widget:hover {
@@ -106,7 +67,7 @@
 .node-title {
     background: @nodeTitle;
     height: @nodeTitleHeight;
-    color: #fff;
+    color: @lightColor;
     font-weight: bold;
     font-size: @nodeTitleFontSize;
     padding-left: 10px;
@@ -137,7 +98,9 @@
     }
 }
 
-// interface
+/*************/
+/* Interface */
+/*************/
 .node-interface {
     display: flex;
     align-items: center;
@@ -146,49 +109,46 @@
     margin-bottom: 2px;
     min-height: @controlHight;
 }
-
-.input-widget-container {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: space-between;
-
-    // node label and control label
-    .node-label,
-    .control-label,
-    .node-exec-label {
-        user-select: none;
-        color: @textColor;
-        font-size: @nodeFontSize;
-        font-weight: bold;
-        padding-left: 5px;
-        padding-right: 5px;
-        text-align: center;
-        white-space: nowrap;
-        height: @controlHight;
-        line-height: @controlHight;
-    }
-    .node-exec-label {
-        width: 100%;
-    }
-    .node-exec-label,
-    .node-label {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        height: @controlHight - 6px;
-        line-height: @controlHight - 6px;
-    }
-    .control-label {
-        background: @controlBgColor + #111;
-        border-top-left-radius: 2px;
-        border-bottom-left-radius: 2px;
-    }
-}
 .interface-in {
     justify-content: flex-start;
 }
 .interface-out {
     justify-content: flex-end;
+}
+.input-widget-container {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+.node-label,
+.control-label,
+.node-exec-label {
+    user-select: none;
+    color: @textColor;
+    font-size: @nodeFontSize;
+    // font-weight: bold;
+    padding-left: 5px;
+    padding-right: 5px;
+    text-align: center;
+    white-space: nowrap;
+    height: @controlHight;
+    line-height: @controlHight;
+}
+.node-exec-label {
+    width: 100%;
+}
+.node-exec-label,
+.node-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: @controlHight - 6px;
+    line-height: @controlHight - 6px;
+}
+.control-label {
+    background: @controlNormalBg + #111;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
 }
 
 /********/
@@ -201,8 +161,7 @@
     border-radius: 50%;
     background-color: @disport;
     border: 2px solid @nodeBackground;
-    // box-shadow: 0 0 0 0.15rem @disport inset, 0 0 0 0.25rem @nodeBackground inset;
-    transition: all 0.2s;
+    transition: all 0.2s ease-in-out;
     position: absolute;
 }
 .node-port-in {
@@ -214,8 +173,6 @@
 // int
 .port-int,
 .port-int:active {
-    // background: @nodeBackground;
-    // box-shadow: 0 0 0 0.15rem @intPort inset, 0 0 0 0.25rem @nodeBackground inset;
     background: @intPort;
 }
 .port-int:hover {
@@ -230,13 +187,13 @@
     background-color: @floatPort - #444;
 }
 // double
-// .port-double,
-// .port-double:active {
-//     background-color: @doublePort;
-// }
-// .port-double:hover {
-//     background-color: @doublePort - #444;
-// }
+.port-double,
+.port-double:active {
+    background-color: @doublePort;
+}
+.port-double:hover {
+    background-color: @doublePort - #444;
+}
 // string
 .port-string,
 .port-string:active {
@@ -269,7 +226,7 @@
     right: 2px;
     bottom: 2px;
     border-top: 8px solid transparent;
-    border-right: 8px solid #3f3f3f;
+    border-right: 8px solid @indicateColor;
     cursor: nw-resize;
 }
 
@@ -312,17 +269,17 @@ input {
     border-bottom-right-radius: 2px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    min-width: 0;
-    background: @controlBgColor;
+    min-width: 20px;
+    background: @controlNormalBg;
     height: @controlHight;
-    transition: all 0.3s;
+    transition: all 0.3s ease-in-out;
     padding-left: 5px;
     padding-right: 5px;
 }
 .node-item-selection:hover,
 .input-widget:hover {
-    color: #fff;
-    background: @controlHoverBgColor;
+    color: @lightColor;
+    background: @controlHoverBg;
 }
 .node-item-selection {
     appearance: none;
@@ -370,4 +327,17 @@ input {
 }
 .color-warning {
     color: @warningColor !important;
+}
+
+// ScrollBar
+::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+    background-color: @controlDarkBg;
+}
+::-webkit-scrollbar-thumb {
+    background: @controlNormalBg;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: @controlHoverBg;
 }

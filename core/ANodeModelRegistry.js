@@ -4,7 +4,7 @@ import * as DM from '../core/DataModel.js';
 export default class ANodeModelRegistry {
     constructor() {
         this.registryTable = {
-            Other: new Set()
+            Other: new Set(),
         };
     }
 
@@ -40,7 +40,7 @@ export default class ANodeModelRegistry {
         let dm = null;
 
         // 找到数据模型
-        this.registryTable[category].forEach((i, _, __) => {
+        this.registryTable[category].forEach((i) => {
             if (i === name) {
                 eval('dm = new DM.' + i + '()');
             }
@@ -51,6 +51,9 @@ export default class ANodeModelRegistry {
             return null;
         }
 
-        return new ANode(flowView, dm, x, y);
+        var node = new ANode(flowView, dm, x, y);
+        const rw = node.nodeTitle.innerText.realTextWidth($(node.nodeTitle).css('font'));
+        $(node).css('width', rw + 22 + 'px');
+        return node;
     }
 }

@@ -1,3 +1,6 @@
+/*********/
+/** Node */
+/*********/
 * {
   margin: 0;
   padding: 0;
@@ -48,10 +51,10 @@
   background: #272727;
   border: 2px solid transparent;
   box-shadow: 0 0 15px #00000080;
-  transition: border 0.2s;
+  transition: border 0.2s ease-in-out;
   color: #cccccc;
   font-size: 0.7rem;
-  opacity: 0.9;
+  opacity: 0.92;
   cursor: default;
 }
 .node-widget:hover {
@@ -60,7 +63,7 @@
 .node-title {
   background: #3f3f3f;
   height: 28px;
-  color: #fff;
+  color: #ffffff;
   font-weight: bold;
   font-size: 0.9rem;
   padding-left: 10px;
@@ -88,6 +91,9 @@
 .node-prompt i {
   margin-right: 4px;
 }
+/*************/
+/* Interface */
+/*************/
 .node-interface {
   display: flex;
   align-items: center;
@@ -96,19 +102,24 @@
   margin-bottom: 2px;
   min-height: 22px;
 }
+.interface-in {
+  justify-content: flex-start;
+}
+.interface-out {
+  justify-content: flex-end;
+}
 .input-widget-container {
   display: flex;
   width: 100%;
   align-items: center;
   justify-content: space-between;
 }
-.input-widget-container .node-label,
-.input-widget-container .control-label,
-.input-widget-container .node-exec-label {
+.node-label,
+.control-label,
+.node-exec-label {
   user-select: none;
   color: #cccccc;
   font-size: 0.7rem;
-  font-weight: bold;
   padding-left: 5px;
   padding-right: 5px;
   text-align: center;
@@ -116,26 +127,20 @@
   height: 22px;
   line-height: 22px;
 }
-.input-widget-container .node-exec-label {
+.node-exec-label {
   width: 100%;
 }
-.input-widget-container .node-exec-label,
-.input-widget-container .node-label {
+.node-exec-label,
+.node-label {
   overflow: hidden;
   text-overflow: ellipsis;
   height: 16px;
   line-height: 16px;
 }
-.input-widget-container .control-label {
-  background: #505050;
+.control-label {
+  background: #565656;
   border-top-left-radius: 2px;
   border-bottom-left-radius: 2px;
-}
-.interface-in {
-  justify-content: flex-start;
-}
-.interface-out {
-  justify-content: flex-end;
 }
 /********/
 /* Port */
@@ -147,7 +152,7 @@
   border-radius: 50%;
   background-color: red;
   border: 2px solid #272727;
-  transition: all 0.2s;
+  transition: all 0.2s ease-in-out;
   position: absolute;
 }
 .node-port-in {
@@ -165,10 +170,17 @@
 }
 .port-float,
 .port-float:active {
-  background-color: #e76ff6;
+  background-color: #ec8ef8;
 }
 .port-float:hover {
-  background-color: #a32bb2;
+  background-color: #a84ab4;
+}
+.port-double,
+.port-double:active {
+  background-color: #70f68d;
+}
+.port-double:hover {
+  background-color: #2cb249;
 }
 .port-string,
 .port-string:active {
@@ -179,10 +191,10 @@
 }
 .port-bool,
 .port-bool:active {
-  background-color: #fd7191;
+  background-color: #ff7a7a;
 }
 .port-bool:hover {
-  background-color: #b92d4d;
+  background-color: #bb3636;
 }
 .port-exec,
 .port-exec:active {
@@ -235,17 +247,17 @@ input {
   border-bottom-right-radius: 2px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  min-width: 0;
-  background: #3f3f3f;
+  min-width: 20px;
+  background: #454545;
   height: 22px;
-  transition: all 0.3s;
+  transition: all 0.3s ease-in-out;
   padding-left: 5px;
   padding-right: 5px;
 }
 .node-item-selection:hover,
 .input-widget:hover {
-  color: #fff;
-  background: #505050;
+  color: #ffffff;
+  background: #4d4d4d;
 }
 .node-item-selection {
   appearance: none;
@@ -292,4 +304,15 @@ input {
 }
 .color-warning {
   color: #ccb805 !important;
+}
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+  background-color: #2b2b2b;
+}
+::-webkit-scrollbar-thumb {
+  background: #454545;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4d4d4d;
 }
