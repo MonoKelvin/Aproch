@@ -8,6 +8,11 @@
   border: none;
   font-family: 'Microsoft Yahei', 'DejaVu Sans Mono', monospace, sans-serif;
 }
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
 .flow-view {
   background: -webkit-linear-gradient(top, transparent 29px, #2e2e2e 30px), -webkit-linear-gradient(left, #1d1d1d 29px, #2e2e2e 30px);
   background-size: 30px 30px;
@@ -15,26 +20,39 @@
   position: relative;
   display: block;
   cursor: grab;
-  width: 4096px;
-  height: 4096px;
+  width: 2048px;
+  height: 2048px;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
 }
+.flow-view .guid-line-h {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  top: 50%;
+  background: #454545;
+  transform: translateY(-150%);
+}
+.flow-view .guid-line-v {
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  left: 50%;
+  background: #454545;
+  transform: translateX(-150%);
+}
 .selection-frame {
   position: absolute;
   width: 0px;
   height: 0px;
   font-size: 0px;
-  margin: 0px;
-  padding: 0px;
   border: 1px dashed #aaa;
   background-color: #4b4b4b;
   z-index: 1000;
   opacity: 0.6;
-  display: none;
 }
 .clear-background {
   background-color: transparent !important;

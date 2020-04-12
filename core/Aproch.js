@@ -33,6 +33,14 @@ export class AFlowView extends HTMLElement {
         /** 场景中选择的项目 */
         this.selectedItems = [];
 
+        this.transform = {
+            move: {
+                x: 0,
+                y: 0,
+            },
+            scale: 1.0,
+        };
+
         /** 场景中的连线 */
         // this.connections = [];
 
@@ -56,8 +64,8 @@ export class AFlowView extends HTMLElement {
         this.onmousedown = function (evt) {
             let t = $(this); // 视图的jquery对象
             let tdom = t[0]; // 视图的dom对象
-            let oldX = parseInt(t.css('left')); // 视图起始x点
-            let oldY = parseInt(t.css('top')); // 视图起始y点
+            let oldX = parseInt(t.offset().left); // 视图起始x点
+            let oldY = parseInt(t.offset().top); // 视图起始y点
             let startEvtX = evt.clientX; // 鼠标点击时起始x点
             let startEvtY = evt.clientY; // 鼠标点击时起始y点
             let sfX = null; // selection-frame 选择框起始x点
@@ -71,42 +79,33 @@ export class AFlowView extends HTMLElement {
             }
 
             // 清空选择集
-            tdom.selectedItems.length = 0;
-            tdom.selectedItems = [];
+            this.clearSelectedItems();
 
-            sfDiv = document.createElement('div');
+            // 创建选择框
+            sfDiv = $('<div class="selection-frame"></div>');
 
             // 视图移动事件
-            $(document).on('mousemove', function (em) {
+            $(document).on('mousemove', (em) => {
                 // 按下shift键就多选
                 if (evt.shiftKey == 1) {
-                    // tdom.selectedItems.length = 0;
-                    // tdom.selectedItems = [];
-
-                    sfDiv.style.cssText =
-                        'position:absolute;width:0px;height:0px;font-size:0px;margin:0px;padding:0px;border:1px dashed #AAA;background-color:#333;z-index:1000;filter:alpha(opacity:60);opacity:0.6;display:none;';
-
                     t.append(sfDiv);
-                    sfDiv.style.left = startEvtX + 'px';
-                    sfDiv.style.top = startEvtY + 'px';
+                    sfDiv.css('left', startEvtX + 'px');
+                    sfDiv.css('top', startEvtY + 'px');
 
-                    clearEventBubble(evt);
+                    // evt.preventDefault();
 
-                    if (sfDiv.style.display == 'none') {
-                        sfDiv.style.display = '';
-                    }
                     sfX = em.clientX;
                     sfY = em.clientY;
-                    sfDiv.style.left = Math.min(sfX, startEvtX) - oldX + 'px';
-                    sfDiv.style.top = Math.min(sfY, startEvtY) - oldY + 'px';
-                    sfDiv.style.width = Math.abs(sfX - startEvtX) + 'px';
-                    sfDiv.style.height = Math.abs(sfY - startEvtY) + 'px';
+                    sfDiv.css('left', Math.min(sfX, startEvtX) - oldX + 'px');
+                    sfDiv.css('top', Math.min(sfY, startEvtY) - oldY + 'px');
+                    sfDiv.css('width', Math.abs(sfX - startEvtX) + 'px');
+                    sfDiv.css('height', Math.abs(sfY - startEvtY) + 'px');
 
-                    let _l = sfDiv.offsetLeft,
-                        _t = sfDiv.offsetTop;
+                    let _l = sfDiv.offset().left,
+                        _t = sfDiv.offset().top;
 
-                    let _w = sfDiv.offsetWidth,
-                        _h = sfDiv.offsetHeight;
+                    let _w = sfDiv.innerWidth(),
+                        _h = sfDiv.innerHeight();
 
                     for (var i = 0; i < tdom.selectedItems.length; i++) {
                         let sl = tdom.selectedItems[i].offsetWidth + tdom.selectedItems[i].offsetLeft;
@@ -128,10 +127,28 @@ export class AFlowView extends HTMLElement {
                     }
                 } else {
                     t.css('cursor', 'grabbing');
-                    let x = em.clientX - evt.clientX;
-                    let y = em.clientY - evt.clientY;
-                    t.css('left', String(oldX + x) + 'px');
-                    t.css('top', String(oldY + y) + 'px');
+                    let tLeft = oldX + em.clientX - evt.clientX;
+                    let tTop = oldY + em.clientY - evt.clientY;
+
+                    if (tLeft > 0) {
+                        t.css('left', '0px');
+                    } else if (tLeft < t.parent().innerWidth() - t.innerWidth()) {
+                        t.css('left', t.parent().innerWidth() - t.innerWidth());
+                    } else {
+                        t.css('left', tLeft + 'px');
+                    }
+
+                    if (tTop > 0) {
+                        t.css('top', '0px');
+                    } else if (tTop < t.parent().innerHeight() - t.innerHeight()) {
+                        t.css('top', t.parent().innerHeight() - t.innerHeight());
+                    } else {
+                        t.css('top', tTop + 'px');
+                    }
+
+                    this.transform.move.x = -parseInt(t.css('left'));
+                    this.transform.move.y = -parseInt(t.css('top'));
+                    console.log(this.transform.move);
                 }
                 return false;
             });
@@ -164,6 +181,9 @@ export class AFlowView extends HTMLElement {
         //     k.preventDefault();
         //     console.log('k :', k);
         // });
+
+        this.addCenterGuidLine();
+        this.moveToOrigin();
     }
 
     /**
@@ -183,7 +203,7 @@ export class AFlowView extends HTMLElement {
     addNode(node, x = 0, y = 0) {
         if (node) {
             this.append(node);
-            node.setPosition(x, y);
+            node.setPosition(x + this.transform.move.x, y + this.transform.move.y);
             this.attachTransformForNode(node);
             this.nodes.push(node);
         }
@@ -210,6 +230,40 @@ export class AFlowView extends HTMLElement {
         conn.path.r.t = p.y + parseInt(this.style.top);
 
         return conn;
+    }
+
+    /**
+     * 添加中心导航线，如果存在则不做任何动作
+     * @note 默认在视图创建时添加上
+     * @see removeCenterGuidLine()
+     */
+    addCenterGuidLine() {
+        if ($(this).children('[class^="guid-line"]').length > 0) {
+            return;
+        }
+        $(this).prepend($('<div class="guid-line-h"></div><div class="guid-line-v"></div>'));
+    }
+
+    /**
+     * 移除中心导航线，如果不存在则不做任何动作
+     * @see addCenterGuidLine()
+     */
+    removeCenterGuidLine() {
+        $(this).children('[class^="guid-line"]').remove();
+    }
+
+    /**
+     * 将视图移动到原点，即视图中心位置在外部框架容器中心处
+     */
+    moveToOrigin() {
+        let t = $(this);
+        const hw = (t.parent().innerWidth() - t.innerWidth()) / 2,
+            hh = (t.parent().innerHeight() - t.innerHeight()) / 2;
+
+        t.css('left', hw + 'px').css('top', hh + 'px');
+
+        this.transform.move.x = -parseInt(t.css('left'));
+        this.transform.move.y = -parseInt(t.css('top'));
     }
 
     /**
@@ -730,7 +784,11 @@ export class APort extends HTMLElement {
             }
 
             $(document).on('mousemove', function (em) {
-                conn._setLinkingPoint(f, { x: em.clientX, y: em.clientY });
+                const fv = t.getNode().getFlowView();
+                conn._setLinkingPoint(f, {
+                    x: fv.transform.move.x + em.clientX,
+                    y: fv.transform.move.y + em.clientY,
+                });
 
                 tar = em.target;
 
