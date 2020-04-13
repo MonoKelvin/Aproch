@@ -10,6 +10,17 @@ export const EPortType = {
     OUTPUT: 1,
 };
 
+/**
+ * 视图事件状态，用于在视图中区别不同事件
+ */
+const EViewEventState = {
+    NoneState: 0,  // 无
+    SelectItem: 1, // 单选
+    DeselectItem: 2, // 取消选择
+    MultiSelectItem: 3, // 多选
+    MoveItem: 4, // 移动
+};
+
 const MAX_INTERFACE_COUNTER = 100;
 
 // export const PInterfaceOption = {
@@ -28,10 +39,13 @@ export class AFlowView extends HTMLElement {
         this.name = this.getAttribute('name') ? this.getAttribute('name') : name;
 
         /** 场景中所有的节点 */
-        this.nodes = [];
+        // this.nodes = [];
+
+        /** 事件状态 */
+        this.eventState = EViewEventState.NoneState;
 
         /** 场景中选择的项目 */
-        this.selectedItems = [];
+        // this.selectedItems = [];
 
         /** 场景中的连线 */
         // this.connections = [];
@@ -64,14 +78,8 @@ export class AFlowView extends HTMLElement {
             let sfY = null; // selection-frame 选择框起始y点
             let sfDiv = null; // selection-frame 选择框div标签
 
-            // 按下ctrl加选
-            if (evt.ctrlKey == 1) {
-                console.log('ctrl被按下 :');
-                return;
-            }
-
             // 清空选择集
-            this.clearSelectedItems();
+            // this.clearSelectedItems();
 
             // 创建选择框
             sfDiv = $('<div class="selection-frame"></div>');
@@ -177,9 +185,13 @@ export class AFlowView extends HTMLElement {
     /**
      * 清空选择集
      */
-    clearSelectedItems() {
-        this.selectedItems.length = 0;
-        this.selectedItems = [];
+    // clearSelectedItems() {
+    //     this.selectedItems.length = 0;
+    //     this.selectedItems = [];
+    // }
+
+    getSelectedNodes() {
+        return $(this).children('.node-widget-selected');
     }
 
     /**
@@ -195,8 +207,15 @@ export class AFlowView extends HTMLElement {
             this.append(node);
             node.setPosition(x + offset.x, y + offset.y);
             this.attachTransformForNode(node);
-            this.nodes.push(node);
+            // this.nodes.push(node);
         }
+    }
+
+    /**
+     * 获得视图中的所有节点
+     */
+    getNodes() {
+        return this.children('.node-widget');
     }
 
     /**
@@ -303,6 +322,25 @@ export class AFlowView extends HTMLElement {
     }
 
     /**
+     * 更新节点的选择集合
+     * @param {Event} event 事件，一般为鼠标点选节点的事件
+     * @param {ANode} curSelectedNode 当前选择的节点
+     */
+    _updateSelectedSet(event, curSelectedNode) {
+        let node = $(curSelectedNode);
+        // 加选
+        if (event.ctrlKey == 1 || event.shiftKey == 1) {
+            if (node.hasClass('node-widget-selected')) {
+                node.removeClass('node-widget-selected');
+                return;
+            }
+        } else {
+            $(this).children('.node-widget').removeClass('node-widget-selected');
+        }
+        node.addClass('node-widget-selected');
+    }
+
+    /**
      * 为节点附加变换
      * @param {any} node 要添加到该场景中的节点
      * @param {any} options 相关配置选项
@@ -343,6 +381,9 @@ export class AFlowView extends HTMLElement {
         });
         t.on('mousedown', (e) => {
             e.stopPropagation();
+        });
+        t.on('click', (e) => {
+            this._updateSelectedSet(e, node);
         });
         t.resize(function () {
             w_width = $(this).width();
@@ -394,7 +435,6 @@ export class AFlowView extends HTMLElement {
                 let top2 = top + e.pageY - ed.pageY;
                 t.css({ top: top2, left: left2 });
                 t[0]._updateConnectionPosition();
-                return false;
             });
             $(document).on('mouseup', function (e) {
                 top = t.offset().top - $(this).scrollTop();
@@ -402,21 +442,15 @@ export class AFlowView extends HTMLElement {
                 $(document).off('mousemove');
                 $(document).off('mouseup');
             });
-            return false;
         });
 
         // 调整尺寸部分
         if (!iwc && !ihc) {
             return;
         }
-        let rs = document.createElement('span');
-        rs.setAttribute('class', 'resize-indicator');
+        var rs = $('<span class="resize-indicator"></span>');
         t.append(rs);
-        t.css({
-            'min-height': t.height(),
-            'min-width': t.width(),
-        });
-        rs.onmousedown = function (e) {
+        rs.on('mousedown', function (e) {
             let old_width = t.width();
             let old_height = t.height();
             let old_size_x = e.pageX;
@@ -446,7 +480,7 @@ export class AFlowView extends HTMLElement {
                 $(document).off('mouseup');
             });
             return false;
-        };
+        });
     }
 }
 
@@ -498,11 +532,6 @@ export class ANode extends HTMLElement {
      */
     disconnectedCallback() {
         this._propagationData();
-
-        // 先移除所有相关连线
-        // this.getInterfaces().forEach((i) => {
-        //     i.remove();
-        // });
     }
 
     _propagationData() {

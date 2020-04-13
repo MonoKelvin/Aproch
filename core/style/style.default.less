@@ -39,7 +39,7 @@ body {
         top: 50%;
         background: @controlNormalBg;
         transform: translateY(-50%);
-    z-index: 0;
+        z-index: 0;
     }
     .guid-line-v {
         position: absolute;
@@ -48,7 +48,7 @@ body {
         left: 50%;
         background: @controlNormalBg;
         transform: translateX(-50%);
-    z-index: 0;
+        z-index: 0;
     }
 }
 
@@ -79,7 +79,7 @@ body {
     background: @nodeBackground;
     border: 2px solid transparent;
     box-shadow: 0 0 15px @nodeShadow;
-    transition: border 0.2s ease-in-out;
+    transition: border 0.16s ease-in-out, height 0.16s ease-in-out;
     color: @textColor;
     font-size: @nodeFontSize;
     opacity: 0.92;
@@ -87,7 +87,10 @@ body {
     z-index: 10;
 }
 .node-widget:hover {
-    border: 2px solid @primaryColor;
+    border: @nodeHoverBorder;
+}
+.node-widget-selected {
+    border: 2px solid @primaryActiveColor !important;
 }
 .node-title {
     background: @nodeTitle;

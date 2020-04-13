@@ -31,63 +31,7 @@ $(document).ready(function () {
         currentObj.remove();
         return width;
     };
-
-    // 点的加法
-    Object.prototype.pointAdd = function (point) {
-        let tx = 0,
-            ty = 0,
-            px = 0,
-            py = 0;
-
-        if (point.left !== undefined) {
-            px = point.left;
-            py = point.top;
-        } else {
-            px = point.x;
-            py = point.y;
-        }
-        if (this.left !== undefined) {
-            tx = this.left;
-            ty = this.top;
-        } else {
-            tx = this.x;
-            ty = this.y;
-        }
-
-        return {
-            x: tx + px,
-            y: ty + py,
-        };
-    };
-
-    // 点的减法
-    Object.prototype.pointSub = function (point) {
-        let tx = 0,
-            ty = 0,
-            px = 0,
-            py = 0;
-
-        if (point.left !== undefined) {
-            px = point.left;
-            py = point.top;
-        } else {
-            px = point.x;
-            py = point.y;
-        }
-        if (this.left !== undefined) {
-            tx = this.left;
-            ty = this.top;
-        } else {
-            tx = this.x;
-            ty = this.y;
-        }
-
-        return {
-            x: tx - px,
-            y: ty - py,
-        };
-    };
-
+    
     // 移除数组中的指定元素，移除失败返回false，否则返回true
     Array.prototype.remove = function (element) {
         const index = this.indexOf(element);

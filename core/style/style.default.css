@@ -73,7 +73,7 @@ body {
   background: #272727;
   border: 2px solid transparent;
   box-shadow: 0 0 15px #00000080;
-  transition: border 0.2s ease-in-out;
+  transition: border 0.16s ease-in-out, height 0.16s ease-in-out;
   color: #cccccc;
   font-size: 0.7rem;
   opacity: 0.92;
@@ -81,7 +81,10 @@ body {
   z-index: 10;
 }
 .node-widget:hover {
-  border: 2px solid #6fbbf5;
+  border: 2px solid #9a9a9a;
+}
+.node-widget-selected {
+  border: 2px solid #58a9e7 !important;
 }
 .node-title {
   background: #3f3f3f;
