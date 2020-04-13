@@ -16,8 +16,10 @@ body {
 .flow-view {
   background: -webkit-linear-gradient(top, transparent 29px, #2e2e2e 30px), -webkit-linear-gradient(left, #1d1d1d 29px, #2e2e2e 30px);
   background-size: 30px 30px;
+  background-position-x: 4px;
+  background-position-y: 4px;
   overflow: hidden !important;
-  position: relative;
+  position: fixed;
   display: block;
   cursor: grab;
   width: 2048px;
@@ -34,7 +36,8 @@ body {
   height: 2px;
   top: 50%;
   background: #454545;
-  transform: translateY(-150%);
+  transform: translateY(-50%);
+  z-index: 0;
 }
 .flow-view .guid-line-v {
   position: absolute;
@@ -42,7 +45,8 @@ body {
   height: 100%;
   left: 50%;
   background: #454545;
-  transform: translateX(-150%);
+  transform: translateX(-50%);
+  z-index: 0;
 }
 .selection-frame {
   position: absolute;
@@ -74,6 +78,7 @@ body {
   font-size: 0.7rem;
   opacity: 0.92;
   cursor: default;
+  z-index: 10;
 }
 .node-widget:hover {
   border: 2px solid #6fbbf5;
@@ -237,6 +242,7 @@ body {
   position: absolute;
   min-width: 2px;
   min-height: 2px;
+  z-index: 1;
 }
 .aproch-conn svg {
   position: absolute;

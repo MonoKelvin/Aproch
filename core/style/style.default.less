@@ -18,8 +18,10 @@ body {
     background: -webkit-linear-gradient(top, transparent @gridSpacing - 1px, @gridColor @gridSpacing),
         -webkit-linear-gradient(left, @viewBgColor @gridSpacing - 1px, @gridColor @gridSpacing);
     background-size: @gridSpacing @gridSpacing;
+    background-position-x: 4px;
+    background-position-y: 4px;
     overflow: hidden !important;
-    position: relative;
+    position: fixed;
     display: block;
     cursor: grab;
     width: 2048px;
@@ -36,7 +38,8 @@ body {
         height: 2px;
         top: 50%;
         background: @controlNormalBg;
-        transform: translateY(-150%);
+        transform: translateY(-50%);
+    z-index: 0;
     }
     .guid-line-v {
         position: absolute;
@@ -44,7 +47,8 @@ body {
         height: 100%;
         left: 50%;
         background: @controlNormalBg;
-        transform: translateX(-150%);
+        transform: translateX(-50%);
+    z-index: 0;
     }
 }
 
@@ -80,6 +84,7 @@ body {
     font-size: @nodeFontSize;
     opacity: 0.92;
     cursor: default;
+    z-index: 10;
 }
 .node-widget:hover {
     border: 2px solid @primaryColor;
@@ -258,6 +263,7 @@ body {
     // border: 1px solid red;   //调试线框
     min-width: @connLineWidth;
     min-height: @connLineWidth;
+    z-index: 1;
 
     svg {
         position: absolute; // 必须写这句

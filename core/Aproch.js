@@ -33,14 +33,6 @@ export class AFlowView extends HTMLElement {
         /** 场景中选择的项目 */
         this.selectedItems = [];
 
-        this.transform = {
-            move: {
-                x: 0,
-                y: 0,
-            },
-            scale: 1.0,
-        };
-
         /** 场景中的连线 */
         // this.connections = [];
 
@@ -145,10 +137,6 @@ export class AFlowView extends HTMLElement {
                     } else {
                         t.css('top', tTop + 'px');
                     }
-
-                    this.transform.move.x = -parseInt(t.css('left'));
-                    this.transform.move.y = -parseInt(t.css('top'));
-                    console.log(this.transform.move);
                 }
                 return false;
             });
@@ -202,8 +190,10 @@ export class AFlowView extends HTMLElement {
      */
     addNode(node, x = 0, y = 0) {
         if (node) {
+            const offset = this.getOrigin();
+
             this.append(node);
-            node.setPosition(x + this.transform.move.x, y + this.transform.move.y);
+            node.setPosition(x + offset.x, y + offset.y);
             this.attachTransformForNode(node);
             this.nodes.push(node);
         }
@@ -253,6 +243,55 @@ export class AFlowView extends HTMLElement {
     }
 
     /**
+     * 获取视图中心的位置，及相对于视图左上角的位置
+     * @return {Object} 返回偏移坐标，格式：{x, y}
+     * @see getOriginOffset()、getViewOffset()
+     */
+    getOrigin() {
+        return {
+            x: parseInt(this.offsetWidth) / 2,
+            y: parseInt(this.offsetHeight) / 2,
+        };
+    }
+
+    /**
+     * 获得视图中心的偏移位置，即`视图中心`相对于`视口`左上角的偏移
+     * @return {Object} 返回偏移坐标，格式：{x, y}
+     * @see getOrigin()、getViewOffset()
+     */
+    getOriginOffset() {
+        return {
+            x: parseInt(this.offsetLeft + this.offsetWidth / 2),
+            y: parseInt(this.offsetTop + this.offsetHeight / 2),
+        };
+    }
+
+    /**
+     * 获取视图的偏移量，即视图左上角到视口左上角的偏移量
+     * @return {Object} 返回偏移坐标，格式：{x, y}
+     * @note 返回的偏移量都大于等于0
+     * @see getOrigin()、getOriginOffset()
+     */
+    getViewOffset() {
+        return {
+            x: -parseInt(this.offsetLeft),
+            y: -parseInt(this.offsetTop),
+        };
+    }
+
+    /**
+     * 视口坐标转到视图中的坐标
+     * @param {Object}} point 视口坐标
+     * @return {Object} 返回视图中的坐标，格式：{x, y}
+     */
+    viewportToFlowView(point) {
+        return {
+            x: point.x - parseInt(this.offsetLeft),
+            y: point.y - parseInt(this.offsetTop),
+        };
+    }
+
+    /**
      * 将视图移动到原点，即视图中心位置在外部框架容器中心处
      */
     moveToOrigin() {
@@ -261,9 +300,6 @@ export class AFlowView extends HTMLElement {
             hh = (t.parent().innerHeight() - t.innerHeight()) / 2;
 
         t.css('left', hw + 'px').css('top', hh + 'px');
-
-        this.transform.move.x = -parseInt(t.css('left'));
-        this.transform.move.y = -parseInt(t.css('top'));
     }
 
     /**
@@ -454,21 +490,25 @@ export class ANode extends HTMLElement {
         }
 
         // 添加到场景并设置位置
-        flowView.addNode(this);
-        this.setPosition(x, y);
+        flowView.addNode(this, x, y);
     }
 
     /**
      * 元素被移除时调用
      */
     disconnectedCallback() {
-        _propagationData();
+        this._propagationData();
+
+        // 先移除所有相关连线
+        // this.getInterfaces().forEach((i) => {
+        //     i.remove();
+        // });
     }
 
     _propagationData() {
-        this.dataModel.forEach((dm) => {
-            dm.dataModel.outputData();
-        });
+        // this.dataModel.forEach((dm) => {
+        //     dm.dataModel.outputData();
+        // });
     }
 
     /**
@@ -784,11 +824,8 @@ export class APort extends HTMLElement {
             }
 
             $(document).on('mousemove', function (em) {
-                const fv = t.getNode().getFlowView();
-                conn._setLinkingPoint(f, {
-                    x: fv.transform.move.x + em.clientX,
-                    y: fv.transform.move.y + em.clientY,
-                });
+                const fvOffset = t.getNode().getFlowView().viewportToFlowView({ x: em.clientX, y: em.clientY });
+                conn._setLinkingPoint(f, fvOffset);
 
                 tar = em.target;
 
@@ -822,6 +859,12 @@ export class APort extends HTMLElement {
         });
     }
 
+    disconnectedCallback() {
+        $(this.connections).each((_, conn) => {
+            this.detachConnection(conn);
+        });
+    }
+
     /**
      * 获取连接的对立端口
      * @returns {AConnection[]} 如果是输入端口，那返回结果只有一条连线，否则可能有多条
@@ -829,9 +872,9 @@ export class APort extends HTMLElement {
     getOppositePort() {
         let ports = [];
         if (this.type === EPortType.INPUT) {
-            if (this.connections.length > 0) {
-                ports.push(this.connections[0].inPort);
-            }
+            this.connections.forEach((c) => {
+                ports.push(c.inPort);
+            });
         } else {
             this.connections.forEach((c) => {
                 ports.push(c.outPort);
@@ -861,8 +904,13 @@ export class APort extends HTMLElement {
         }
     }
 
+    /**
+     * 分离该端口上指定的连线，同时也会分离与该连线链接的另一头的端口
+     * @param {AConnection} conn 链接该端口上的连线
+     */
     detachConnection(conn) {
-        this.connections.splice(conn);
+        conn.remove();
+
         // todo: 更新数据
     }
 
@@ -886,7 +934,8 @@ export class APort extends HTMLElement {
      */
     getPositionInView() {
         let t = $(this);
-        return { x: t.offset().left + t.width() / 2, y: t.offset().top + t.height() / 2 };
+        const p = { x: t.offset().left + this.offsetWidth / 2, y: t.offset().top + this.offsetHeight / 2 };
+        return this.getNode().getFlowView().viewportToFlowView(p);
     }
 
     /**
@@ -968,10 +1017,10 @@ export class AConnection extends HTMLElement {
 
     disconnectedCallback() {
         if (this.inPort) {
-            this.inPort.detachConnection(this);
+            this.inPort.connections.remove(this);
         }
         if (this.outPort) {
-            this.outPort.detachConnection(this);
+            this.outPort.connections.remove(this);
         }
 
         this.path = null;
