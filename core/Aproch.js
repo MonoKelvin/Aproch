@@ -30,6 +30,13 @@ const MAX_INTERFACE_COUNTER = 100;
 // };
 
 export class AFlowView extends HTMLElement {
+
+    /**
+     * 保存的节点表，所有视图共享
+     * @see ANodeModelRegistry
+     */
+    static NodeTable = null;
+
     /** 创建一个指定name的节点编辑视图控件
      * @param {string} name 该视图的名称
      */

@@ -1,7 +1,6 @@
-import { IDataModel, OutDataModel } from '../core/DataModel.js';
-import { ALabelWidget, AInputNumberWidget } from '../core/AWidget.js';
-import { AFlowView, ANode, AConnection, AInterface, APort } from '../core/Aproch.js';
-import ANodeModelRegistry from '../core/ANodeModelRegistry.js';
+import { ALabelWidget, AInputNumberWidget } from './AWidget.js';
+import { AFlowView, ANode, AConnection, AInterface, APort } from './Aproch.js';
+import ANodeModelRegistry from './ANodeModelRegistry.js';
 
 $(document).ready(function () {
     // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
@@ -31,7 +30,7 @@ $(document).ready(function () {
         currentObj.remove();
         return width;
     };
-    
+
     // 移除数组中的指定元素，移除失败返回false，否则返回true
     Array.prototype.remove = function (element) {
         const index = this.indexOf(element);
@@ -43,14 +42,9 @@ $(document).ready(function () {
         return false;
     };
 
-    //var FVManager = [];
-    const CurrentFV = document.querySelector('#fv_1');
-    const NodesTable = new ANodeModelRegistry();
 
-    NodesTable.registryDataModel('OutDataModel', 'MyCategory');
-    NodesTable.registryDataModel('InDataModel', 'MyCategory');
-    NodesTable.createNode('OutDataModel', 'MyCategory', CurrentFV, -200, -150);
-    NodesTable.createNode('OutDataModel', 'MyCategory', CurrentFV, -200, 150);
-    NodesTable.createNode('InDataModel', 'MyCategory', CurrentFV, 100, -150);
-    NodesTable.createNode('InDataModel', 'MyCategory', CurrentFV, 100, 150);
+    // 创建系统默认的节点表
+    AFlowView.NodeTable = new ANodeModelRegistry();
+    AFlowView.NodeTable.registryDataModel('OutDataModel', 'MyCategory');
+    AFlowView.NodeTable.registryDataModel('InDataModel', 'MyCategory');
 });
