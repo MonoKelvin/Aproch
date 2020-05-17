@@ -73,6 +73,14 @@ export class AFlowView extends HTMLElement {
             return false;
         };
 
+        this.onclick = function (evt) {
+            // 点击到空白处
+            if (evt.target == this && evt.shiftKey != 1 && evt.ctrlKey != 1) {
+                let selectedNodes = this.getSelectedNodes();
+                selectedNodes.removeClass('node-widget-selected');
+            }
+        }
+
         /** 注册事件 */
         this.onmousedown = function (evt) {
             let t = $(this); // 视图的jquery对象
@@ -84,6 +92,30 @@ export class AFlowView extends HTMLElement {
             let sfX = null; // selection-frame 选择框起始x点
             let sfY = null; // selection-frame 选择框起始y点
             let sfDiv = null; // selection-frame 选择框div标签
+
+            const curItem = ANode.GetNodeByChildComponent(evt.target);
+            if (curItem && curItem.classList.contains('node-widget')) {
+                if (evt.shiftKey != 1 && this.getSelectedNodes().length <= 1) {
+                    this.clearSelectedItems();
+                }
+                curItem.classList.add('node-widget-selected');
+                tdom.getSelectedNodes().each(function() {
+                    const node = $(this);
+                    const left = parseInt(node.css('left'));
+                    const top = parseInt(node.css('top'));
+                    $(document).on('mousemove', (e) => {
+                        node.css({ top: top + e.pageY - startEvtY, left: left + e.pageX - startEvtX });
+                        this.updateConnectionPosition();
+                    });
+                    $(document).on('mouseup', () => {
+                        $(document).off('mousemove');
+                        $(document).off('mousedown');
+                        $(document).off('mouseup');
+                    });
+                });
+
+                return;
+            }
 
             // 清空选择集
             // this.clearSelectedItems();
@@ -114,6 +146,7 @@ export class AFlowView extends HTMLElement {
                     let _w = sfDiv.innerWidth(),
                         _h = sfDiv.innerHeight();
 
+                    // FIXME
                     for (var i = 0; i < tdom.selectedItems.length; i++) {
                         let sl = tdom.selectedItems[i].offsetWidth + tdom.selectedItems[i].offsetLeft;
                         let st = tdom.selectedItems[i].offsetHeight + tdom.selectedItems[i].offsetTop;
@@ -192,11 +225,13 @@ export class AFlowView extends HTMLElement {
     /**
      * 清空选择集
      */
-    // clearSelectedItems() {
-    //     this.selectedItems.length = 0;
-    //     this.selectedItems = [];
-    // }
+    clearSelectedItems() {
+        $(this).children('.node-widget-selected').removeClass('node-widget-selected');
+    }
 
+    /**
+     * 获取选择的节点
+     */
     getSelectedNodes() {
         return $(this).children('.node-widget-selected');
     }
@@ -213,7 +248,7 @@ export class AFlowView extends HTMLElement {
 
             this.append(node);
             node.setPosition(x + offset.x, y + offset.y);
-            this.attachTransformForNode(node);
+            this.attachTransformForElement(node);
             // this.nodes.push(node);
         }
     }
@@ -348,24 +383,20 @@ export class AFlowView extends HTMLElement {
     }
 
     /**
-     * 为节点附加变换
-     * @param {any} node 要添加到该场景中的节点
+     * 为场景中的元素附加变换
+     * @param {any} ele 要添加到该场景中的元素
      * @param {any} options 相关配置选项
      */
-    attachTransformForNode(
-        node,
+    attachTransformForElement(
+        ele,
         options = {
-            /** 可以移动部分的元素名称，用class名 */
-            moveable: 'node-title',
             /** 是否可以改变宽度 */
             isWidthCanChange: true,
             /** 是否可以改变高度 */
             isHeightCanChange: false,
         }
     ) {
-        const t = $(node);
-        const m = t.find('.' + options.moveable).first();
-
+        const t = $(ele);
         const iwc = options.isWidthCanChange;
         const ihc = options.isHeightCanChange;
         const box_sizing = t.css('box-sizing');
@@ -385,12 +416,6 @@ export class AFlowView extends HTMLElement {
         t.css({
             'max-height': w_height - c_height,
             'max-width': w_width - c_width,
-        });
-        t.on('mousedown', (e) => {
-            e.stopPropagation();
-        });
-        t.on('click', (e) => {
-            this._updateSelectedSet(e, node);
         });
         t.resize(function () {
             w_width = $(this).width();
@@ -431,26 +456,6 @@ export class AFlowView extends HTMLElement {
             }
         });
 
-        // 移动部分
-        m.on('mousedown', function (ed) {
-            left = parseInt(t.css('left'));
-            top = parseInt(t.css('top'));
-            height = t.outerHeight();
-            width = t.outerWidth();
-            $(document).on('mousemove', function (e) {
-                let left2 = left + e.pageX - ed.pageX;
-                let top2 = top + e.pageY - ed.pageY;
-                t.css({ top: top2, left: left2 });
-                t[0]._updateConnectionPosition();
-            });
-            $(document).on('mouseup', function (e) {
-                top = t.offset().top - $(this).scrollTop();
-                left = t.offset().left - $(this).scrollLeft();
-                $(document).off('mousemove');
-                $(document).off('mouseup');
-            });
-        });
-
         // 调整尺寸部分
         if (!iwc && !ihc) {
             return;
@@ -477,7 +482,7 @@ export class AFlowView extends HTMLElement {
                         t.width(w_width - left - c_width);
                     }
                 }
-                t[0]._updateConnectionPosition();
+                t[0].updateConnectionPosition();
                 return false;
             });
             $(document).on('mouseup', function () {
@@ -492,6 +497,23 @@ export class AFlowView extends HTMLElement {
 }
 
 export class ANode extends HTMLElement {
+
+    /**
+     * 通过子组件获取父节点
+     * @param {Object} childComponent 节点子组件
+     */
+    static GetNodeByChildComponent(childComponent) {
+        let curElement = childComponent;
+        while (curElement != document) {
+            if (curElement.classList.contains('node-widget')) {
+                return curElement;
+            }
+            curElement = curElement.parentNode;
+        }
+
+        return null;
+    }
+
     constructor(flowView, dataModel, x = 0, y = 0) {
         super();
 
@@ -512,6 +534,7 @@ export class ANode extends HTMLElement {
         this.nodeTitle.setAttribute('class', 'node-title');
         this.nodeTitle.innerHTML = dataModel.name;
         this.nodeContent.setAttribute('class', 'node-content');
+        this.nodeContent.onmousedown = (e) => { e.stopPropagation() };
         this.id = 'node_' + NodeIDGenerator++;
 
         // 端口ID清零
@@ -550,7 +573,7 @@ export class ANode extends HTMLElement {
     /**
      * 更新连线的位置
      */
-    _updateConnectionPosition() {
+    updateConnectionPosition() {
         this.getInterfaces().forEach((i) => {
             if (i.getPort(EPortType.INPUT)) {
                 i.getPort(EPortType.INPUT).connections.forEach((conn) => {
