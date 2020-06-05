@@ -34,8 +34,9 @@ export class AFlowView extends HTMLElement {
     /**
      * 保存的节点表，所有视图共享
      * @see ANodeModelRegistry
+     * @note ES6不支持静态属性，ES7支持
      */
-    static NodeTable = null;
+    //static NodeTable = null;
 
     /** 创建一个指定name的节点编辑视图控件
      * @param {string} name 该视图的名称
@@ -76,10 +77,10 @@ export class AFlowView extends HTMLElement {
         this.onclick = function (evt) {
             // 点击到空白处
             if (evt.target == this && evt.shiftKey != 1 && evt.ctrlKey != 1) {
-                let selectedNodes = this.getSelectedNodes();
-                selectedNodes.removeClass('node-widget-selected');
+                let selectedNodes = this.getSelectedItems();
+                selectedNodes.removeClass('item-interactive');
             }
-        }
+        };
 
         /** 注册事件 */
         this.onmousedown = function (evt) {
@@ -95,11 +96,11 @@ export class AFlowView extends HTMLElement {
 
             const curItem = ANode.GetNodeByChildComponent(evt.target);
             if (curItem && curItem.classList.contains('node-widget')) {
-                if (evt.shiftKey != 1 && this.getSelectedNodes().length <= 1) {
+                if (evt.shiftKey != 1 && this.getSelectedItems().length <= 1) {
                     this.clearSelectedItems();
                 }
-                curItem.classList.add('node-widget-selected');
-                tdom.getSelectedNodes().each(function() {
+                curItem.classList.add('item-interactive');
+                tdom.getSelectedItems().each(function() {
                     const node = $(this);
                     const left = parseInt(node.css('left'));
                     const top = parseInt(node.css('top'));
@@ -226,14 +227,14 @@ export class AFlowView extends HTMLElement {
      * 清空选择集
      */
     clearSelectedItems() {
-        $(this).children('.node-widget-selected').removeClass('node-widget-selected');
+        $(this).children('.item-interactive').removeClass('item-interactive');
     }
 
     /**
-     * 获取选择的节点
+     * 获取选择的 item
      */
-    getSelectedNodes() {
-        return $(this).children('.node-widget-selected');
+    getSelectedItems() {
+        return $(this).children('.item-interactive');
     }
 
     /**
@@ -364,22 +365,22 @@ export class AFlowView extends HTMLElement {
     }
 
     /**
-     * 更新节点的选择集合
+     * 更新item的选择集合
      * @param {Event} event 事件，一般为鼠标点选节点的事件
      * @param {ANode} curSelectedNode 当前选择的节点
      */
-    _updateSelectedSet(event, curSelectedNode) {
+    _updateSelectionSet(event, curSelectedNode) {
         let node = $(curSelectedNode);
         // 加选
         if (event.ctrlKey == 1 || event.shiftKey == 1) {
-            if (node.hasClass('node-widget-selected')) {
-                node.removeClass('node-widget-selected');
+            if (node.hasClass('item-interactive')) {
+                node.removeClass('item-interactive');
                 return;
             }
         } else {
-            $(this).children('.node-widget').removeClass('node-widget-selected');
+            $(this).children('.node-widget').removeClass('item-interactive');
         }
-        node.addClass('node-widget-selected');
+        node.addClass('item-interactive');
     }
 
     /**
@@ -534,7 +535,7 @@ export class ANode extends HTMLElement {
         this.nodeTitle.setAttribute('class', 'node-title');
         this.nodeTitle.innerHTML = dataModel.name;
         this.nodeContent.setAttribute('class', 'node-content');
-        this.nodeContent.onmousedown = (e) => { e.stopPropagation() };
+        this.nodeContent.onmousedown = (e) => { e.stopPropagation(); };
         this.id = 'node_' + NodeIDGenerator++;
 
         // 端口ID清零

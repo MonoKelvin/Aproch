@@ -5,6 +5,7 @@
     padding: 0;
     outline: none;
     border: none;
+    font-size: 14px;
     font-family: 'Microsoft Yahei', 'DejaVu Sans Mono', monospace, sans-serif;
 }
 
@@ -14,6 +15,126 @@ body {
     height: 100%;
 }
 
+svg {
+    fill: @textColor;
+}
+
+.text-select-none {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.p-absolute {
+    position: absolute;
+}
+
+.l-0 {
+    left: 0;
+}
+.r-0 {
+    right: 0;
+}
+.t-0 {
+    top: 0;
+}
+.b-0{
+    bottom: 0;
+}
+
+.fixed-left-top {
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+.fixed-left-bottom {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+}
+.fixed-right-top {
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+.fixed-right-bottom {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+}
+
+.anchor-left {
+    float: left;
+}
+.anchor-right {
+    float: right;
+}
+
+.disabled {
+    cursor: not-allowed;
+    filter: brightness(60%);
+}
+.no-pointer-event {
+    pointer-events: none;
+}
+.clear-padding {
+    padding: 0 !important;
+}
+.clear-margin {
+    margin: 0 !important;
+}
+.display-none {
+    display: none !important;
+}
+.alert-color {
+    color: @alertColor;
+}
+
+.row-layout {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+.column-layout {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-interactive {
+    border: 2px solid @primaryLightColor !important;
+}
+
+// ScrollBar
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: @controlBgNormalColor;
+    border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: @controlBgHoverColor;
+}
+
+.tooltip-item {
+    color: @textColor;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    span,
+    strong {
+        font-size: 0.8em;
+        margin: 0.4em 1.2em;
+    }
+}
+
+/************/
+/* FlowView */
+/************/
 .flow-view {
     background: -webkit-linear-gradient(top, transparent @gridSpacing - 1px, @gridColor @gridSpacing),
         -webkit-linear-gradient(left, @viewBgColor @gridSpacing - 1px, @gridColor @gridSpacing);
@@ -37,7 +158,7 @@ body {
         width: 100%;
         height: 2px;
         top: 50%;
-        background: @controlNormalBg;
+        background: @controlBgNormalColor;
         transform: translateY(-50%);
         z-index: 0;
     }
@@ -46,7 +167,7 @@ body {
         width: 2px;
         height: 100%;
         left: 50%;
-        background: @controlNormalBg;
+        background: @controlBgNormalColor;
         transform: translateX(-50%);
         z-index: 0;
     }
@@ -57,8 +178,8 @@ body {
     width: 0px;
     height: 0px;
     font-size: 0px;
-    border: 1px dashed #aaa;
-    background-color: #4b4b4b;
+    border: 1px dashed @borderHoverColor;
+    background-color: rgba(@controlBgNormalColor, 0.4);
     z-index: 1000;
     opacity: 0.6;
 }
@@ -88,9 +209,6 @@ body {
 }
 .node-widget:hover {
     border: @nodeHoverBorder;
-}
-.node-widget-selected {
-    border: 2px solid @primaryActiveColor !important;
 }
 .node-title {
     background: @nodeTitle;
@@ -174,7 +292,7 @@ body {
     line-height: @controlHight - 6px;
 }
 .control-label {
-    background: @controlNormalBg + #111;
+    background: @controlBgNormalColor + #111;
     border-top-left-radius: 2px;
     border-bottom-left-radius: 2px;
 }
@@ -299,7 +417,7 @@ input {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     min-width: 20px;
-    background: @controlNormalBg;
+    background: @controlBgNormalColor;
     height: @controlHight;
     transition: all 0.3s ease-in-out;
     padding-left: 5px;
@@ -308,7 +426,7 @@ input {
 .node-item-selection:hover,
 .input-widget:hover {
     color: @lightColor;
-    background: @controlHoverBg;
+    background: @controlBgHoverColor;
 }
 .node-item-selection {
     appearance: none;
@@ -362,11 +480,11 @@ input {
 ::-webkit-scrollbar {
     width: 9px;
     height: 9px;
-    background-color: @controlDarkBg;
+    background-color: @controlBgDarkColor;
 }
 ::-webkit-scrollbar-thumb {
-    background: @controlNormalBg;
+    background: @controlBgNormalColor;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: @controlHoverBg;
+    background: @controlBgHoverColor;
 }

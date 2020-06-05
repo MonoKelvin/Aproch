@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Node Widget</title>
+    <link rel="stylesheet" href="lib/bootstrap-4.3.1/bootstrap-grid.min.css">
     <link rel="stylesheet" href="core/style/style.default.css">
+    <link rel="stylesheet" href="core/component/css/component-style.default.css">
     <link rel="stylesheet" href="lib/font-awesome-4.7.0/css/font-awesome.min.css">
 </head>
 
@@ -14,9 +16,40 @@
     <a-flow-view id="fv_1" name="flow view" class="flow-view">
     </a-flow-view>
 
+    <div id="test-fp" class="float-panel text-select-none">
+        <div class="header">
+            <div class="header-title">快捷键</div>
+        </div>
+        <div class="btn-close" data-close-id="#test-fp"></div>
+        <div class="tooltip-item">
+            <strong>Ctrl + LB</strong>
+            <span>加选/减选</span>
+        </div>
+        <div class="tooltip-item">
+            <strong>Shift + LB</strong>
+            <span>框选</span>
+        </div>
+        <div class="tooltip-item">
+            <strong>Ctrl + A</strong>
+            <span>全选</span>
+        </div>
+        <div class="tooltip-item">
+            <strong>LB + 空白处</strong>
+            <span>取消全选</span>
+        </div>
+    </div>
+
     <script type="text/javascript" src="./lib/jquery/jquery-3.4.1.min.js"></script>
+    <script type="module" src="./core/component/ComponentInit.js"></script>
     <script type="module" src="./core/index.js"></script>
     <script type="module" src="./test/BaseDataModelNodes.js"></script>
+    <script type="module">
+        import { MonoFloatPanel } from './core/component/MonoFloatPanel.js';
+        new MonoFloatPanel({
+            ele: '#test-fp',
+            canMove: true,
+        });
+    </script>
 </body>
 
 </html>

@@ -23,13 +23,7 @@ export function rgbToHex(r, g, b) {
     if (r === undefined) {
         return false;
     }
-    return (
-        '#' +
-        ((1 << 24) + (r << 16) + (g << 8) + b)
-            .toString(16)
-            .slice(1)
-            .toUpperCase()
-    );
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
 }
 
 export function clearEventBubble(evt) {
@@ -52,7 +46,7 @@ export function clearEventBubble(evt) {
  * @return 类名
  */
 export function getClassName(clsName) {
-    if (typeof clsName == "string") {
+    if (typeof clsName == 'string') {
         return clsName;
     }
     var s = clsName.toString();
@@ -62,7 +56,87 @@ export function getClassName(clsName) {
         s = s.replace('function', '');
         var idx = s.indexOf('(');
         s = s.substring(0, idx);
-        s = s.replace(" ", "");
+        s = s.replace(' ', '');
     }
     return s;
+}
+
+/**
+ * 为元素添加可移动组件
+ * @param {Element} movableElement 可移动的组件js对象
+ * @param {Element} areaElement 限制区域元素。指定该值后，移动元素不会超出这个区域内
+ */
+export function attachMoveComponent(movableElement, areaElement) {
+    document.onmousedown = function (evt) {
+        if (!findParentFromChild(movableElement, evt.target)) {
+            return;
+        }
+        const startEvtX = evt.clientX; // 鼠标点击时起始x点
+        const startEvtY = evt.clientY; // 鼠标点击时起始y点
+        const $mvEle = $(movableElement);
+        const left = parseInt($mvEle.css('left')); // 元素起始x
+        const top = parseInt($mvEle.css('top')); // 元素起始y
+
+        $(document).on('mousemove', (e) => {
+            const newLeft = left + e.pageX - startEvtX;
+            const newTop = top + e.pageY - startEvtY;
+
+            if (areaElement) {
+                const $aEle = $(areaElement);
+                let l = parseInt($aEle.css('left'));
+                let t = parseInt($aEle.css('top'));
+                l = isNaN(l) ? 0 : l;
+                t = isNaN(t) ? 0 : t;
+
+                const bRL = newLeft + $mvEle.innerWidth() > l + $aEle.innerWidth(); // right limit
+                const bBL = newTop + $mvEle.innerHeight() > t + $aEle.innerHeight(); // bottom limit
+
+                // 紧贴左右两侧，可以上下移动
+                if (newLeft < l || bRL) {
+                    if (newTop < t || bBL) {
+                        return;
+                    } else {
+                        $mvEle.css('top', newTop + 'px');
+                    }
+                    return;
+                }
+
+                // 紧贴上下两侧，可以左右移动
+                if (newTop < t || bBL) {
+                    if (newLeft < l || bRL) {
+                        return;
+                    } else {
+                        $mvEle.css('left', newLeft + 'px');
+                    }
+                    return;
+                }
+            }
+            $mvEle.css('top', newTop + 'px');
+            $mvEle.css('left', newLeft + 'px');
+        });
+        $(document).on('mouseup', () => {
+            $(document).off('mousemove');
+            $(document).off('mousedown');
+            $(document).off('mouseup');
+        });
+        return;
+    };
+}
+
+/**
+ * 从子元素找到父元素
+ * @param {Element} parent 父元素
+ * @param {Element} child 子元素
+ * @returns {Boolean} 如果找到就返回true，否则返回false
+ */
+export function findParentFromChild(parent, child) {
+    let curElement = child;
+    while (curElement != document) {
+        if (curElement == parent) {
+            return true;
+        }
+        curElement = curElement.parentNode;
+    }
+
+    return false;
 }

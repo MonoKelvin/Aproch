@@ -1,0 +1,523 @@
+@import '../../style/variable.less';
+
+* {
+    padding: 0;
+    margin: 0;
+    outline: none;
+    font-size: 14px;
+    color: @textColor;
+    font-family: 'Microsoft Yahei', 'DejaVu Sans Mono', monospace, sans-serif;
+}
+
+.header {
+    position: relative;
+    text-align: center;
+    margin: 2px;
+    min-height: @controlHeight * 1.2;
+    text-align: center;
+    line-height: @controlHeight * 1.2;
+
+    .header-title {
+        font-weight: bold;
+        letter-spacing: 2px;
+    }
+}
+
+// Common Style
+button,
+input,
+select,
+.option-list > * {
+    border-radius: 2px;
+}
+button:disabled,
+input:disabled {
+    cursor: not-allowed;
+    filter: brightness(60%);
+}
+
+// Normal Button
+button {
+    cursor: pointer;
+    fill: @textColor;
+    position: relative;
+    border: 2px solid transparent;
+    padding: 0 10px;
+    max-width: 374px;
+    min-width: 32px;
+    height: 32px;
+    overflow: hidden;
+    background: @controlBgNormalColor;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+    transition: all 0.1s ease-in-out;
+}
+button:hover {
+    background: @controlBgHoverColor;
+}
+button:active {
+    background: @controlBgActiveColor;
+}
+
+// Primary Button
+.btn-primary {
+    background: @primaryColor;
+}
+.btn-primary:hover {
+    background: @primaryHoverColor;
+}
+.btn-primary:active {
+    background: @primaryActiveColor;
+}
+
+// Border Button
+.btn-border {
+    background: transparent;
+    border: 1px solid @borderNormalColor;
+    padding: 0 11px;
+}
+.btn-border:hover {
+    background: transparent;
+    border: 1px solid @borderHoverColor;
+}
+.btn-border:active {
+    background: transparent;
+    border: 1px solid @borderActiveColor;
+}
+
+// Icon Button (only icon, no text)
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    min-width: 36px;
+    max-width: unset;
+    background: transparent;
+}
+
+// Dropdown Button
+.btn-dropdown {
+    min-width: 72px;
+    text-align: center;
+    padding-right: 28px;
+    text-overflow: ellipsis;
+}
+// Close Button
+.btn-close {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    width: 26px;
+    max-width: 26px;
+    height: 26px;
+    background: transparent !important;
+    // display: flex;
+    // justify-content: space-evenly;
+    // align-items: center;
+    text-align: center;
+    line-height: 32px;
+}
+.btn-close:hover {
+    background: @controlBgHoverColor !important;
+}
+.btn-close:active {
+    background: @controlBgActiveColor !important;
+}
+
+.btn-small {
+    width: 26px;
+    max-width: 26px;
+    height: 26px;
+}
+
+// Link
+a {
+    line-height: 20px;
+    text-decoration: none;
+    border-bottom: 1px solid @primaryLightColor;
+    color: @primaryLightColor;
+    transition: all 0.2s ease-in-out, border 0.03s ease-in-out;
+}
+a:hover {
+    border-bottom: 1px solid @primaryLightHoverColor;
+    color: @primaryLightHoverColor;
+}
+a:active {
+    border-bottom: 1px solid @primaryLightActiveColor;
+    color: @primaryLightActiveColor;
+}
+
+// Normal Input
+input {
+    height: 20px;
+    padding: 1px 2px;
+    background-color: transparent;
+    box-sizing: border-box;
+    text-indent: 0px;
+    text-align: start;
+    border-image: initial;
+    text-rendering: auto;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    transition: all 0.2s ease-in-out;
+}
+
+// Switcher
+.switcher {
+    cursor: pointer;
+    width: 40px;
+    min-width: 40px;
+    position: relative;
+    border-radius: 20px;
+}
+.switcher::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    transform: translateX(3px) translateY(3px);
+    border-radius: 50%;
+    background: @textColor;
+    pointer-events: none;
+    transition: all 0.1s ease;
+}
+.switcher:checked {
+    background: @primaryColor;
+    border: 1px solid @primaryColor;
+}
+.switcher:checked:hover {
+    background: @primaryColor;
+    border: 1px solid @primaryColor;
+}
+.switcher:checked::after {
+    transform: translateX(22px) translateY(3px);
+}
+.switcher:hover {
+    border: 1px solid @borderHoverColor;
+}
+
+// Slider
+input[type='range'] {
+    cursor: pointer;
+    height: 4px;
+    padding: 0;
+    border: none;
+    background: @controlBgNormalColor;
+}
+input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background: @controlBgLightColor;
+    transition: all 0.2s ease-in-out;
+}
+input[type='range']::-webkit-slider-thumb:hover {
+    background: @textColor;
+}
+
+.panel {
+    margin: 10px;
+    padding: 20px;
+    border-radius: 4px;
+    background: @panelBackground;
+    box-shadow: @panelShadow;
+    transition: all 0.2s ease-in-out;
+}
+
+// Menu
+.menu {
+    display: inline-block;
+    position: absolute;
+    padding: 4px 0;
+    max-width: none;
+    min-width: 64px;
+    border-radius: 4px;
+    background: @panelBackground;
+    box-shadow: @popItemShadow;
+    z-index: 9999;
+}
+.menuitem {
+    cursor: pointer;
+    display: grid;
+    padding: 0;
+    height: 32px;
+    font-size: 12px;
+    line-height: 16px;
+    grid-template-columns: 42px auto 42px;
+    box-sizing: border-box;
+    align-items: center;
+    white-space: nowrap;
+    justify-items: center;
+    list-style-type: none;
+    grid-template-rows: auto;
+    transition: all 0.2s ease-in-out;
+
+    i {
+        font-size: 16px;
+    }
+
+    span,
+    .menuitem-self-control {
+        justify-self: start;
+        text-overflow: ellipsis;
+        grid-column-start: 2;
+    }
+}
+.menuitem:hover {
+    background: @controlBgHoverColor;
+}
+.menuitem:active {
+    background: @controlBgActiveColor;
+}
+
+.menuitem-no-selected:hover {
+    background: transparent !important;
+}
+.menuitem-no-selected:active {
+    background: transparent !important;
+}
+
+.menuitem-selected {
+    background: @primaryColor !important;
+}
+
+// Menu Separator
+.menuitem-separator {
+    margin: 4px 12px;
+    height: 2px;
+    border-radius: 2px;
+    background-color: @controlBgHoverColor;
+}
+
+// Select
+.select {
+    position: relative;
+    display: inline-block;
+    transition: all 0.2s ease-in-out;
+
+    .arrow-down {
+        cursor: pointer;
+        position: absolute;
+        font-size: 16px;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
+.option-list {
+    position: absolute;
+    left: 0;
+    top: 32px;
+    margin: 0;
+    padding: 4px 0;
+    min-width: 64px;
+    max-height: 354px;
+    overflow: auto;
+    border-radius: 4px;
+    z-index: 888;
+    background: @panelBackground;
+    box-shadow: @popItemShadow;
+}
+.option-list > * {
+    cursor: pointer;
+    display: flex;
+    height: 32px;
+    padding: 0 10px;
+    margin: 0 4px;
+    background: transparent;
+    border: 2px solid transparent;
+    overflow: hidden;
+    white-space: nowrap;
+    list-style-type: none;
+    box-sizing: border-box;
+    align-items: center;
+}
+.option-list > *:hover {
+    background: @controlBgNormalColor;
+}
+.option-list > *:active {
+    background: @controlBgActiveColor;
+}
+
+/************/
+/**   List  */
+/************/
+
+.list {
+    display: block;
+    list-style-type: none;
+    overflow: auto;
+    padding: 0 10px;
+}
+
+.list-widget {
+    li,
+    .list-item {
+        cursor: pointer;
+        padding: 10px;
+        margin: 10px 0;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 4px;
+        box-sizing: border-box;
+        background: @panelBackground;
+        box-shadow: @panelShadow;
+        transition: background 0.2s ease-in-out;
+    }
+
+    li:hover,
+    .list-item:hover {
+        box-shadow: @popItemShadow;
+    }
+
+    li:active,
+    .list-item:active {
+        background-color: @controlBgActiveColor;
+    }
+
+    .list-item-selected {
+        box-shadow: 0px 0px 0px 1.5px @primaryLightColor !important;
+        background-color: @controlBgHoverColor !important;
+    }
+}
+
+.list-view {
+    padding: 0;
+
+    li,
+    .list-item {
+        cursor: pointer;
+        border-radius: 2px;
+        padding: 10px 20px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    li:hover,
+    .list-item:hover {
+        background-color: @controlBgHoverColor;
+    }
+
+    li:active,
+    .list-item:active {
+        background-color: @controlBgActiveColor;
+    }
+
+    .list-item-selected {
+        position: relative;
+        box-shadow: none !important;
+        background-color: @controlBgNormalColor !important;
+    }
+
+    .list-item-selected::after {
+        content: '';
+        width: 3px;
+        height: 100%;
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: unset;
+        border-radius: 2px;
+        background: @primaryLightColor;
+    }
+}
+
+.list-item-delegate {
+    display: none;
+}
+
+/************/
+/*  Dialog  */
+/************/
+
+.dim {
+    width: 100vw;
+    height: 100vh;
+    z-index: 999999999;
+    background: @dimColor !important;
+}
+
+// Loading
+.dialog-loading {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999999999;
+    left: 0;
+    top: 0;
+
+    svg circle {
+        fill: none;
+        stroke: @controlBgHoverColor;
+        stroke-width: 2px;
+        transform-origin: 50% 50%;
+    }
+}
+
+.dialog-container {
+    position: absolute;
+    padding: 20px;
+    border-radius: 4px;
+    left: 50%;
+    top: 50%;
+    min-width: 120px;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background: @panelBackground;
+    box-shadow: @popItemShadow;
+}
+.dialog-header {
+    margin-bottom: 16px;
+
+    span,
+    p,
+    div {
+        font-weight: bold;
+        font-size: 18px;
+    }
+}
+.dialog-content {
+    margin: 10px 0;
+}
+.circle-run {
+    stroke: @primaryColor !important;
+    animation: spin-infinite 2s linear infinite;
+}
+
+@keyframes spin-infinite {
+    0% {
+        stroke-dasharray: 0.01px 43.97px;
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(450deg);
+        stroke-dasharray: 21.99px 21.99px;
+    }
+    100% {
+        stroke-dasharray: 0.01px 43.97px;
+        transform: rotate(1080deg);
+    }
+}
+
+// Float Panel
+.float-panel {
+    z-index: 9999;
+    border-radius: 4px;
+    background: @panelBackground;
+    padding: 4px;
+    position: absolute;
+}
+
+.fold-up-indicator {
+    border-top: 6px solid @textColor;
+    border-bottom: 6px solid transparent;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+}
