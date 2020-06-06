@@ -17,6 +17,12 @@ body {
 svg {
   fill: #cccccc;
 }
+[a-cloak] {
+  display: none !important;
+}
+[a-invisible] {
+  visibility: hidden !important;
+}
 .text-select-none {
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -116,7 +122,7 @@ svg {
 .tooltip-item span,
 .tooltip-item strong {
   font-size: 0.8em;
-  margin: 0.4em 1.2em;
+  margin: 0.2em 1em;
 }
 /************/
 /* FlowView */

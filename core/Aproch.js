@@ -1,4 +1,5 @@
 import { ITypeConverter, ABaseTypeConverter } from './TypeConverter.js';
+import { addResizeComponent } from './utilities.js';
 
 var NodeIDGenerator = 0;
 var InterfaceIDGenerator = 0;
@@ -14,7 +15,7 @@ export const EPortType = {
  * 视图事件状态，用于在视图中区别不同事件
  */
 const EViewEventState = {
-    NoneState: 0,  // 无
+    NoneState: 0, // 无
     SelectItem: 1, // 单选
     DeselectItem: 2, // 取消选择
     MultiSelectItem: 3, // 多选
@@ -30,7 +31,6 @@ const MAX_INTERFACE_COUNTER = 100;
 // };
 
 export class AFlowView extends HTMLElement {
-
     /**
      * 保存的节点表，所有视图共享
      * @see ANodeModelRegistry
@@ -100,7 +100,7 @@ export class AFlowView extends HTMLElement {
                     this.clearSelectedItems();
                 }
                 curItem.classList.add('item-interactive');
-                tdom.getSelectedItems().each(function() {
+                tdom.getSelectedItems().each(function () {
                     const node = $(this);
                     const left = parseInt(node.css('left'));
                     const top = parseInt(node.css('top'));
@@ -224,6 +224,36 @@ export class AFlowView extends HTMLElement {
     }
 
     /**
+     * 当鼠标在item上按下时
+     * @param {Event} event 点击事件
+     */
+    onItemPressed(event) {}
+
+    /**
+     * 当items移动时
+     * @param {Event} event 移动事件
+     */
+    onItemsMoving(event) {}
+
+    /**
+     * 当框选时
+     * @param {Event} event 框选事件
+     */
+    onBoxSelect(event) {}
+
+    /**
+     * 当item菜单事件触发时
+     * @param {Event} event item菜单事件
+     */
+    onItemContextMenu(event) {}
+
+    /**
+     * 当视图菜单事件触发时
+     * @param {Event} event 视图菜单事件
+     */
+    onContextMenu(event) {}
+
+    /**
      * 清空选择集
      */
     clearSelectedItems() {
@@ -249,7 +279,9 @@ export class AFlowView extends HTMLElement {
 
             this.append(node);
             node.setPosition(x + offset.x, y + offset.y);
-            this.attachTransformForElement(node);
+            addResizeComponent(node, () => {
+                node.updateConnectionPosition();
+            });
             // this.nodes.push(node);
         }
     }
@@ -382,123 +414,9 @@ export class AFlowView extends HTMLElement {
         }
         node.addClass('item-interactive');
     }
-
-    /**
-     * 为场景中的元素附加变换
-     * @param {any} ele 要添加到该场景中的元素
-     * @param {any} options 相关配置选项
-     */
-    attachTransformForElement(
-        ele,
-        options = {
-            /** 是否可以改变宽度 */
-            isWidthCanChange: true,
-            /** 是否可以改变高度 */
-            isHeightCanChange: false,
-        }
-    ) {
-        const t = $(ele);
-        const iwc = options.isWidthCanChange;
-        const ihc = options.isHeightCanChange;
-        const box_sizing = t.css('box-sizing');
-        let top = t.css('top') - $(this).scrollTop();
-        let left = t.css('left') - $(this).scrollLeft();
-        let height = t.outerHeight();
-        let width = t.outerWidth();
-        let w_width = $(this).width();
-        let w_height = $(this).height();
-        let c_width = 0;
-        let c_height = 0;
-
-        if (box_sizing != 'border-box') {
-            c_width = width - t.width();
-            c_height = height - t.height();
-        }
-        t.css({
-            'max-height': w_height - c_height,
-            'max-width': w_width - c_width,
-        });
-        t.resize(function () {
-            w_width = $(this).width();
-            w_height = $(this).height();
-            if (box_sizing != 'border-box') {
-                c_width = width - t.width();
-                c_height = height - t.height();
-            } else {
-                c_width = 0;
-                c_height = 0;
-            }
-            if (t.width() > w_width - c_width) {
-                t.width(w_width - c_width);
-            }
-            if (t.height() > w_height - c_height) {
-                t.height(w_height - c_height);
-            }
-            t.css({ 'max-height': w_height - c_height, 'max-width': w_width - c_width });
-            height = t.outerHeight();
-            width = t.outerWidth();
-            if (width + left >= w_width) {
-                left = w_width - width;
-                if (parseInt(t.css('left')) < 0) {
-                    t.css('left', -width);
-                } else if (parseInt(t.css('left')) > w_width - width) {
-                    t.css('left', w_width);
-                } else {
-                    t.css('left', left);
-                }
-            }
-            if (height + top >= w_height) {
-                top = w_height - height;
-                if (parseInt(t.css('top')) < 0) {
-                    t.css('top', -height);
-                } else {
-                    t.css('top', top);
-                }
-            }
-        });
-
-        // 调整尺寸部分
-        if (!iwc && !ihc) {
-            return;
-        }
-        var rs = $('<span class="resize-indicator"></span>');
-        t.append(rs);
-        rs.on('mousedown', function (e) {
-            let old_width = t.width();
-            let old_height = t.height();
-            let old_size_x = e.pageX;
-            let old_size_y = e.pageY;
-            $(document).on('mousemove', function (e) {
-                if (ihc) {
-                    let new_height = e.pageY - old_size_y + old_height;
-                    t.height(new_height);
-                    if (t.outerHeight() + top >= w_height) {
-                        t.height(w_height - top - c_height);
-                    }
-                }
-                if (iwc) {
-                    let new_width = e.pageX - old_size_x + old_width;
-                    t.width(new_width);
-                    if (t.outerWidth() + left >= w_width) {
-                        t.width(w_width - left - c_width);
-                    }
-                }
-                t[0].updateConnectionPosition();
-                return false;
-            });
-            $(document).on('mouseup', function () {
-                width = t.outerWidth();
-                height = t.outerHeight();
-                $(document).off('mousemove');
-                $(document).off('mouseup');
-            });
-            return false;
-        });
-    }
 }
 
 export class ANode extends HTMLElement {
-
     /**
      * 通过子组件获取父节点
      * @param {Object} childComponent 节点子组件
@@ -535,7 +453,9 @@ export class ANode extends HTMLElement {
         this.nodeTitle.setAttribute('class', 'node-title');
         this.nodeTitle.innerHTML = dataModel.name;
         this.nodeContent.setAttribute('class', 'node-content');
-        this.nodeContent.onmousedown = (e) => { e.stopPropagation(); };
+        this.nodeContent.onmousedown = (e) => {
+            e.stopPropagation();
+        };
         this.id = 'node_' + NodeIDGenerator++;
 
         // 端口ID清零

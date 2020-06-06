@@ -66,7 +66,7 @@ export function getClassName(clsName) {
  * @param {Element} movableElement 可移动的组件js对象
  * @param {Element} areaElement 限制区域元素。指定该值后，移动元素不会超出这个区域内
  */
-export function attachMoveComponent(movableElement, areaElement) {
+export function addMoveComponent(movableElement, areaElement) {
     document.onmousedown = function (evt) {
         if (!findParentFromChild(movableElement, evt.target)) {
             return;
@@ -121,6 +121,51 @@ export function attachMoveComponent(movableElement, areaElement) {
         });
         return;
     };
+}
+
+/**
+ * 为元素附加尺寸变换组件。重置尺寸指示器默认在元素的右下角，暂无法更改其他位置。
+ * @param {any} ele 顶层元素
+ * @param {Function} onResize 当尺寸改变时的回调函数
+ * @param {Boolean} wEffect 宽度影响，是否可以改变宽度
+ * @param {Boolean} hEffect 高度影响，是否可以改变高度
+ */
+export function addResizeComponent(ele, onResize = null, wEffect = true, hEffect = false) {
+    // 调整尺寸部分
+    if (!wEffect && !hEffect) {
+        return;
+    }
+
+    const t = $(ele);
+    if (t.length == 0 || t.children('.resize-indicator').length > 0) {
+        return;
+    }
+
+    const rs = $('<span class="resize-indicator"></span>');
+    t.append(rs);
+    rs.on('mousedown', function (e) {
+        const old_width = t.width();
+        const old_height = t.height();
+        const old_x = e.clientX;
+        const old_y = e.clientY;
+        $(document).on('mousemove', function (e) {
+            if (wEffect) {
+                t.width(e.clientX - old_x + old_width);
+            }
+            if (hEffect) {
+                t.height(e.clientY - old_y + old_height);
+            }
+            if (onResize) {
+                onResize();
+            }
+            return false;
+        });
+        $(document).on('mouseup', function () {
+            $(document).off('mousemove');
+            $(document).off('mouseup');
+        });
+        return false;
+    });
 }
 
 /**

@@ -7,11 +7,23 @@ $(document).ready(function () {
     window.onkeydown = function (e) {
         var ev = window.event || e;
         var code = ev.keyCode || ev.which;
-        if (code == 82 && (ev.metaKey || ev.ctrlKey)) {
+        if (code == 116 || (code == 82 && (ev.metaKey || ev.ctrlKey))) {
             return false;
         }
     };
 
+    /** 初始化属性设置 */
+
+    // 删除所有元素会因刷新导致闪烁的属性
+    $('[a-cloak]').removeAttr('a-cloak');
+    $('[a-invisible]').removeAttr('a-invisible');
+
+    $('[a-min-size]').each(function () {
+        let t = $(this);
+        t.css({ 'min-width': t.css('width'), 'min-height': t.css('height') });
+    });
+
+    /** 注册元素 */
     customElements.define('a-label-widget', ALabelWidget);
     customElements.define('a-input-number', AInputNumberWidget);
     customElements.define('a-flow-view', AFlowView);
@@ -41,7 +53,6 @@ $(document).ready(function () {
 
         return false;
     };
-
 
     // 创建系统默认的节点表
     AFlowView.NodeTable = new ANodeModelRegistry();

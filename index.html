@@ -16,7 +16,7 @@
     <a-flow-view id="fv_1" name="flow view" class="flow-view">
     </a-flow-view>
 
-    <div id="test-fp" class="float-panel text-select-none">
+    <div id="test-fp" class="float-panel text-select-none" a-invisible a-min-size>
         <div class="header">
             <div class="header-title">快捷键</div>
         </div>
@@ -44,10 +44,11 @@
     <script type="module" src="./core/index.js"></script>
     <script type="module" src="./test/BaseDataModelNodes.js"></script>
     <script type="module">
+        import { EPosition } from './core/Types.js';
         import { MonoFloatPanel } from './core/component/MonoFloatPanel.js';
         new MonoFloatPanel({
             ele: '#test-fp',
-            canMove: true,
+            position: EPosition.BOTTOM | EPosition.RIGHT
         });
     </script>
 </body>

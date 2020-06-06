@@ -19,6 +19,14 @@ svg {
     fill: @textColor;
 }
 
+[a-cloak] {
+	display: none !important;
+}
+
+[a-invisible] {
+	visibility: hidden !important;
+}
+
 .text-select-none {
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -128,7 +136,7 @@ svg {
     span,
     strong {
         font-size: 0.8em;
-        margin: 0.4em 1.2em;
+        margin: 0.2em 1em;
     }
 }
 
@@ -195,7 +203,7 @@ svg {
     position: absolute;
     width: @nodeMinWidth;
     min-width: @nodeMinWidth;
-    min-height: @controlHight;
+    min-height: @controlHeight;
     border-radius: 6px;
     background: @nodeBackground;
     border: 2px solid transparent;
@@ -253,7 +261,7 @@ svg {
     justify-content: space-between;
     margin-top: 2px;
     margin-bottom: 2px;
-    min-height: @controlHight;
+    min-height: @controlHeight;
 }
 .interface-in {
     justify-content: flex-start;
@@ -278,8 +286,8 @@ svg {
     padding-right: 5px;
     text-align: center;
     white-space: nowrap;
-    height: @controlHight;
-    line-height: @controlHight;
+    height: @controlHeight;
+    line-height: @controlHeight;
 }
 .node-exec-label {
     width: 100%;
@@ -288,8 +296,8 @@ svg {
 .node-label {
     overflow: hidden;
     text-overflow: ellipsis;
-    height: @controlHight - 6px;
-    line-height: @controlHight - 6px;
+    height: @controlHeight - 6px;
+    line-height: @controlHeight - 6px;
 }
 .control-label {
     background: @controlBgNormalColor + #111;
@@ -418,7 +426,7 @@ input {
     border-bottom-left-radius: 0;
     min-width: 20px;
     background: @controlBgNormalColor;
-    height: @controlHight;
+    height: @controlHeight;
     transition: all 0.3s ease-in-out;
     padding-left: 5px;
     padding-right: 5px;

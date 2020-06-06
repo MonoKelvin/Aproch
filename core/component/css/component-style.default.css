@@ -448,7 +448,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   border-radius: 4px;
   background: #3b3b3b;
   padding: 4px;
-  position: absolute;
+  position: fixed;
 }
 .fold-up-indicator {
   border-top: 6px solid #cccccc;
