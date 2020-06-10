@@ -40,7 +40,7 @@
     </div>
 
     <script type="text/javascript" src="./lib/jquery/jquery-3.4.1.min.js"></script>
-    <script type="module" src="./core/component/ComponentInit.js"></script>
+    <script type="module" src="./core/component/index.js"></script>
     <script type="module" src="./core/index.js"></script>
     <script type="module" src="./test/BaseDataModelNodes.js"></script>
     <script type="module">
@@ -48,7 +48,7 @@
         import { MonoFloatPanel } from './core/component/MonoFloatPanel.js';
         new MonoFloatPanel({
             ele: '#test-fp',
-            position: EPosition.BOTTOM | EPosition.RIGHT
+            position: EPosition.BOTTOM | EPosition.RIGHT,
         });
     </script>
 </body>

@@ -20,11 +20,11 @@ svg {
 }
 
 [a-cloak] {
-	display: none !important;
+    display: none !important;
 }
 
 [a-invisible] {
-	visibility: hidden !important;
+    visibility: hidden !important;
 }
 
 .text-select-none {
@@ -48,7 +48,7 @@ svg {
 .t-0 {
     top: 0;
 }
-.b-0{
+.b-0 {
     bottom: 0;
 }
 
@@ -110,10 +110,6 @@ svg {
     flex-direction: column;
 }
 
-.item-interactive {
-    border: 2px solid @primaryLightColor !important;
-}
-
 // ScrollBar
 ::-webkit-scrollbar {
     width: 8px;
@@ -128,7 +124,6 @@ svg {
 }
 
 .tooltip-item {
-    color: @textColor;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -196,10 +191,14 @@ svg {
     background-color: transparent !important;
 }
 
+.fv-item-slt {
+    border: 2px solid @primaryLightColor !important;
+}
+
 /********/
 /* Node */
 /********/
-.node-widget {
+.aproch-node {
     position: absolute;
     width: @nodeMinWidth;
     min-width: @nodeMinWidth;
@@ -215,7 +214,10 @@ svg {
     cursor: default;
     z-index: 10;
 }
-.node-widget:hover {
+.aproch-node .fv-item-slt{
+    border: 2px solid @primaryColor !important;
+}
+.aproch-node:hover {
     border: @nodeHoverBorder;
 }
 .node-title {
@@ -255,7 +257,7 @@ svg {
 /*************/
 /* Interface */
 /*************/
-.node-interface {
+.aproch-interface {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -308,8 +310,8 @@ svg {
 /********/
 /* Port */
 /********/
-.node-port-in,
-.node-port-out {
+.aproch-port-in,
+.aproch-port-out {
     min-width: @portSize;
     min-height: @portSize;
     border-radius: 50%;
@@ -318,10 +320,10 @@ svg {
     transition: all 0.2s ease-in-out;
     position: absolute;
 }
-.node-port-in {
+.aproch-port-in {
     left: -@portSize + 2px;
 }
-.node-port-out {
+.aproch-port-out {
     right: -@portSize + 2px;
 }
 // int

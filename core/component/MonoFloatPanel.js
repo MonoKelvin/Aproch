@@ -17,7 +17,7 @@ export class MonoFloatPanel {
             options && options.position != undefined ? parseInt(options.position) : EPosition.RIGHT | EPosition.BOTTOM;
 
         if (this.canMove) {
-            addMoveComponent(this.ele, document.documentElement);
+            addMoveComponent(this.ele, document.documentElement, options.onMoving);
         }
 
         this.setPosition(this.position);

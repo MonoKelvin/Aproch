@@ -1,5 +1,3 @@
-import { ANode } from './Aproch.js';
-import * as DM from '../core/DataModel.js';
 
 export default class ANodeModelRegistry {
     constructor() {

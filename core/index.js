@@ -1,6 +1,5 @@
-import { ALabelWidget, AInputNumberWidget } from './AWidget.js';
-import { AFlowView, ANode, AConnection, AInterface, APort } from './Aproch.js';
-import ANodeModelRegistry from './ANodeModelRegistry.js';
+import { ALabelWidget, AInputNumberWidget } from './NodeEditor/AWidget.js';
+import ANodeModelRegistry from './NodeEditor/ANodeModelRegistry.js';
 
 $(document).ready(function () {
     // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新

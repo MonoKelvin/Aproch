@@ -99,9 +99,6 @@ svg {
   display: flex;
   flex-direction: column;
 }
-.item-interactive {
-  border: 2px solid #4ea1e1 !important;
-}
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -114,7 +111,6 @@ svg {
   background: #4d4d4d;
 }
 .tooltip-item {
-  color: #cccccc;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -175,10 +171,13 @@ svg {
 .clear-background {
   background-color: transparent !important;
 }
+.fv-item-slt {
+  border: 2px solid #4ea1e1 !important;
+}
 /********/
 /* Node */
 /********/
-.node-widget {
+.aproch-node {
   position: absolute;
   width: 110px;
   min-width: 110px;
@@ -194,7 +193,10 @@ svg {
   cursor: default;
   z-index: 10;
 }
-.node-widget:hover {
+.aproch-node .fv-item-slt {
+  border: 2px solid #006cbe !important;
+}
+.aproch-node:hover {
   border: 2px solid #9a9a9a;
 }
 .node-title {
@@ -231,7 +233,7 @@ svg {
 /*************/
 /* Interface */
 /*************/
-.node-interface {
+.aproch-interface {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -282,8 +284,8 @@ svg {
 /********/
 /* Port */
 /********/
-.node-port-in,
-.node-port-out {
+.aproch-port-in,
+.aproch-port-out {
   min-width: 12px;
   min-height: 12px;
   border-radius: 50%;
@@ -292,10 +294,10 @@ svg {
   transition: all 0.2s ease-in-out;
   position: absolute;
 }
-.node-port-in {
+.aproch-port-in {
   left: -10px;
 }
-.node-port-out {
+.aproch-port-out {
   right: -10px;
 }
 .port-int,
