@@ -1,17 +1,28 @@
-/// <reference path="../Types.d.ts" />
-import { NodeIDGenerator, InterfaceIDGenerator } from '../Aprochh';
+import ANode from './ANode';
+import APort, { EPortType } from './APort';
 
-const MAX_INTERFACE_COUNTER = 100;
+export declare interface IInterfaceOption {
+    ui: any;
+    isInPort: boolean;
+    isOutPort: boolean;
+}
 
 export default class AInterface extends HTMLElement {
-    constructor(node, options) {
+    /**
+     * 输入端口（左侧）
+     */
+    private _inPort: APort | null;
+
+    /**
+     * 输出端口（右侧）
+     */
+    private _outPort: APort | null;
+
+    constructor(node: ANode, options: IInterfaceOption) {
         super();
 
-        /** 输入端口（左侧） */
-        this.inPort = null;
-
-        /** 输出端口（右侧） */
-        this.outPort = null;
+        this._inPort = null;
+        this._outPort = null;
 
         this.id = 'itf_' + NodeIDGenerator + '_' + InterfaceIDGenerator++;
         this.setAttribute('class', 'aproch-interface');
@@ -22,7 +33,7 @@ export default class AInterface extends HTMLElement {
         this.append(options.ui);
     }
 
-    disconnectedCallback() {
+    protected disconnectedCallback() {
         this.removePort(true, true);
     }
 
@@ -31,14 +42,14 @@ export default class AInterface extends HTMLElement {
      * @param {boolean} isInPort 是否要移除输入端口（左侧）
      * @param {boolean} isOutPort 是否要移除输出端口（右侧）
      */
-    removePort(isInPort, isOutPort) {
-        if (isInPort && this.inPort) {
-            this.inPort.remove();
-            this.inPort = null;
+    public removePort(isInPort: boolean, isOutPort: boolean) {
+        if (isInPort && this._inPort) {
+            this._inPort.remove();
+            this._inPort = null;
         }
-        if (isOutPort && this.outPort) {
-            this.outPort.remove();
-            this.outPort = null;
+        if (isOutPort && this._outPort) {
+            this._outPort.remove();
+            this._outPort = null;
         }
     }
 
@@ -49,17 +60,17 @@ export default class AInterface extends HTMLElement {
      * @note 当存在输入或输出端口时，可以设置为false以移除端口
      * @see removePort();
      */
-    setPort(isInPort, isOutPort) {
-        if (isInPort && !this.inPort) {
-            this.inPort = new APort(EPortType.INPUT);
-            this.append(this.inPort);
+    public setPort(isInPort: boolean, isOutPort: boolean) {
+        if (isInPort && !this._inPort) {
+            this._inPort = new APort(EPortType.INPUT);
+            this.append(this._inPort);
             if (!isOutPort) {
                 $(this).addClass('interface-in');
             }
         }
-        if (isOutPort && !this.outPort) {
-            this.outPort = new APort(EPortType.OUTPUT);
-            this.append(this.outPort);
+        if (isOutPort && !this._outPort) {
+            this._outPort = new APort(EPortType.OUTPUT);
+            this.append(this._outPort);
             if (!isInPort) {
                 $(this).addClass('interface-out');
             }
@@ -72,17 +83,17 @@ export default class AInterface extends HTMLElement {
      * @param {EPortType} type 端口类型
      * @returns {APort} port 返回端口，若无端口则返回空null
      */
-    getPort(type) {
+    public getPort(type: EPortType) {
         if (type === EPortType.INPUT) {
-            return this.inPort;
+            return this._inPort;
         }
         if (type === EPortType.OUTPUT) {
-            return this.outPort;
+            return this._outPort;
         }
         return null;
     }
 
-    getNode() {
-        return this.offsetParent;
+    public getNode() {
+        return this.offsetParent as ANode;
     }
 }

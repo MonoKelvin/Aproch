@@ -129,12 +129,12 @@ export function addMoveComponent(movableElement, areaElement, onMoving = null) {
 
 /**
  * 为元素附加尺寸变换组件。重置尺寸指示器默认在元素的右下角，暂无法更改其他位置。
- * @param {any} ele 顶层元素
- * @param {Function} onResize 当尺寸改变时的回调函数
+ * @param {Element} ele 顶层元素
+ * @param {Function | null} onResize 当尺寸改变时的回调函数
  * @param {Boolean} wEffect 宽度影响，是否可以改变宽度
  * @param {Boolean} hEffect 高度影响，是否可以改变高度
  */
-export function addResizeComponent(ele, onResize = null, wEffect = true, hEffect = false) {
+export function addResizeComponent(ele: Element, onResize: Function | null, wEffect = true, hEffect = false) {
     // 调整尺寸部分
     if (!wEffect && !hEffect) {
         return;

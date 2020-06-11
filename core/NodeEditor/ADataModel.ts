@@ -1,4 +1,7 @@
-export interface IDataModel {
+import { MonoInputNumber } from '../component/MonoInputWidget';
+import { MonoLabel } from '../component/MonoLabel';
+
+export default interface IDataModel {
     /* 数据变量名，一般各个数据模型的值都不一样 */
     // variableName:string;
 
@@ -43,7 +46,7 @@ export interface IDataModel {
 export class OutDataModel implements IDataModel {
     public name: string;
 
-    public inputWidget: AInputNumberWidget = new AInputNumberWidget('输出');
+    public inputWidget: MonoInputNumber = new MonoInputNumber('输出');
 
     constructor() {
         this.name = 'Output Model';
@@ -76,7 +79,7 @@ export class OutDataModel implements IDataModel {
 export class InDataModel implements IDataModel {
     public name: string;
 
-    public label: ALabelWidget = new ALabelWidget('输入');
+    public label: MonoLabel = new MonoLabel('输入');
 
     constructor() {
         this.name = 'Input Model';

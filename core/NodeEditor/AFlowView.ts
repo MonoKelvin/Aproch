@@ -1,4 +1,6 @@
+import ANode from './ANode';
 import { addResizeComponent, getElementsByClassName } from '../Utilities';
+import { AbstractFlowViewItem } from './AFlowViewItem';
 
 /**
  * 视图事件状态，用于在视图中区别不同事件
@@ -9,32 +11,6 @@ enum EViewEventState {
     DeselectItem, // 取消选择
     MultiSelectItem, // 多选
     MoveItem, // 移动
-}
-
-export abstract class AbstractFlowViewItem extends HTMLElement implements IViewItemEvent {
-    constructor(flowView: AFlowView) {
-        super();
-    }
-    onSelected(): void {
-        throw new Error('Method not implemented.');
-    }
-    onDeselected(): void {
-        throw new Error('Method not implemented.');
-    }
-    onHovered(): void {
-        throw new Error('Method not implemented.');
-    }
-    onMoving(): void {
-        throw new Error('Method not implemented.');
-    }
-    onResize(): void {
-        throw new Error('Method not implemented.');
-    }
-
-    /**
-     * 构造元素的抽象方法
-     */
-    protected abstract builder(): void;
 }
 
 export default class AFlowView extends HTMLElement {
@@ -84,25 +60,25 @@ export default class AFlowView extends HTMLElement {
             return false;
         };
 
-        this.onclick = function (evt) {
+        this.onclick = (evt: any) => {
             // 点击到空白处
             if (evt.target == this && !evt.shiftKey && !evt.ctrlKey) {
                 let selectedNodes = this.getSelectedItems();
-                selectedNodes.removeClass('fv-item-slt');
+                $(selectedNodes).removeClass('fv-item-slt');
             }
         };
 
         /** 注册事件 */
         this.onmousedown = (evt) => {
             let t = $(this); // 视图的jquery对象
-            let tdom = t[0]; // 视图的dom对象
+            let tdom = this; // 视图的dom对象
             let oldX = parseInt(t.offset().left); // 视图起始x点
             let oldY = parseInt(t.offset().top); // 视图起始y点
             let startEvtX = evt.clientX; // 鼠标点击时起始x点
             let startEvtY = evt.clientY; // 鼠标点击时起始y点
             let sfX = null; // selection-frame 选择框起始x点
             let sfY = null; // selection-frame 选择框起始y点
-            let sfDiv = null; // selection-frame 选择框div标签
+            let sfDiv: any = null; // selection-frame 选择框div标签
 
             const curItem = ANode.GetNodeByChildComponent(evt.target);
             if (curItem && curItem.classList.contains('aproch-node')) {
@@ -110,13 +86,14 @@ export default class AFlowView extends HTMLElement {
                     this.clearSelectedItems();
                 }
                 curItem.classList.add('fv-item-slt');
-                tdom.getSelectedItems().each(function () {
-                    const node = $(this);
-                    const left = parseInt(node.css('left'));
-                    const top = parseInt(node.css('top'));
-                    $(document).on('mousemove', (e) => {
-                        node.css({ top: top + e.pageY - startEvtY, left: left + e.pageX - startEvtX });
-                        this.updateConnectionPosition();
+                // TODO:
+                tdom.getSelectedItems().forEach((item) => {
+                    const jqItem = $(item);
+                    const left = parseInt(jqItem.css('left'));
+                    const top = parseInt(jqItem.css('top'));
+                    $(document).on('mousemove', (e: any) => {
+                        jqItem.css({ top: top + e.pageY - startEvtY, left: left + e.pageX - startEvtX });
+                        item.onMoving();
                     });
                     $(document).on('mouseup', () => {
                         $(document).off('mousemove');
@@ -375,10 +352,10 @@ export default class AFlowView extends HTMLElement {
      * @note 返回的偏移量都大于等于0
      * @see getOrigin()、getOriginOffset()
      */
-    getViewOffset() {
+    public getViewOffset() {
         return {
-            x: -parseInt(this.offsetLeft),
-            y: -parseInt(this.offsetTop),
+            x: -this.offsetLeft,
+            y: -this.offsetTop,
         };
     }
 
@@ -387,17 +364,17 @@ export default class AFlowView extends HTMLElement {
      * @param {Object}} point 视口坐标
      * @return {Object} 返回视图中的坐标，格式：{x, y}
      */
-    viewportToFlowView(point) {
+    public viewportToFlowView(point: Point) {
         return {
-            x: point.x - parseInt(this.offsetLeft),
-            y: point.y - parseInt(this.offsetTop),
+            x: point.x - this.offsetLeft,
+            y: point.y - this.offsetTop,
         };
     }
 
     /**
      * 将视图移动到原点，即视图中心位置在外部框架容器中心处
      */
-    moveToOrigin() {
+    public moveToOrigin() {
         let t = $(this);
         const hw = (t.parent().innerWidth() - t.innerWidth()) / 2,
             hh = (t.parent().innerHeight() - t.innerHeight()) / 2;
@@ -410,7 +387,7 @@ export default class AFlowView extends HTMLElement {
      * @param {Event} event 事件，一般为鼠标点选节点的事件
      * @param {ANode} curSelectedNode 当前选择的节点
      */
-    _updateSelectionSet(event, curSelectedNode) {
+    private _updateSelectionSet(event: any, curSelectedNode: ANode) {
         let node = $(curSelectedNode);
         // 加选
         if (event.ctrlKey == 1 || event.shiftKey == 1) {

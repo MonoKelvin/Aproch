@@ -1,40 +1,19 @@
-declare global {
-    var $: any;
-    declare var NodeIDGenerator: number;
-    declare var InterfaceIDGenerator: number;
-    declare var PortIDGenerator: number;
-    declare var ConnectionIDGenerator: number;
-}
+// 声明为jquery的$符号
+declare var $: any;
 
-// export const PInterfaceOption = {
-//     ui: null,
-//     inPort: true,
-//     outPort: true
-// };
+// 节点ID生成器
+declare var NodeIDGenerator: number = 0;
+// 接口ID生成器
+declare var InterfaceIDGenerator: number = 0;
+// 端口ID生成器
+declare var PortIDGenerator: number = 0;
+// 连线ID生成器
+declare var ConnectionIDGenerator: number = 0;
 
-export interface IViewItemEvent {
-    /**
-     * 当item被选择
-     */
-    onSelected(): void;
+// 最大接口数量
+declare const MAX_INTERFACE_COUNTER: number = 64;
 
-    /**
-     * 当item被取消选择
-     */
-    onDeselected(): void;
-
-    /**
-     * 当鼠标悬停在item上
-     */
-    onHovered(): void;
-
-    /**
-     * 当移动item
-     */
-    onMoving(): void;
-
-    /**
-     * 当item尺寸发生改变
-     */
-    onResize(): void;
+declare interface Point {
+    x: number = 0;
+    y: number = 0;
 }

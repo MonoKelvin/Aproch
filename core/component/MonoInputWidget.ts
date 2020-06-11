@@ -16,7 +16,7 @@ interface IInputEvent {
     validate(): boolean;
 }
 
-export default class MonoInputWidget extends AbstractWidget implements IInputEvent {
+export default class MonoInput extends AbstractWidget implements IInputEvent {
     /**
      * 输入控件的类型
      */
@@ -56,7 +56,7 @@ export default class MonoInputWidget extends AbstractWidget implements IInputEve
     }
 }
 
-export class MonoInputNumberWidget extends MonoInputWidget {
+export class MonoInputNumber extends MonoInput {
     constructor(label: string, defValue = 0, minValue = -Number.MAX_VALUE, maxValue = Number.MAX_VALUE) {
         super(label, defValue);
 

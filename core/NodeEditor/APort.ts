@@ -1,7 +1,8 @@
-/// <reference path="../Types.d.ts" />
-import $ from 'aproch';
+/// <reference path="../Aproch.d.ts" />
+/// <reference path="../../lib/jquery/jquery-3.4.1.min.js" />
+
 import AConnection from './AConnection';
-import { NodeIDGenerator, PortIDGenerator } from '../Aprochh';
+import ANode from './ANode';
 
 export const enum EPortType {
     INPUT,
@@ -39,12 +40,12 @@ export default class APort extends HTMLElement {
         }
 
         // 点击时创建连线
-        $(this).on('mousedown', function (ed) {
+        $(this).on('mousedown', (ed: any) => {
             const t = this;
-            const tp = t.offsetParent;
-            let tar = null;
+            const tp = t.getNode();
+            let tar: any = null;
             let f = t.getPositionInView();
-            let conn = null;
+            let conn: AConnection | null = null;
             let canLink = false; // 是否可连
 
             /*
@@ -88,9 +89,9 @@ export default class APort extends HTMLElement {
                 }
             });
 
-            $(document).on('mouseup', function (eu) {
+            $(document).on('mouseup', function (eu: any) {
                 if (!canLink) {
-                    conn.remove();
+                    conn?.remove();
                 } else {
                     // 附加连线到节点上
                     t.attachConnection(conn);
@@ -103,8 +104,8 @@ export default class APort extends HTMLElement {
         });
     }
 
-    disconnectedCallback() {
-        $(this.connections).each((_, conn) => {
+    protected disconnectedCallback() {
+        $(this.connections).each((_: any, conn: AConnection) => {
             this.detachConnection(conn);
         });
     }
@@ -113,8 +114,8 @@ export default class APort extends HTMLElement {
      * 获取连接的对立端口
      * @returns {AConnection[]} 如果是输入端口，那返回结果只有一条连线，否则可能有多条
      */
-    getOppositePort() {
-        let ports = [];
+    public getOppositePort() {
+        let ports: APort[] = [];
         if (this.type === EPortType.INPUT) {
             this.connections.forEach((c) => {
                 ports.push(c.inPort);
@@ -131,7 +132,7 @@ export default class APort extends HTMLElement {
      * 获得端口所在接口，不是jquery对象
      * @returns {AInterface} 端口所在的接口
      */
-    getInterface() {
+    public getInterface() {
         return this.parentNode;
     }
 
@@ -139,7 +140,7 @@ export default class APort extends HTMLElement {
      * 附加连线到该端口上
      * @param {AConnection} conn 要附加的连线
      */
-    attachConnection(conn) {
+    public attachConnection(conn: AConnection) {
         this.connections.push(conn);
         if (this.type === EPortType.INPUT) {
             conn.outPort = this;
@@ -152,7 +153,7 @@ export default class APort extends HTMLElement {
      * 分离该端口上指定的连线，同时也会分离与该连线链接的另一头的端口
      * @param {AConnection} conn 链接该端口上的连线
      */
-    detachConnection(conn) {
+    public detachConnection(conn: AConnection) {
         conn.remove();
 
         // todo: 更新数据
@@ -161,14 +162,14 @@ export default class APort extends HTMLElement {
     /**
      * 获得端口所在的节点
      */
-    getNode(): ANode {
+    public getNode(): ANode {
         return this.offsetParent as ANode;
     }
 
     /**
      * 获得端口上连线的数量
      */
-    getConnectionCount() {
+    public getConnectionCount() {
         return this.connections.length;
     }
 
@@ -176,10 +177,10 @@ export default class APort extends HTMLElement {
      * 获得端口在视图中的位置
      * @returns 返回坐标对象{x, y}
      */
-    getPositionInView() {
+    public getPositionInView() {
         let t = $(this);
         const p = { x: t.offset().left + this.offsetWidth / 2, y: t.offset().top + this.offsetHeight / 2 };
-        return this.getNode().getFlowView().viewportToFlowView(p);
+        return this.getNode().getFlowView()?.viewportToFlowView(p);
     }
 
     /**

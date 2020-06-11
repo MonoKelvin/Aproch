@@ -1,5 +1,3 @@
-/// <reference path="../Types.d.ts" />
-import $ from 'aproch';
 import APort from './APort';
 import AFlowView from './AFlowView';
 
@@ -7,11 +5,11 @@ import AFlowView from './AFlowView';
  * 连线类
  */
 export default class AConnection extends HTMLElement {
-    inPort: APort = null;
+    public inPort: APort = null;
 
-    outPort: APort = null;
+    public outPort: APort = null;
 
-    path: any;
+    private _path: any;
 
     constructor(flowView: AFlowView, inPort: APort = null, outPort: APort = null) {
         super();
@@ -25,7 +23,7 @@ export default class AConnection extends HTMLElement {
         // this.data = null;
 
         /** 连线标签 */
-        this.path = {
+        this._path = {
             id: 'conn_' + ConnectionIDGenerator++,
             p1y: 0,
             p2y: 0,
@@ -61,10 +59,14 @@ export default class AConnection extends HTMLElement {
             this.outPort.connections.remove(this);
         }
 
-        this.path = null;
+        this._path = null;
     }
 
-    _update() {
+    /**
+     * 更新连线位置
+     * @node 虽然是共有函数，但尽量不要手动调用该方法
+     */
+    public _update() {
         this._setLinkingPoint(this.inPort.getPositionInView(), this.outPort.getPositionInView());
     }
 
@@ -72,40 +74,41 @@ export default class AConnection extends HTMLElement {
      * 设置正在连接（只有一端是有端口，另一端还没有端口）的连线
      * @param {any} fixed 固定点，一般为鼠标点击时的点
      * @param {any} move 移动点，一般为鼠标移动时的点
+     * @node 虽然是共有函数，但尽量不要手动调用该方法
      */
-    _setLinkingPoint(fixed, move) {
-        this.path.r.w = Math.abs(fixed.x - move.x);
-        this.path.r.h = Math.abs(fixed.y - move.y);
+    public _setLinkingPoint(fixed: any, move: any) {
+        this._path.r.w = Math.abs(fixed.x - move.x);
+        this._path.r.h = Math.abs(fixed.y - move.y);
 
         if (fixed.x < move.x) {
-            this.path.r.l = fixed.x;
+            this._path.r.l = fixed.x;
         } else {
-            this.path.r.l = move.x;
+            this._path.r.l = move.x;
         }
         if (fixed.y < move.y) {
-            this.path.r.t = fixed.y;
+            this._path.r.t = fixed.y;
             if (fixed.x > move.x) {
-                this.path.p1y = this.path.r.h;
-                this.path.p2y = 0;
+                this._path.p1y = this._path.r.h;
+                this._path.p2y = 0;
             } else {
-                this.path.p1y = 0;
-                this.path.p2y = this.path.r.h;
+                this._path.p1y = 0;
+                this._path.p2y = this._path.r.h;
             }
         } else {
-            this.path.r.t = move.y;
+            this._path.r.t = move.y;
             if (fixed.x < move.x) {
-                this.path.p1y = this.path.r.h;
-                this.path.p2y = 0;
+                this._path.p1y = this._path.r.h;
+                this._path.p2y = 0;
             } else {
-                this.path.p1y = 0;
-                this.path.p2y = this.path.r.h;
+                this._path.p1y = 0;
+                this._path.p2y = this._path.r.h;
             }
         }
 
-        this.style.left = this.path.r.l + 'px';
-        this.style.top = this.path.r.t + 'px';
-        this.style.width = this.path.r.w + 'px';
-        this.style.height = this.path.r.h + 'px';
-        this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" >' + this.path.toString() + '</svg>';
+        this.style.left = this._path.r.l + 'px';
+        this.style.top = this._path.r.t + 'px';
+        this.style.width = this._path.r.w + 'px';
+        this.style.height = this._path.r.h + 'px';
+        this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" >' + this._path.toString() + '</svg>';
     }
 }

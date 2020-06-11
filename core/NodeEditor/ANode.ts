@@ -1,18 +1,20 @@
-/// <reference path="../Aproch.d.ts" />
-/// <reference path="../../lib/jquery/jquery-3.4.1.min.js" />
+import AFlowView from './AFlowView';
+import IDataModel from './ADataModel';
+import AInterface from './AInterface';
+import AConnection from './AConnection';
+import { EPortType } from './APort';
+import { AbstractFlowViewItem } from './AFlowViewItem';
 
-import AFlowView from "./AFlowView";
-
-export default class ANode extends HTMLElement {
+export default class ANode extends AbstractFlowViewItem {
     /**
      * 通过子组件获取父节点
      * @param {Object} childComponent 节点子组件
      */
-    public static GetNodeByChildComponent(childComponent: any) {
+    public static GetNodeByChildComponent(childComponent: any): ANode | null {
         let curElement = childComponent;
         while (curElement != document) {
             if (curElement.classList.contains('aproch-node')) {
-                return curElement;
+                return curElement as ANode;
             }
             curElement = curElement.parentNode;
         }
@@ -20,31 +22,42 @@ export default class ANode extends HTMLElement {
         return null;
     }
 
-    public nodeTitle: HTMLElement;
-    public nodeContent: HTMLElement;
+    /**
+     * 节点标题元素
+     */
+    private _nodeTitle: HTMLElement;
+
+    /**
+     * 节点内容元素
+     */
+    private _nodeContent: HTMLElement;
+
+    /**
+     * 数据模型
+     */
     public dataModel: IDataModel;
 
-    constructor(flowView:AFlowView, dataModel, x = 0, y = 0) {
-        super();
+    constructor(flowView: AFlowView, dataModel: IDataModel, x: number = 0, y: number = 0) {
+        super(flowView);
 
         /** UUID，标识每一个节点 */
         // this.uuid = getUUID();
 
         /** 节点头部元素 */
-        this.nodeTitle = document.createElement('div');
+        this._nodeTitle = document.createElement('div');
 
         /** 节点内容，放置所有接口的容器 */
-        this.nodeContent = document.createElement('div');
+        this._nodeContent = document.createElement('div');
 
         /** 管理的数据模型 */
         this.dataModel = dataModel;
 
         // 初始化节点控件
         this.setAttribute('class', 'aproch-node');
-        this.nodeTitle.setAttribute('class', 'node-title');
-        this.nodeTitle.innerHTML = dataModel.name;
-        this.nodeContent.setAttribute('class', 'node-content');
-        this.nodeContent.onmousedown = (e) => {
+        this._nodeTitle.setAttribute('class', 'node-title');
+        this._nodeTitle.innerHTML = dataModel.name;
+        this._nodeContent.setAttribute('class', 'node-content');
+        this._nodeContent.onmousedown = (e) => {
             e.stopPropagation();
         };
         this.id = 'node_' + NodeIDGenerator++;
@@ -53,12 +66,12 @@ export default class ANode extends HTMLElement {
         PortIDGenerator = 0;
 
         // 添加为子组件
-        this.append(this.nodeTitle);
-        this.append(this.nodeContent);
+        this.append(this._nodeTitle);
+        this.append(this._nodeContent);
 
         // 初始化数据模型，添加接口
         for (let i = 0; i < MAX_INTERFACE_COUNTER; i++) {
-            var itfOption = this.dataModel.uiBuilder(i);
+            var itfOption = this.dataModel.builder(i);
             if (!itfOption) {
                 break;
             }
@@ -72,28 +85,48 @@ export default class ANode extends HTMLElement {
     /**
      * 元素被移除时调用
      */
-    disconnectedCallback() {
+    protected disconnectedCallback() {
         this._propagationData();
     }
 
-    _propagationData() {
+    private _propagationData() {
         // this.dataModel.forEach((dm) => {
         //     dm.dataModel.outputData();
         // });
     }
 
+    public onSelected(): void {
+        throw new Error('Method not implemented.');
+    }
+    public onDeselected(): void {
+        throw new Error('Method not implemented.');
+    }
+    public onHovered(): void {
+        throw new Error('Method not implemented.');
+    }
+    public onResize(): void {
+        throw new Error('Method not implemented.');
+    }
+    protected builder(): void {
+        throw new Error('Method not implemented.');
+    }
+
+    public onMoving(event?: MouseEvent) {
+        this.updateConnectionPosition();
+    }
+
     /**
      * 更新连线的位置
      */
-    updateConnectionPosition() {
+    public updateConnectionPosition() {
         this.getInterfaces().forEach((i) => {
             if (i.getPort(EPortType.INPUT)) {
-                i.getPort(EPortType.INPUT).connections.forEach((conn) => {
+                i.getPort(EPortType.INPUT)?.connections.forEach((conn: AConnection) => {
                     conn._update();
                 });
             }
             if (i.getPort(EPortType.OUTPUT)) {
-                i.getPort(EPortType.OUTPUT).connections.forEach((conn) => {
+                i.getPort(EPortType.OUTPUT)?.connections.forEach((conn: AConnection) => {
                     conn._update();
                 });
             }
@@ -104,15 +137,15 @@ export default class ANode extends HTMLElement {
      * 设置节点标题
      * @param {string} name 标题字符串
      */
-    setTitle(name) {
-        this.nodeTitle.innerHTML = name;
+    public setTitle(name: string) {
+        this._nodeTitle.innerHTML = name;
     }
 
     /**
      * 获得节点标题显示的文字
      */
-    getTitle() {
-        return this.nodeTitle.innerHTML;
+    public getTitle() {
+        return this._nodeTitle.innerHTML;
     }
 
     /**
@@ -123,14 +156,18 @@ export default class ANode extends HTMLElement {
      *  setTitleColor("rgb(255,255,255)")
      * @warning 尽量不要设置透明alpha通道
      */
-    setTitleColor(color) {
-        this.nodeTitle.style.background = color;
+    public setTitleColor(color: string) {
+        this._nodeTitle.style.backgroundColor = color;
+    }
+
+    public getTitleColor() {
+        return this._nodeTitle.style.backgroundColor;
     }
 
     /** 获得节点在场景中的位置
      * @returns 返回坐标对象{x,y}
      */
-    getPosition() {
+    public getPosition() {
         return {
             x: parseInt(this.style.left),
             y: parseInt(this.style.top),
@@ -142,7 +179,7 @@ export default class ANode extends HTMLElement {
      * @param {number} x x坐标
      * @param {number} y y坐标
      */
-    setPosition(x, y) {
+    public setPosition(x: number, y: number) {
         /* 设置位置 */
         this.style.left = x + 'px';
         this.style.top = y + 'px';
@@ -152,9 +189,9 @@ export default class ANode extends HTMLElement {
      * 增加节点在视图中的位置
      * @param {number} dx x增量
      * @param {number} dy y增量
-     * @note 等价于 position = position + (dx, dy)
+     * @note 等价于 new_position = old_position + (dx, dy)
      */
-    addPosition(dx, dy) {
+    public addPosition(dx: number, dy: number) {
         this.style.left = parseInt(this.style.left) + dx + 'px';
         this.style.top = parseInt(this.style.top) + dy + 'px';
     }
@@ -163,14 +200,14 @@ export default class ANode extends HTMLElement {
      * 添加接口
      * @param {AInterface} itf 要添加的接口
      */
-    addInterface(itf) {
+    public addInterface(itf: AInterface) {
         try {
-            this.nodeContent.childNodes.forEach((i) => {
+            this._nodeContent.childNodes.forEach((i) => {
                 if (i === itf) {
-                    throw new Error('接口已经存在，无法重复添加。interface:', itf);
+                    throw new Error('接口已经存在，无法重复添加！');
                 }
             });
-            this.nodeContent.appendChild(itf);
+            this._nodeContent.appendChild(itf);
         } catch (e) {
             console.log(e);
         }
@@ -180,9 +217,9 @@ export default class ANode extends HTMLElement {
      * 获得所有的接口
      * @returns {AInterface[]} 接口数组
      */
-    getInterfaces() {
-        const interfaces = [];
-        this.nodeContent.childNodes.forEach((i) => {
+    public getInterfaces() {
+        const interfaces: AInterface[] = [];
+        this._nodeContent.childNodes.forEach((i) => {
             if (i instanceof AInterface) {
                 interfaces.push(i);
             }
@@ -194,9 +231,9 @@ export default class ANode extends HTMLElement {
      * 获得节点当前所在的视图
      * @returns {AFlowView} 返回视图类
      */
-    getFlowView() {
+    public getFlowView(): AFlowView | null {
         let fv = null;
-        $.each($(this).parents(), function (_, p) {
+        $.each($(this).parents(), function (_: any, p: any) {
             if (p instanceof AFlowView) {
                 fv = p;
                 return;
@@ -226,7 +263,7 @@ export default class ANode extends HTMLElement {
      * @return {ANode} 返回自身节点，即可以再次使用该方法
      * //TODO: 在每个文本后添加删除按钮
      */
-    pushPromptText(option) {
+    public pushPromptText(option: any) {
         if (typeof option === 'object') {
             let prompt = $('<div class="node-prompt"></div>');
             prompt.html(option.content);
@@ -248,7 +285,7 @@ export default class ANode extends HTMLElement {
                 prompt = null;
             }, timeout);
 
-            this.nodeContent.appendChild(prompt[0]);
+            this._nodeContent.appendChild(prompt[0]);
         }
 
         return this;
