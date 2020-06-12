@@ -1,6 +1,6 @@
 import AbstractWidget from './MonoWidget';
 
-export class MonoLabel extends AbstractWidget {
+export default class MonoLabel extends AbstractWidget {
     constructor(label: string = '数据源') {
         super(label);
 

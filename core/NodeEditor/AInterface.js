@@ -1,4 +1,3 @@
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -12,17 +11,15 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
-var Aprochh_1 = require("../Aprochh");
-var MAX_INTERFACE_COUNTER = 100;
+import APort from './APort';
 var AInterface = (function (_super) {
     __extends(AInterface, _super);
     function AInterface(node, options) {
         var _this = _super.call(this) || this;
-        _this.inPort = null;
-        _this.outPort = null;
-        _this.id = 'itf_' + Aprochh_1.NodeIDGenerator + '_' + Aprochh_1.InterfaceIDGenerator++;
-        _this.setAttribute('class', 'aproch-interface');
+        _this._inPort = null;
+        _this._outPort = null;
+        _this.id = 'itf_' + NodeIDGenerator + '_' + InterfaceIDGenerator++;
+        _this.setAttribute('class', 'a-interface');
         node.addInterface(_this);
         _this.setPort(options.isInPort, options.isOutPort);
         _this.append(options.ui);
@@ -32,26 +29,26 @@ var AInterface = (function (_super) {
         this.removePort(true, true);
     };
     AInterface.prototype.removePort = function (isInPort, isOutPort) {
-        if (isInPort && this.inPort) {
-            this.inPort.remove();
-            this.inPort = null;
+        if (isInPort && this._inPort) {
+            this._inPort.remove();
+            this._inPort = null;
         }
-        if (isOutPort && this.outPort) {
-            this.outPort.remove();
-            this.outPort = null;
+        if (isOutPort && this._outPort) {
+            this._outPort.remove();
+            this._outPort = null;
         }
     };
     AInterface.prototype.setPort = function (isInPort, isOutPort) {
-        if (isInPort && !this.inPort) {
-            this.inPort = new APort(EPortType.INPUT);
-            this.append(this.inPort);
+        if (isInPort && !this._inPort) {
+            this._inPort = new APort(0);
+            this.append(this._inPort);
             if (!isOutPort) {
                 $(this).addClass('interface-in');
             }
         }
-        if (isOutPort && !this.outPort) {
-            this.outPort = new APort(EPortType.OUTPUT);
-            this.append(this.outPort);
+        if (isOutPort && !this._outPort) {
+            this._outPort = new APort(1);
+            this.append(this._outPort);
             if (!isInPort) {
                 $(this).addClass('interface-out');
             }
@@ -59,11 +56,11 @@ var AInterface = (function (_super) {
         this.removePort(!isInPort, !isOutPort);
     };
     AInterface.prototype.getPort = function (type) {
-        if (type === EPortType.INPUT) {
-            return this.inPort;
+        if (type === 0) {
+            return this._inPort;
         }
-        if (type === EPortType.OUTPUT) {
-            return this.outPort;
+        if (type === 1) {
+            return this._outPort;
         }
         return null;
     };
@@ -72,4 +69,4 @@ var AInterface = (function (_super) {
     };
     return AInterface;
 }(HTMLElement));
-exports.default = AInterface;
+export default AInterface;

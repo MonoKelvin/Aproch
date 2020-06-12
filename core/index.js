@@ -1,5 +1,6 @@
-import { ALabelWidget, AInputNumberWidget } from './NodeEditor/AWidget.js';
 import ANodeModelRegistry from './NodeEditor/ANodeModelRegistry.js';
+import MonoLabel from './Component/MonoLabel.js';
+import MonoInputWidget from './Component/MonoInputWidget.js';
 
 $(document).ready(function () {
     // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
@@ -23,8 +24,8 @@ $(document).ready(function () {
     });
 
     /** 注册元素 */
-    customElements.define('a-label-widget', ALabelWidget);
-    customElements.define('a-input-number', AInputNumberWidget);
+    customElements.define('mono-label', MonoLabel);
+    customElements.define('mono-input-number', MonoInputWidget);
     customElements.define('a-flow-view', AFlowView);
     customElements.define('a-node', ANode);
     customElements.define('a-interface', AInterface);

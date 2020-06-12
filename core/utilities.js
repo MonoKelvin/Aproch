@@ -1,32 +1,23 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getElementsByClassName = exports.findParentFromChild = exports.addResizeComponent = exports.addMoveComponent = exports.getClassName = exports.clearEventBubble = exports.rgbToHex = exports.hexToRGB = exports.getUUID = void 0;
-function getUUID() {
+export function getUUID() {
     var s = [];
     var hexDigits = '0123456789abcdef';
     for (var i = 0; i < 36; i++) {
         s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
     }
     s[14] = '4';
-    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);
+    s[19] = hexDigits.substr((parseInt(s[19]) & 0x3) | 0x8, 1);
     s[8] = s[13] = s[18] = s[23] = '-';
     var uuid = s.join('');
     return uuid;
 }
-exports.getUUID = getUUID;
-function hexToRGB(hex, alpha) {
+export function hexToRGB(hex, alpha) {
     var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
     return [r, g, b];
 }
-exports.hexToRGB = hexToRGB;
-function rgbToHex(r, g, b) {
-    if (r === undefined) {
-        return false;
-    }
+export function rgbToHex(r, g, b) {
     return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
 }
-exports.rgbToHex = rgbToHex;
-function clearEventBubble(evt) {
+export function clearEventBubble(evt) {
     if (evt.stopPropagation) {
         evt.stopPropagation();
     }
@@ -40,12 +31,11 @@ function clearEventBubble(evt) {
         evt.returnValue = false;
     }
 }
-exports.clearEventBubble = clearEventBubble;
-function getClassName(clsName) {
-    if (typeof clsName == 'string') {
-        return clsName;
+export function getClassName(className) {
+    if (typeof className == 'string') {
+        return className;
     }
-    var s = clsName.toString();
+    var s = className.toString();
     if (s.indexOf('function') == -1) {
         return null;
     }
@@ -57,11 +47,9 @@ function getClassName(clsName) {
     }
     return s;
 }
-exports.getClassName = getClassName;
-function addMoveComponent(movableElement, areaElement, onMoving) {
-    if (onMoving === void 0) { onMoving = null; }
+export function addMoveComponent(movableElement, areaElement, onMoving) {
     document.onmousedown = function (evt) {
-        if (!findParentFromChild(movableElement, evt.target)) {
+        if (!isParentChild(movableElement, evt.target)) {
             return;
         }
         var startEvtX = evt.pageX;
@@ -113,9 +101,7 @@ function addMoveComponent(movableElement, areaElement, onMoving) {
         return;
     };
 }
-exports.addMoveComponent = addMoveComponent;
-function addResizeComponent(ele, onResize, wEffect, hEffect) {
-    if (onResize === void 0) { onResize = null; }
+export function addResizeComponent(ele, onResize, wEffect, hEffect) {
     if (wEffect === void 0) { wEffect = true; }
     if (hEffect === void 0) { hEffect = false; }
     if (!wEffect && !hEffect) {
@@ -151,24 +137,21 @@ function addResizeComponent(ele, onResize, wEffect, hEffect) {
         return false;
     });
 }
-exports.addResizeComponent = addResizeComponent;
-function findParentFromChild(parent, child) {
+export function isParentChild(parent, child) {
     var curElement = child;
     while (curElement != document) {
         if (curElement == parent) {
             return true;
         }
-        curElement = curElement.parentNode;
+        curElement = curElement === null || curElement === void 0 ? void 0 : curElement.parentNode;
     }
     return false;
 }
-exports.findParentFromChild = findParentFromChild;
-function getElementsByClassName(element, className) {
-    var s = this.getElementsByClassName(className);
-    var result;
+export function getElementsByClassName(parentElement, className) {
+    var s = document.getElementsByClassName(className);
+    var result = [];
     for (var i = 0; i < s.length; i++) {
         result.push(s[i]);
     }
     return result;
 }
-exports.getElementsByClassName = getElementsByClassName;

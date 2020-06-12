@@ -13,7 +13,7 @@ export default class ANode extends AbstractFlowViewItem {
     public static GetNodeByChildComponent(childComponent: any): ANode | null {
         let curElement = childComponent;
         while (curElement != document) {
-            if (curElement.classList.contains('aproch-node')) {
+            if (curElement.classList.contains('a-node')) {
                 return curElement as ANode;
             }
             curElement = curElement.parentNode;
@@ -53,7 +53,7 @@ export default class ANode extends AbstractFlowViewItem {
         this.dataModel = dataModel;
 
         // 初始化节点控件
-        this.setAttribute('class', 'aproch-node');
+        this.setAttribute('class', 'a-node');
         this._nodeTitle.setAttribute('class', 'node-title');
         this._nodeTitle.innerHTML = dataModel.name;
         this._nodeContent.setAttribute('class', 'node-content');
@@ -113,6 +113,14 @@ export default class ANode extends AbstractFlowViewItem {
 
     public onMoving(event?: MouseEvent) {
         this.updateConnectionPosition();
+    }
+
+    /**
+     * 获取推荐宽度
+     * @return {number} 返回值为标题的实际像素宽度
+     */
+    public getImplicitWidth(): number {
+        return (this._nodeTitle.innerText as any).realTextWidth($(this._nodeTitle).css('font'));
     }
 
     /**

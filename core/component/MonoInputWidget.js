@@ -1,4 +1,3 @@
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -12,15 +11,10 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.MonoInputNumberWidget = void 0;
-var MonoWidget_1 = __importDefault(require("./MonoWidget"));
-var MonoInputWidget = (function (_super) {
-    __extends(MonoInputWidget, _super);
-    function MonoInputWidget(label, defaultValue) {
+import AbstractWidget from './MonoWidget';
+var MonoInput = (function (_super) {
+    __extends(MonoInput, _super);
+    function MonoInput(label, defaultValue) {
         if (defaultValue === void 0) { defaultValue = ''; }
         var _this = _super.call(this, label) || this;
         _this.type = 6;
@@ -32,21 +26,21 @@ var MonoInputWidget = (function (_super) {
         _this.widget.defaultValue = defaultValue;
         return _this;
     }
-    MonoInputWidget.prototype.onComplete = function () {
+    MonoInput.prototype.onComplete = function () {
         throw new Error('Method not implemented.');
     };
-    MonoInputWidget.prototype.onValueChanged = function () {
+    MonoInput.prototype.onValueChanged = function () {
         throw new Error('Method not implemented.');
     };
-    MonoInputWidget.prototype.validate = function () {
+    MonoInput.prototype.validate = function () {
         throw new Error('Method not implemented.');
     };
-    return MonoInputWidget;
-}(MonoWidget_1.default));
-exports.default = MonoInputWidget;
-var MonoInputNumberWidget = (function (_super) {
-    __extends(MonoInputNumberWidget, _super);
-    function MonoInputNumberWidget(label, defValue, minValue, maxValue) {
+    return MonoInput;
+}(AbstractWidget));
+export default MonoInput;
+var MonoInputNumber = (function (_super) {
+    __extends(MonoInputNumber, _super);
+    function MonoInputNumber(label, defValue, minValue, maxValue) {
         if (defValue === void 0) { defValue = 0; }
         if (minValue === void 0) { minValue = -Number.MAX_VALUE; }
         if (maxValue === void 0) { maxValue = Number.MAX_VALUE; }
@@ -69,6 +63,6 @@ var MonoInputNumberWidget = (function (_super) {
         _this.append(_this.widget);
         return _this;
     }
-    return MonoInputNumberWidget;
-}(MonoInputWidget));
-exports.MonoInputNumberWidget = MonoInputNumberWidget;
+    return MonoInputNumber;
+}(MonoInput));
+export { MonoInputNumber };

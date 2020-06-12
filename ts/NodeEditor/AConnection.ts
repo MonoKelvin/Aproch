@@ -5,13 +5,16 @@ import AFlowView from './AFlowView';
  * 连线类
  */
 export default class AConnection extends HTMLElement {
-    public inPort: APort = null;
+    /** 输入端口 */
+    public inPort: APort | null = null;
 
-    public outPort: APort = null;
+    /** 输出端口 */
+    public outPort: APort | null = null;
 
+    /** 连线路径 */
     private _path: any;
 
-    constructor(flowView: AFlowView, inPort: APort = null, outPort: APort = null) {
+    constructor(flowView: AFlowView, inPort: APort | null = null, outPort: APort | null = null) {
         super();
 
         /** 输入端口，对应节点的输出端口 */
@@ -60,6 +63,11 @@ export default class AConnection extends HTMLElement {
         }
 
         this._path = null;
+    }
+
+    public setStartFixedPoint(point: Point) {
+        this._path.r.l = point.x;
+        this._path.r.t = point.y;
     }
 
     /**

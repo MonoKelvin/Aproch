@@ -1,6 +1,9 @@
-import ANode from './ANode';
 import { addResizeComponent, getElementsByClassName } from '../Utilities';
 import { AbstractFlowViewItem } from './AFlowViewItem';
+import ANode from './ANode';
+import APort from './APort';
+import AConnection from './AConnection';
+import ANodeModelRegistry from './ANodeModelRegistry';
 
 /**
  * 视图事件状态，用于在视图中区别不同事件
@@ -19,7 +22,8 @@ export default class AFlowView extends HTMLElement {
      * @see ANodeModelRegistry
      * @note ES6不支持静态属性，ES7支持
      */
-    //static NodeTable = null;
+    static NodeTable: ANodeModelRegistry;
+
     private name: string | null = 'Flow View';
 
     eventState: EViewEventState;
@@ -81,7 +85,7 @@ export default class AFlowView extends HTMLElement {
             let sfDiv: any = null; // selection-frame 选择框div标签
 
             const curItem = ANode.GetNodeByChildComponent(evt.target);
-            if (curItem && curItem.classList.contains('aproch-node')) {
+            if (curItem && curItem.classList.contains('a-node')) {
                 if (!evt.shiftKey && this.getSelectedItems().length <= 1) {
                     this.clearSelectedItems();
                 }
@@ -112,7 +116,7 @@ export default class AFlowView extends HTMLElement {
             sfDiv = $('<div class="selection-frame"></div>');
 
             // 视图移动事件
-            $(document).on('mousemove', (em) => {
+            $(document).on('mousemove', (em: MouseEvent) => {
                 // 按下shift键就多选
                 if (evt.shiftKey == true) {
                     t.append(sfDiv);
@@ -135,7 +139,7 @@ export default class AFlowView extends HTMLElement {
                         _h = sfDiv.innerHeight();
 
                     // FIXME
-                    for (var i = 0; i < tdom.selectedItems.length; i++) {
+                    /*for (var i = 0; i < tdom.selectedItems.length; i++) {
                         let sl = tdom.selectedItems[i].offsetWidth + tdom.selectedItems[i].offsetLeft;
                         let st = tdom.selectedItems[i].offsetHeight + tdom.selectedItems[i].offsetTop;
                         if (
@@ -149,10 +153,10 @@ export default class AFlowView extends HTMLElement {
                             }
                         } else {
                             if (tdom.selectedItems[i].className.indexOf('seled') != -1) {
-                                tdom.selectedItems[i].className = 'aproch-node';
+                                tdom.selectedItems[i].className = 'a-node';
                             }
                         }
-                    }
+                    }*/
                 } else {
                     t.css('cursor', 'grabbing');
                     let tLeft = oldX + em.clientX - evt.clientX;
@@ -184,10 +188,6 @@ export default class AFlowView extends HTMLElement {
                     sfDiv.remove();
                 }
 
-                oldX = null;
-                oldY = null;
-                startEvtX = null;
-                startEvtY = null;
                 sfX = null;
                 sfY = null;
                 sfDiv = null;
@@ -214,31 +214,31 @@ export default class AFlowView extends HTMLElement {
      * 当鼠标在item上按下时
      * @param {Event} event 点击事件
      */
-    private onItemPressed(event) {}
+    private onItemPressed(event: MouseEvent) {}
 
     /**
      * 当items移动时
      * @param {Event} event 移动事件
      */
-    private onItemsMoving(event) {}
+    private onItemsMoving(event: MouseEvent) {}
 
     /**
      * 当框选时
      * @param {Event} event 框选事件
      */
-    private onBoxSelect(event) {}
+    private onBoxSelect(event: MouseEvent) {}
 
     /**
      * 当item菜单事件触发时
      * @param {Event} event item菜单事件
      */
-    private onItemContextMenu(event) {}
+    private onItemContextMenu(event: MouseEvent) {}
 
     /**
      * 当视图菜单事件触发时
      * @param {Event} event 视图菜单事件
      */
-    private onContextMenu(event) {}
+    private onContextMenu(event: MouseEvent) {}
 
     /**
      * 清空选择集
@@ -275,7 +275,7 @@ export default class AFlowView extends HTMLElement {
      * 获得视图中的所有节点
      */
     public getNodes() {
-        return getElementsByClassName<ANode>(this, 'aproch-node');
+        return getElementsByClassName<ANode>(this, 'a-node');
     }
 
     /**
@@ -285,19 +285,20 @@ export default class AFlowView extends HTMLElement {
     deleteNode(node: ANode) {
         if (node) {
             node.remove();
-            node = null;
         } else {
             console.log('删除了一个无效的节点');
         }
     }
 
-    addLinkingConnection(sourcePort) {
+    addLinkingConnection(sourcePort: APort) {
         let conn = new AConnection(this);
 
         // 设置起始地固定点
-        let p = sourcePort.getPositionInView();
-        conn.path.r.l = p.x + parseInt(this.style.left);
-        conn.path.r.t = p.y + parseInt(this.style.top);
+        const p = sourcePort.getPositionInView();
+        conn.setStartFixedPoint({
+            x: p.x + parseInt(this.style.left),
+            y: p.y + parseInt(this.style.top),
+        });
 
         return conn;
     }
@@ -329,8 +330,8 @@ export default class AFlowView extends HTMLElement {
      */
     getOrigin() {
         return {
-            x: parseInt(this.offsetWidth) / 2,
-            y: parseInt(this.offsetHeight) / 2,
+            x: this.offsetWidth / 2,
+            y: this.offsetHeight / 2,
         };
     }
 
@@ -341,8 +342,8 @@ export default class AFlowView extends HTMLElement {
      */
     getOriginOffset() {
         return {
-            x: parseInt(this.offsetLeft + this.offsetWidth / 2),
-            y: parseInt(this.offsetTop + this.offsetHeight / 2),
+            x: (this.offsetLeft + this.offsetWidth) / 2,
+            y: (this.offsetTop + this.offsetHeight) / 2,
         };
     }
 
@@ -364,7 +365,7 @@ export default class AFlowView extends HTMLElement {
      * @param {Object}} point 视口坐标
      * @return {Object} 返回视图中的坐标，格式：{x, y}
      */
-    public viewportToFlowView(point: Point) {
+    public viewportToFlowView(point: Point): Point {
         return {
             x: point.x - this.offsetLeft,
             y: point.y - this.offsetTop,
@@ -396,7 +397,7 @@ export default class AFlowView extends HTMLElement {
                 return;
             }
         } else {
-            $(this).children('.aproch-node').removeClass('fv-item-slt');
+            $(this).children('.a-node').removeClass('fv-item-slt');
         }
         node.addClass('fv-item-slt');
     }

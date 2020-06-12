@@ -11,16 +11,11 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-import AbstractWidget from './MonoWidget';
-var MonoLabel = (function (_super) {
-    __extends(MonoLabel, _super);
-    function MonoLabel(label) {
-        if (label === void 0) { label = '数据源'; }
-        var _this = _super.call(this, label) || this;
-        _this.setAttribute('class', 'input-widget-container');
-        _this.append(_this.mLabel);
-        return _this;
+var AbstractFlowViewItem = (function (_super) {
+    __extends(AbstractFlowViewItem, _super);
+    function AbstractFlowViewItem(flowView) {
+        return _super.call(this) || this;
     }
-    return MonoLabel;
-}(AbstractWidget));
-export default MonoLabel;
+    return AbstractFlowViewItem;
+}(HTMLElement));
+export { AbstractFlowViewItem };

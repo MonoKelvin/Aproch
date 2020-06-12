@@ -1,16 +1,45 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.InDataModel = exports.OutDataModel = void 0;
-var OutDataModel = (function () {
-    function OutDataModel() {
-        this.inputWidget = new AInputNumberWidget('输出');
-        this.name = 'Output Model';
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+import { MonoInputNumber } from '../Component/MonoInputWidget';
+import MonoLabel from '../Component/MonoLabel';
+var AbstractDataModel = (function () {
+    function AbstractDataModel(name) {
+        this.name = '';
+        this.dataWidget = [];
+        this.name = name;
     }
-    OutDataModel.prototype.builder = function (index) {
+    AbstractDataModel.prototype.setDataWidget = function (index, widget) {
+        this.dataWidget[index] = widget;
+    };
+    AbstractDataModel.prototype.getDataWidget = function (index) {
+        return this.dataWidget[index];
+    };
+    return AbstractDataModel;
+}());
+export default AbstractDataModel;
+var DM_SimpleOut = (function (_super) {
+    __extends(DM_SimpleOut, _super);
+    function DM_SimpleOut(name) {
+        var _this = _super.call(this, name) || this;
+        _this.dataWidget = [new MonoInputNumber('输出')];
+        return _this;
+    }
+    DM_SimpleOut.prototype.builder = function (index) {
         switch (index) {
             case 0:
                 return {
-                    ui: this.inputWidget,
+                    ui: this.dataWidget[0],
                     isInPort: false,
                     isOutPort: true,
                 };
@@ -19,28 +48,30 @@ var OutDataModel = (function () {
         }
         return null;
     };
-    OutDataModel.prototype.calculate = function (index) {
+    DM_SimpleOut.prototype.calculate = function (index) {
         throw new Error('Method not implemented.');
     };
-    OutDataModel.prototype.inputData = function (index, data) {
+    DM_SimpleOut.prototype.inputData = function (index, data) {
         throw new Error('Method not implemented.');
     };
-    OutDataModel.prototype.outputData = function (index) {
+    DM_SimpleOut.prototype.outputData = function (index) {
         throw new Error('Method not implemented.');
     };
-    return OutDataModel;
-}());
-exports.OutDataModel = OutDataModel;
-var InDataModel = (function () {
-    function InDataModel() {
-        this.label = new ALabelWidget('输入');
-        this.name = 'Input Model';
+    return DM_SimpleOut;
+}(AbstractDataModel));
+export { DM_SimpleOut };
+var DM_SimpleIn = (function (_super) {
+    __extends(DM_SimpleIn, _super);
+    function DM_SimpleIn(name) {
+        var _this = _super.call(this, name) || this;
+        _this.dataWidget = [new MonoLabel('输入')];
+        return _this;
     }
-    InDataModel.prototype.builder = function (index) {
+    DM_SimpleIn.prototype.builder = function (index) {
         switch (index) {
             case 0:
                 return {
-                    ui: this.label,
+                    ui: this.dataWidget,
                     isInPort: true,
                     isOutPort: false,
                 };
@@ -49,15 +80,15 @@ var InDataModel = (function () {
         }
         return null;
     };
-    InDataModel.prototype.calculate = function (index) {
+    DM_SimpleIn.prototype.calculate = function (index) {
         throw new Error('Method not implemented.');
     };
-    InDataModel.prototype.inputData = function (index, data) {
+    DM_SimpleIn.prototype.inputData = function (index, data) {
         throw new Error('Method not implemented.');
     };
-    InDataModel.prototype.outputData = function (index) {
+    DM_SimpleIn.prototype.outputData = function (index) {
         throw new Error('Method not implemented.');
     };
-    return InDataModel;
-}());
-exports.InDataModel = InDataModel;
+    return DM_SimpleIn;
+}(AbstractDataModel));
+export { DM_SimpleIn };

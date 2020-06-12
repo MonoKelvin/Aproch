@@ -1,0 +1,260 @@
+/*********/
+/** Node */
+/*********/
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  border: none;
+  font-size: 14px;
+  font-family: 'Microsoft Yahei', 'DejaVu Sans Mono', monospace, sans-serif;
+}
+/************/
+/* FlowView */
+/************/
+.a-flow-view {
+  background: -webkit-linear-gradient(top, transparent 29px, #2e2e2e 30px), -webkit-linear-gradient(left, #1d1d1d 29px, #2e2e2e 30px);
+  background-size: 30px 30px;
+  background-position-x: 4px;
+  background-position-y: 4px;
+  overflow: hidden !important;
+  position: fixed;
+  display: block;
+  cursor: grab;
+  width: 2048px;
+  height: 2048px;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.a-flow-view .guid-line-h {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  top: 50%;
+  background: #454545;
+  transform: translateY(-50%);
+  z-index: 0;
+}
+.a-flow-view .guid-line-v {
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  left: 50%;
+  background: #454545;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+.selection-frame {
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  font-size: 0px;
+  border: 1px dashed #9a9a9a;
+  background-color: rgba(69, 69, 69, 0.4);
+  z-index: 1000;
+  opacity: 0.6;
+}
+.clear-background {
+  background-color: transparent !important;
+}
+.fv-item-slt {
+  border: 2px solid #4ea1e1 !important;
+}
+/********/
+/* Node */
+/********/
+.a-node {
+  position: absolute;
+  width: 110px;
+  min-width: 110px;
+  min-height: 22px;
+  border-radius: 6px;
+  background: #272727;
+  border: 2px solid transparent;
+  box-shadow: 0 0 15px #00000080;
+  transition: border 0.16s ease-in-out, height 0.16s ease-in-out;
+  color: #cccccc;
+  font-size: 0.7rem;
+  opacity: 0.92;
+  cursor: default;
+  z-index: 10;
+}
+.a-node .fv-item-slt {
+  border: 2px solid #006cbe !important;
+}
+.a-node:hover {
+  border: 2px solid #9a9a9a;
+}
+.node-title {
+  background: #3f3f3f;
+  height: 28px;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 0.9rem;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  line-height: 28px;
+  cursor: move;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.node-content {
+  padding: 4px 10px 8px 10px;
+  display: flex;
+  flex-direction: column;
+}
+.node-prompt {
+  color: #ffffff;
+  margin-top: 4px;
+  min-height: 24px;
+  border-radius: 2px;
+  padding: 4px;
+}
+.node-prompt i {
+  margin-right: 4px;
+}
+/*************/
+/* Interface */
+/*************/
+.a-interface {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  min-height: 22px;
+}
+.interface-in {
+  justify-content: flex-start;
+}
+.interface-out {
+  justify-content: flex-end;
+}
+.input-widget-container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+.node-label,
+.control-label,
+.node-exec-label {
+  user-select: none;
+  color: #cccccc;
+  font-size: 0.7rem;
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: center;
+  white-space: nowrap;
+  height: 22px;
+  line-height: 22px;
+}
+.node-exec-label {
+  width: 100%;
+}
+.node-exec-label,
+.node-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 16px;
+  line-height: 16px;
+}
+.control-label {
+  background: #565656;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+/********/
+/* Port */
+/********/
+.a-port-in,
+.a-port-out {
+  min-width: 12px;
+  min-height: 12px;
+  border-radius: 50%;
+  background-color: red;
+  border: 2px solid #272727;
+  transition: all 0.2s ease-in-out;
+  position: absolute;
+}
+.a-port-in {
+  left: -10px;
+}
+.a-port-out {
+  right: -10px;
+}
+.a-port-int,
+.a-port-int:active {
+  background: #006cbe;
+}
+.a-port-int:hover {
+  background-color: #00287a;
+}
+.a-port-float,
+.a-port-float:active {
+  background-color: #ec8ef8;
+}
+.a-port-float:hover {
+  background-color: #a84ab4;
+}
+.a-port-double,
+.a-port-double:active {
+  background-color: #70f68d;
+}
+.a-port-double:hover {
+  background-color: #2cb249;
+}
+.a-port-string,
+.a-port-string:active {
+  background-color: #ebf879;
+}
+.a-port-string:hover {
+  background-color: #a7b435;
+}
+.a-port-bool,
+.a-port-bool:active {
+  background-color: #ff7a7a;
+}
+.a-port-bool:hover {
+  background-color: #bb3636;
+}
+.a-port-exec,
+.a-port-exec:active {
+  background-color: white;
+}
+.a-port-exec:hover {
+  background-color: #bbbbbb;
+}
+.resize-indicator {
+  color: #3f3f3f;
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  border-top: 8px solid transparent;
+  border-right: 8px solid #3f3f3f;
+  cursor: nw-resize;
+}
+/***********************/
+/*      Connection     */
+/***********************/
+.aproch-conn {
+  position: absolute;
+  min-width: 2px;
+  min-height: 2px;
+  z-index: 1;
+}
+.aproch-conn svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.aproch-conn .conn-path {
+  fill: none;
+  stroke-width: 2px;
+}

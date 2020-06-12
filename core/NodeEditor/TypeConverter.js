@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ABaseTypeConverter = void 0;
 var ABaseTypeConverter = (function () {
     function ABaseTypeConverter() {
     }
@@ -12,4 +9,4 @@ var ABaseTypeConverter = (function () {
     };
     return ABaseTypeConverter;
 }());
-exports.ABaseTypeConverter = ABaseTypeConverter;
+export { ABaseTypeConverter };

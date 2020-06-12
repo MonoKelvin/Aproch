@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Node Widget</title>
-    <link rel="stylesheet" href="lib/bootstrap-4.3.1/bootstrap-grid.min.css">
-    <link rel="stylesheet" href="core/style/style.default.css">
-    <link rel="stylesheet" href="core/component/css/component-style.default.css">
     <link rel="stylesheet" href="lib/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="lib/bootstrap-4.3.1/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="core/Style/style.default.css">
+    <link rel="stylesheet" href="core/NodeEditor/css/node-editor.default.css">
+    <link rel="stylesheet" href="core/Component/css/component.default.css">
 </head>
 
 <body>
@@ -40,15 +41,17 @@
     </div>
 
     <script type="text/javascript" src="./lib/jquery/jquery-3.4.1.min.js"></script>
-    <script type="module" src="./core/component/index.js"></script>
+    <script type="module" src="./core/Component/index.js"></script>
     <script type="module" src="./core/index.js"></script>
     <script type="module" src="./test/BaseDataModelNodes.js"></script>
     <script type="module">
-        import { EPosition } from './core/Types.js';
-        import { MonoFloatPanel } from './core/component/MonoFloatPanel.js';
+        import MonoFloatPanel from './core/Component/MonoFloatPanel.js';
         new MonoFloatPanel({
             ele: '#test-fp',
             position: EPosition.BOTTOM | EPosition.RIGHT,
+            onMoving: () => {
+                console.log('moving');
+            }
         });
     </script>
 </body>

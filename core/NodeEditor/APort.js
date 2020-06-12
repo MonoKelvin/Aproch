@@ -1,4 +1,3 @@
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -12,12 +11,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var aproch_1 = __importDefault(require("aproch"));
-var Aprochh_1 = require("../Aprochh");
+import { ABaseTypeConverter } from './TypeConverter';
 var APort = (function (_super) {
     __extends(APort, _super);
     function APort(type) {
@@ -26,16 +20,16 @@ var APort = (function (_super) {
         _this.connections = [];
         _this.type = type;
         _this.connectCountLimit = type == 0 ? 1 : Infinity;
-        _this.id = 'port_' + Aprochh_1.NodeIDGenerator + '_' + Aprochh_1.PortIDGenerator++;
+        _this.id = 'port_' + NodeIDGenerator + '_' + PortIDGenerator++;
         if (_this.type == 0) {
-            _this.setAttribute('class', 'aproch-port-in');
+            _this.setAttribute('class', 'a-port-in');
         }
         else {
-            _this.setAttribute('class', 'aproch-port-out');
+            _this.setAttribute('class', 'a-port-out');
         }
-        aproch_1.default(_this).on('mousedown', function (ed) {
-            var t = this;
-            var tp = t.offsetParent;
+        $(_this).on('mousedown', function (ed) {
+            var t = _this;
+            var tp = t.getNode();
             var tar = null;
             var f = t.getPositionInView();
             var conn = null;
@@ -55,36 +49,39 @@ var APort = (function (_super) {
                 });
                 return;
             }
-            aproch_1.default(document).on('mousemove', function (em) {
-                var fvOffset = t.getNode().getFlowView().viewportToFlowView({ x: em.clientX, y: em.clientY });
-                conn._setLinkingPoint(f, fvOffset);
+            $(document).on('mousemove', function (em) {
+                var fvOffset = t.getNode().getFlowView().viewportToFlowView({
+                    x: em.clientX,
+                    y: em.clientY,
+                });
+                conn === null || conn === void 0 ? void 0 : conn._setLinkingPoint(f, fvOffset);
                 tar = em.target;
                 canLink = false;
                 if (tar instanceof APort && tar !== ed.target) {
                     if (APort.CanLink(t, tar)) {
                         var p = tar.getPositionInView();
-                        conn._setLinkingPoint(f, p);
+                        conn === null || conn === void 0 ? void 0 : conn._setLinkingPoint(f, p);
                         canLink = true;
                     }
                 }
             });
-            aproch_1.default(document).on('mouseup', function (eu) {
+            $(document).on('mouseup', function (eu) {
                 if (!canLink) {
-                    conn.remove();
+                    conn === null || conn === void 0 ? void 0 : conn.remove();
                 }
-                else {
+                else if (conn) {
                     t.attachConnection(conn);
                     tar.attachConnection(conn);
                 }
-                aproch_1.default(document).off('mousemove');
-                aproch_1.default(document).off('mouseup');
+                $(document).off('mousemove');
+                $(document).off('mouseup');
             });
         });
         return _this;
     }
     APort.prototype.disconnectedCallback = function () {
         var _this = this;
-        aproch_1.default(this.connections).each(function (_, conn) {
+        $(this.connections).each(function (_, conn) {
             _this.detachConnection(conn);
         });
     };
@@ -92,12 +89,16 @@ var APort = (function (_super) {
         var ports = [];
         if (this.type === 0) {
             this.connections.forEach(function (c) {
-                ports.push(c.inPort);
+                if (c.inPort) {
+                    ports.push(c.inPort);
+                }
             });
         }
         else {
             this.connections.forEach(function (c) {
-                ports.push(c.outPort);
+                if (c.outPort) {
+                    ports.push(c.outPort);
+                }
             });
         }
         return ports;
@@ -124,12 +125,11 @@ var APort = (function (_super) {
         return this.connections.length;
     };
     APort.prototype.getPositionInView = function () {
-        var t = aproch_1.default(this);
+        var t = $(this);
         var p = { x: t.offset().left + this.offsetWidth / 2, y: t.offset().top + this.offsetHeight / 2 };
         return this.getNode().getFlowView().viewportToFlowView(p);
     };
     APort.CanLink = function (p1, p2, tv) {
-        if (tv === void 0) { tv = null; }
         if (p1.getNode() !== p2.getNode() &&
             p1.type !== p2.type &&
             p1.getOppositePort()[0] !== p2 &&
@@ -138,7 +138,7 @@ var APort = (function (_super) {
             if (new ABaseTypeConverter().canConvert(p1.getInterface(), p2.getInterface())) {
                 return true;
             }
-            else if (tv && tv.CanConvert()) {
+            else if (tv === null || tv === void 0 ? void 0 : tv.canConvert(p1.getInterface(), p2.getInterface())) {
                 return true;
             }
         }
@@ -146,4 +146,4 @@ var APort = (function (_super) {
     };
     return APort;
 }(HTMLElement));
-exports.default = APort;
+export default APort;

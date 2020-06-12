@@ -25,7 +25,7 @@ export default class AInterface extends HTMLElement {
         this._outPort = null;
 
         this.id = 'itf_' + NodeIDGenerator + '_' + InterfaceIDGenerator++;
-        this.setAttribute('class', 'aproch-interface');
+        this.setAttribute('class', 'a-interface');
 
         node.addInterface(this);
 

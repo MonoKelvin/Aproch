@@ -521,3 +521,54 @@ input[type='range']::-webkit-slider-thumb:hover {
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
 }
+
+/* Input */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input {
+    -moz-appearance: textfield;
+}
+
+.input-widget,
+.mono-selection {
+    flex: 1 1 auto;
+    color: @textColor;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    min-width: 20px;
+    background: @controlBgNormalColor;
+    height: @controlHeight;
+    transition: all 0.3s ease-in-out;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.mono-selection:hover,
+.input-widget:hover {
+    color: @lightColor;
+    background: @controlBgHoverColor;
+}
+.mono-selection {
+    appearance: none;
+    option {
+        margin: 100px;
+        width: 140px;
+        height: 40px;
+        border: 1px solid #cccccc;
+        position: relative;
+    }
+    option select {
+        border: none;
+        outline: none;
+        width: 100%;
+        height: 40px;
+        line-height: 40px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding-left: 20px;
+    }
+}

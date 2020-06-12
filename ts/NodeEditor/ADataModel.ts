@@ -1,12 +1,20 @@
-import { MonoInputNumber } from '../component/MonoInputWidget';
-import { MonoLabel } from '../component/MonoLabel';
+import AbstractWidget from '../Component/MonoWidget';
+import { MonoInputNumber } from '../Component/MonoInputWidget';
+import MonoLabel from '../Component/MonoLabel';
 
-export default interface IDataModel {
+export default abstract class AbstractDataModel {
     /* 数据变量名，一般各个数据模型的值都不一样 */
     // variableName:string;
 
     /* 数据名，显示在节点标题的部分 */
-    name: string;
+    public readonly name: string = '';
+
+    /** 数据  */
+    protected dataWidget: AbstractWidget[] = [];
+
+    constructor(name: string) {
+        this.name = name;
+    }
 
     /**
      * 构建器，返回类型必须时空值`null`或者一个`对象`，该对象定义为：
@@ -34,29 +42,34 @@ export default interface IDataModel {
      *      return null;
      *  }
      */
-    builder(index: number): any;
+    abstract builder(index: number): any;
 
-    calculate(index: number): void;
+    abstract calculate(index: number): void;
 
-    inputData(index: number, data: any): void;
+    abstract inputData(index: number, data: any): void;
 
-    outputData(index: number): void;
+    abstract outputData(index: number): void;
+
+    setDataWidget(index: number, widget: AbstractWidget) {
+        this.dataWidget[index] = widget;
+    }
+
+    getDataWidget(index: number) {
+        return this.dataWidget[index];
+    }
 }
 
-export class OutDataModel implements IDataModel {
-    public name: string;
-
-    public inputWidget: MonoInputNumber = new MonoInputNumber('输出');
-
-    constructor() {
-        this.name = 'Output Model';
+export class DM_SimpleOut extends AbstractDataModel {
+    constructor(name: string) {
+        super(name);
+        this.dataWidget = [new MonoInputNumber('输出')];
     }
 
     builder(index: number): any {
         switch (index) {
             case 0:
                 return {
-                    ui: this.inputWidget,
+                    ui: this.dataWidget[0],
                     isInPort: false,
                     isOutPort: true,
                 };
@@ -76,20 +89,17 @@ export class OutDataModel implements IDataModel {
     }
 }
 
-export class InDataModel implements IDataModel {
-    public name: string;
-
-    public label: MonoLabel = new MonoLabel('输入');
-
-    constructor() {
-        this.name = 'Input Model';
+export class DM_SimpleIn extends AbstractDataModel {
+    constructor(name: string) {
+        super(name);
+        this.dataWidget = [new MonoLabel('输入')];
     }
 
     builder(index: number) {
         switch (index) {
             case 0:
                 return {
-                    ui: this.label,
+                    ui: this.dataWidget,
                     isInPort: true,
                     isOutPort: false,
                 };

@@ -1,4 +1,3 @@
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -12,33 +11,31 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var AFlowView_1 = __importDefault(require("./AFlowView"));
+import AFlowView from './AFlowView';
+import AInterface from './AInterface';
+import { AbstractFlowViewItem } from './AFlowViewItem';
 var ANode = (function (_super) {
     __extends(ANode, _super);
     function ANode(flowView, dataModel, x, y) {
         if (x === void 0) { x = 0; }
         if (y === void 0) { y = 0; }
-        var _this = _super.call(this) || this;
-        _this.nodeTitle = document.createElement('div');
-        _this.nodeContent = document.createElement('div');
+        var _this = _super.call(this, flowView) || this;
+        _this._nodeTitle = document.createElement('div');
+        _this._nodeContent = document.createElement('div');
         _this.dataModel = dataModel;
-        _this.setAttribute('class', 'aproch-node');
-        _this.nodeTitle.setAttribute('class', 'node-title');
-        _this.nodeTitle.innerHTML = dataModel.name;
-        _this.nodeContent.setAttribute('class', 'node-content');
-        _this.nodeContent.onmousedown = function (e) {
+        _this.setAttribute('class', 'a-node');
+        _this._nodeTitle.setAttribute('class', 'node-title');
+        _this._nodeTitle.innerHTML = dataModel.name;
+        _this._nodeContent.setAttribute('class', 'node-content');
+        _this._nodeContent.onmousedown = function (e) {
             e.stopPropagation();
         };
         _this.id = 'node_' + NodeIDGenerator++;
         PortIDGenerator = 0;
-        _this.append(_this.nodeTitle);
-        _this.append(_this.nodeContent);
+        _this.append(_this._nodeTitle);
+        _this.append(_this._nodeContent);
         for (var i = 0; i < MAX_INTERFACE_COUNTER; i++) {
-            var itfOption = _this.dataModel.uiBuilder(i);
+            var itfOption = _this.dataModel.builder(i);
             if (!itfOption) {
                 break;
             }
@@ -50,7 +47,7 @@ var ANode = (function (_super) {
     ANode.GetNodeByChildComponent = function (childComponent) {
         var curElement = childComponent;
         while (curElement != document) {
-            if (curElement.classList.contains('aproch-node')) {
+            if (curElement.classList.contains('a-node')) {
                 return curElement;
             }
             curElement = curElement.parentNode;
@@ -62,28 +59,53 @@ var ANode = (function (_super) {
     };
     ANode.prototype._propagationData = function () {
     };
+    ANode.prototype.onSelected = function () {
+        throw new Error('Method not implemented.');
+    };
+    ANode.prototype.onDeselected = function () {
+        throw new Error('Method not implemented.');
+    };
+    ANode.prototype.onHovered = function () {
+        throw new Error('Method not implemented.');
+    };
+    ANode.prototype.onResize = function () {
+        throw new Error('Method not implemented.');
+    };
+    ANode.prototype.builder = function () {
+        throw new Error('Method not implemented.');
+    };
+    ANode.prototype.onMoving = function (event) {
+        this.updateConnectionPosition();
+    };
+    ANode.prototype.getImplicitWidth = function () {
+        return this._nodeTitle.innerText.realTextWidth($(this._nodeTitle).css('font'));
+    };
     ANode.prototype.updateConnectionPosition = function () {
         this.getInterfaces().forEach(function (i) {
-            if (i.getPort(EPortType.INPUT)) {
-                i.getPort(EPortType.INPUT).connections.forEach(function (conn) {
+            var _a, _b;
+            if (i.getPort(0)) {
+                (_a = i.getPort(0)) === null || _a === void 0 ? void 0 : _a.connections.forEach(function (conn) {
                     conn._update();
                 });
             }
-            if (i.getPort(EPortType.OUTPUT)) {
-                i.getPort(EPortType.OUTPUT).connections.forEach(function (conn) {
+            if (i.getPort(1)) {
+                (_b = i.getPort(1)) === null || _b === void 0 ? void 0 : _b.connections.forEach(function (conn) {
                     conn._update();
                 });
             }
         });
     };
     ANode.prototype.setTitle = function (name) {
-        this.nodeTitle.innerHTML = name;
+        this._nodeTitle.innerHTML = name;
     };
     ANode.prototype.getTitle = function () {
-        return this.nodeTitle.innerHTML;
+        return this._nodeTitle.innerHTML;
     };
     ANode.prototype.setTitleColor = function (color) {
-        this.nodeTitle.style.background = color;
+        this._nodeTitle.style.backgroundColor = color;
+    };
+    ANode.prototype.getTitleColor = function () {
+        return this._nodeTitle.style.backgroundColor;
     };
     ANode.prototype.getPosition = function () {
         return {
@@ -101,12 +123,12 @@ var ANode = (function (_super) {
     };
     ANode.prototype.addInterface = function (itf) {
         try {
-            this.nodeContent.childNodes.forEach(function (i) {
+            this._nodeContent.childNodes.forEach(function (i) {
                 if (i === itf) {
-                    throw new Error('接口已经存在，无法重复添加。interface:', itf);
+                    throw new Error('接口已经存在，无法重复添加！');
                 }
             });
-            this.nodeContent.appendChild(itf);
+            this._nodeContent.appendChild(itf);
         }
         catch (e) {
             console.log(e);
@@ -114,7 +136,7 @@ var ANode = (function (_super) {
     };
     ANode.prototype.getInterfaces = function () {
         var interfaces = [];
-        this.nodeContent.childNodes.forEach(function (i) {
+        this._nodeContent.childNodes.forEach(function (i) {
             if (i instanceof AInterface) {
                 interfaces.push(i);
             }
@@ -124,7 +146,7 @@ var ANode = (function (_super) {
     ANode.prototype.getFlowView = function () {
         var fv = null;
         $.each($(this).parents(), function (_, p) {
-            if (p instanceof AFlowView_1.default) {
+            if (p instanceof AFlowView) {
                 fv = p;
                 return;
             }
@@ -150,10 +172,10 @@ var ANode = (function (_super) {
                 prompt_1.remove();
                 prompt_1 = null;
             }, timeout);
-            this.nodeContent.appendChild(prompt_1[0]);
+            this._nodeContent.appendChild(prompt_1[0]);
         }
         return this;
     };
     return ANode;
-}(HTMLElement));
-exports.default = ANode;
+}(AbstractFlowViewItem));
+export default ANode;

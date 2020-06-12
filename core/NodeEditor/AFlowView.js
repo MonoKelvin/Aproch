@@ -1,4 +1,3 @@
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -12,9 +11,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AbstractFlowViewItem = void 0;
-var Utilities_1 = require("../Utilities");
+import { addResizeComponent, getElementsByClassName } from '../Utilities';
+import ANode from './ANode';
+import AConnection from './AConnection';
 var EViewEventState;
 (function (EViewEventState) {
     EViewEventState[EViewEventState["NoneState"] = 0] = "NoneState";
@@ -23,29 +22,6 @@ var EViewEventState;
     EViewEventState[EViewEventState["MultiSelectItem"] = 3] = "MultiSelectItem";
     EViewEventState[EViewEventState["MoveItem"] = 4] = "MoveItem";
 })(EViewEventState || (EViewEventState = {}));
-var AbstractFlowViewItem = (function (_super) {
-    __extends(AbstractFlowViewItem, _super);
-    function AbstractFlowViewItem(flowView) {
-        return _super.call(this) || this;
-    }
-    AbstractFlowViewItem.prototype.onSelected = function () {
-        throw new Error('Method not implemented.');
-    };
-    AbstractFlowViewItem.prototype.onDeselected = function () {
-        throw new Error('Method not implemented.');
-    };
-    AbstractFlowViewItem.prototype.onHovered = function () {
-        throw new Error('Method not implemented.');
-    };
-    AbstractFlowViewItem.prototype.onMoving = function () {
-        throw new Error('Method not implemented.');
-    };
-    AbstractFlowViewItem.prototype.onResize = function () {
-        throw new Error('Method not implemented.');
-    };
-    return AbstractFlowViewItem;
-}(HTMLElement));
-exports.AbstractFlowViewItem = AbstractFlowViewItem;
 var AFlowView = (function (_super) {
     __extends(AFlowView, _super);
     function AFlowView(name) {
@@ -64,14 +40,14 @@ var AFlowView = (function (_super) {
             return false;
         };
         _this.onclick = function (evt) {
-            if (evt.target == this && !evt.shiftKey && !evt.ctrlKey) {
-                var selectedNodes = this.getSelectedItems();
-                selectedNodes.removeClass('fv-item-slt');
+            if (evt.target == _this && !evt.shiftKey && !evt.ctrlKey) {
+                var selectedNodes = _this.getSelectedItems();
+                $(selectedNodes).removeClass('fv-item-slt');
             }
         };
         _this.onmousedown = function (evt) {
             var t = $(_this);
-            var tdom = t[0];
+            var tdom = _this;
             var oldX = parseInt(t.offset().left);
             var oldY = parseInt(t.offset().top);
             var startEvtX = evt.clientX;
@@ -80,19 +56,18 @@ var AFlowView = (function (_super) {
             var sfY = null;
             var sfDiv = null;
             var curItem = ANode.GetNodeByChildComponent(evt.target);
-            if (curItem && curItem.classList.contains('aproch-node')) {
+            if (curItem && curItem.classList.contains('a-node')) {
                 if (!evt.shiftKey && _this.getSelectedItems().length <= 1) {
                     _this.clearSelectedItems();
                 }
                 curItem.classList.add('fv-item-slt');
-                tdom.getSelectedItems().each(function () {
-                    var _this = this;
-                    var node = $(this);
-                    var left = parseInt(node.css('left'));
-                    var top = parseInt(node.css('top'));
+                tdom.getSelectedItems().forEach(function (item) {
+                    var jqItem = $(item);
+                    var left = parseInt(jqItem.css('left'));
+                    var top = parseInt(jqItem.css('top'));
                     $(document).on('mousemove', function (e) {
-                        node.css({ top: top + e.pageY - startEvtY, left: left + e.pageX - startEvtX });
-                        _this.updateConnectionPosition();
+                        jqItem.css({ top: top + e.pageY - startEvtY, left: left + e.pageX - startEvtX });
+                        item.onMoving();
                     });
                     $(document).on('mouseup', function () {
                         $(document).off('mousemove');
@@ -116,23 +91,6 @@ var AFlowView = (function (_super) {
                     sfDiv.css('height', Math.abs(sfY - startEvtY) + 'px');
                     var _l = sfDiv.offset().left, _t = sfDiv.offset().top;
                     var _w = sfDiv.innerWidth(), _h = sfDiv.innerHeight();
-                    for (var i = 0; i < tdom.selectedItems.length; i++) {
-                        var sl = tdom.selectedItems[i].offsetWidth + tdom.selectedItems[i].offsetLeft;
-                        var st = tdom.selectedItems[i].offsetHeight + tdom.selectedItems[i].offsetTop;
-                        if (sl > _l &&
-                            st > _t &&
-                            tdom.selectedItems[i].offsetLeft < _l + _w &&
-                            tdom.selectedItems[i].offsetTop < _t + _h) {
-                            if (tdom.selectedItems[i].className.indexOf('seled') == -1) {
-                                tdom.selectedItems[i].className = tdom.selectedItems[i].className + ' seled';
-                            }
-                        }
-                        else {
-                            if (tdom.selectedItems[i].className.indexOf('seled') != -1) {
-                                tdom.selectedItems[i].className = 'aproch-node';
-                            }
-                        }
-                    }
                 }
                 else {
                     t.css('cursor', 'grabbing');
@@ -164,10 +122,6 @@ var AFlowView = (function (_super) {
                 if (sfDiv) {
                     sfDiv.remove();
                 }
-                oldX = null;
-                oldY = null;
-                startEvtX = null;
-                startEvtY = null;
                 sfX = null;
                 sfY = null;
                 sfDiv = null;
@@ -189,7 +143,7 @@ var AFlowView = (function (_super) {
         $(this).children('.fv-item-slt').removeClass('fv-item-slt');
     };
     AFlowView.prototype.getSelectedItems = function () {
-        return Utilities_1.getElementsByClassName(this, 'fv-item-slt');
+        return getElementsByClassName(this, 'fv-item-slt');
     };
     AFlowView.prototype.addNode = function (node, x, y) {
         if (x === void 0) { x = 0; }
@@ -197,17 +151,16 @@ var AFlowView = (function (_super) {
         var offset = this.getOrigin();
         this.append(node);
         node.setPosition(x + offset.x, y + offset.y);
-        Utilities_1.addResizeComponent(node, function () {
+        addResizeComponent(node, function () {
             node.updateConnectionPosition();
         });
     };
     AFlowView.prototype.getNodes = function () {
-        return Utilities_1.getElementsByClassName(this, 'aproch-node');
+        return getElementsByClassName(this, 'a-node');
     };
     AFlowView.prototype.deleteNode = function (node) {
         if (node) {
             node.remove();
-            node = null;
         }
         else {
             console.log('删除了一个无效的节点');
@@ -216,8 +169,10 @@ var AFlowView = (function (_super) {
     AFlowView.prototype.addLinkingConnection = function (sourcePort) {
         var conn = new AConnection(this);
         var p = sourcePort.getPositionInView();
-        conn.path.r.l = p.x + parseInt(this.style.left);
-        conn.path.r.t = p.y + parseInt(this.style.top);
+        conn.setStartFixedPoint({
+            x: p.x + parseInt(this.style.left),
+            y: p.y + parseInt(this.style.top),
+        });
         return conn;
     };
     AFlowView.prototype.addCenterGuidLine = function () {
@@ -231,26 +186,26 @@ var AFlowView = (function (_super) {
     };
     AFlowView.prototype.getOrigin = function () {
         return {
-            x: parseInt(this.offsetWidth) / 2,
-            y: parseInt(this.offsetHeight) / 2,
+            x: this.offsetWidth / 2,
+            y: this.offsetHeight / 2,
         };
     };
     AFlowView.prototype.getOriginOffset = function () {
         return {
-            x: parseInt(this.offsetLeft + this.offsetWidth / 2),
-            y: parseInt(this.offsetTop + this.offsetHeight / 2),
+            x: (this.offsetLeft + this.offsetWidth) / 2,
+            y: (this.offsetTop + this.offsetHeight) / 2,
         };
     };
     AFlowView.prototype.getViewOffset = function () {
         return {
-            x: -parseInt(this.offsetLeft),
-            y: -parseInt(this.offsetTop),
+            x: -this.offsetLeft,
+            y: -this.offsetTop,
         };
     };
     AFlowView.prototype.viewportToFlowView = function (point) {
         return {
-            x: point.x - parseInt(this.offsetLeft),
-            y: point.y - parseInt(this.offsetTop),
+            x: point.x - this.offsetLeft,
+            y: point.y - this.offsetTop,
         };
     };
     AFlowView.prototype.moveToOrigin = function () {
@@ -267,10 +222,10 @@ var AFlowView = (function (_super) {
             }
         }
         else {
-            $(this).children('.aproch-node').removeClass('fv-item-slt');
+            $(this).children('.a-node').removeClass('fv-item-slt');
         }
         node.addClass('fv-item-slt');
     };
     return AFlowView;
 }(HTMLElement));
-exports.default = AFlowView;
+export default AFlowView;

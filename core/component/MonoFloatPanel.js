@@ -1,52 +1,44 @@
-import { EPosition } from '../Types.js';
-import { addMoveComponent } from '../utilities.js';
-
-export class MonoFloatPanel {
-    constructor(options) {
-        /** 所指向的js元素对象 */
-        this.ele = document.querySelector(options.ele);
-        if (this.ele == undefined || this.ele == null) {
+import { addMoveComponent } from '../Utilities';
+var MonoFloatPanel = (function () {
+    function MonoFloatPanel(options) {
+        this._canMove = true;
+        this._position = 4 | 8;
+        this._ele = document.querySelector(options.ele);
+        if (!this._ele) {
             return;
         }
-
-        /** 是否能够移动 */
-        this.canMove = options && options.canMove != undefined ? Boolean(options.canMove) : true;
-
-        /**  默认浮动位置 */
-        this.position =
-            options && options.position != undefined ? parseInt(options.position) : EPosition.RIGHT | EPosition.BOTTOM;
-
-        if (this.canMove) {
-            addMoveComponent(this.ele, document.documentElement, options.onMoving);
+        this._canMove = options.canMove;
+        this._position = options.position;
+        if (this._canMove) {
+            addMoveComponent(this._ele, document.documentElement, options.onMoving);
         }
-
-        this.setPosition(this.position);
+        this.setPosition(this._position);
     }
-
-    /**
-     * 设置浮动面板的位置
-     * @param {EPosition} position 位置
-     */
-    setPosition(position) {
-        let t = $(this.ele);
-        let area = $(document.documentElement);
-        if (position & EPosition.LEFT) {
+    MonoFloatPanel.prototype.setPosition = function (position) {
+        if (!position) {
+            return;
+        }
+        var t = $(this._ele);
+        var area = $(document.documentElement);
+        if (position & 1) {
             t.css('left', '0px');
         }
-        if (position & EPosition.RIGHT) {
+        if (position & 4) {
             t.css('left', area.innerWidth() - t.innerWidth() + 'px');
         }
-        if (position & EPosition.TOP) {
+        if (position & 2) {
             t.css('top', '0px');
         }
-        if (position & EPosition.BOTTOM) {
+        if (position & 8) {
             t.css('top', area.innerHeight() - t.innerHeight() + 'px');
         }
-        if (position & EPosition.HCENTER) {
+        if (position & 16) {
             t.css('left', (area.innerWidth() - t.innerWidth()) / 2 + 'px');
         }
-        if (position & EPosition.VCENTER) {
+        if (position & 32) {
             t.css('top', (area.innerHeight() - t.innerHeight()) / 2 + 'px');
         }
-    }
-}
+    };
+    return MonoFloatPanel;
+}());
+export default MonoFloatPanel;

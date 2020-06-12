@@ -1,4 +1,3 @@
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -12,7 +11,6 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
 var AbstractWidget = (function (_super) {
     __extends(AbstractWidget, _super);
     function AbstractWidget(name) {
@@ -36,4 +34,4 @@ var AbstractWidget = (function (_super) {
     });
     return AbstractWidget;
 }(HTMLElement));
-exports.default = AbstractWidget;
+export default AbstractWidget;

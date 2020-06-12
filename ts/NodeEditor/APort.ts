@@ -1,8 +1,9 @@
 /// <reference path="../Aproch.d.ts" />
-/// <reference path="../../lib/jquery/jquery-3.4.1.min.js" />
 
 import AConnection from './AConnection';
 import ANode from './ANode';
+import AFlowView from './AFlowView';
+import { ABaseTypeConverter, ITypeConverter } from './TypeConverter';
 
 export const enum EPortType {
     INPUT,
@@ -34,9 +35,9 @@ export default class APort extends HTMLElement {
         this.id = 'port_' + NodeIDGenerator + '_' + PortIDGenerator++;
 
         if (this.type == EPortType.INPUT) {
-            this.setAttribute('class', 'aproch-port-in');
+            this.setAttribute('class', 'a-port-in');
         } else {
-            this.setAttribute('class', 'aproch-port-out');
+            this.setAttribute('class', 'a-port-out');
         }
 
         // 点击时创建连线
@@ -54,10 +55,10 @@ export default class APort extends HTMLElement {
             */
             if (t.type == EPortType.INPUT && t.connections.length > 0) {
                 conn = t.connections[0];
-                f = t.connections[0].inPort.getPositionInView();
+                f = (t.connections[0].inPort as APort).getPositionInView();
             } else if (t.getConnectionCount() < t.connectCountLimit) {
                 // 创建连接线
-                conn = tp.getFlowView().addLinkingConnection(t);
+                conn = (tp.getFlowView() as AFlowView).addLinkingConnection(t);
             } else {
                 // 提示数量已达上线值，只针对 connectCountLimit > 1 的情况
                 t.getNode().pushPromptText({
@@ -68,9 +69,12 @@ export default class APort extends HTMLElement {
                 return;
             }
 
-            $(document).on('mousemove', function (em) {
-                const fvOffset = t.getNode().getFlowView().viewportToFlowView({ x: em.clientX, y: em.clientY });
-                conn._setLinkingPoint(f, fvOffset);
+            $(document).on('mousemove', function (em: MouseEvent) {
+                const fvOffset = (t.getNode().getFlowView() as AFlowView).viewportToFlowView({
+                    x: em.clientX,
+                    y: em.clientY,
+                });
+                conn?._setLinkingPoint(f, fvOffset);
 
                 tar = em.target;
 
@@ -81,7 +85,7 @@ export default class APort extends HTMLElement {
                         const p = tar.getPositionInView();
 
                         // 1.数据类型一致或通过转换器达到一致
-                        conn._setLinkingPoint(f, p);
+                        conn?._setLinkingPoint(f, p);
 
                         // 2.数据不一致或不可转换则不作任何响应
                         canLink = true;
@@ -92,7 +96,7 @@ export default class APort extends HTMLElement {
             $(document).on('mouseup', function (eu: any) {
                 if (!canLink) {
                     conn?.remove();
-                } else {
+                } else if (conn) {
                     // 附加连线到节点上
                     t.attachConnection(conn);
                     tar.attachConnection(conn);
@@ -118,11 +122,15 @@ export default class APort extends HTMLElement {
         let ports: APort[] = [];
         if (this.type === EPortType.INPUT) {
             this.connections.forEach((c) => {
-                ports.push(c.inPort);
+                if (c.inPort) {
+                    ports.push(c.inPort);
+                }
             });
         } else {
             this.connections.forEach((c) => {
-                ports.push(c.outPort);
+                if (c.outPort) {
+                    ports.push(c.outPort);
+                }
             });
         }
         return ports;
@@ -177,10 +185,10 @@ export default class APort extends HTMLElement {
      * 获得端口在视图中的位置
      * @returns 返回坐标对象{x, y}
      */
-    public getPositionInView() {
+    public getPositionInView(): Point {
         let t = $(this);
         const p = { x: t.offset().left + this.offsetWidth / 2, y: t.offset().top + this.offsetHeight / 2 };
-        return this.getNode().getFlowView()?.viewportToFlowView(p);
+        return (this.getNode().getFlowView() as AFlowView).viewportToFlowView(p);
     }
 
     /**
@@ -197,7 +205,7 @@ export default class APort extends HTMLElement {
      *  5. 该端口所在的接口数据类型一样或可以隐式转换
      *  6. 实现类型转换的方法返回true
      */
-    static CanLink(p1, p2, tv = null) {
+    static CanLink(p1: APort, p2: APort, tv?: ITypeConverter) {
         if (
             p1.getNode() !== p2.getNode() &&
             p1.type !== p2.type &&
@@ -207,7 +215,7 @@ export default class APort extends HTMLElement {
         ) {
             if (new ABaseTypeConverter().canConvert(p1.getInterface(), p2.getInterface())) {
                 return true;
-            } else if (tv && tv.CanConvert()) {
+            } else if (tv?.canConvert(p1.getInterface(), p2.getInterface())) {
                 return true;
             }
         }

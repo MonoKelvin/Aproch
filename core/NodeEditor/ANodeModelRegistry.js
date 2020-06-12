@@ -1,40 +1,38 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+import ANode from './ANode';
 var ANodeModelRegistry = (function () {
     function ANodeModelRegistry() {
         this.registryTable = {
-            Other: new Set(),
+            Other: [],
         };
     }
-    ANodeModelRegistry.prototype.registryDataModel = function (dmClassName, category) {
-        if (category === void 0) { category = 'other'; }
-        if (!dmClassName) {
+    ANodeModelRegistry.prototype.registryDataModel = function (dmName, category) {
+        if (category === void 0) { category = 'Other'; }
+        if (!dmName || this.registryTable[category].indexOf(dmName) == -1) {
             return false;
         }
-        if (this.registryTable[category] === undefined) {
-            this.registryTable[category] = new Set();
+        if (this.registryTable[category] == undefined) {
+            this.registryTable[category] = new Array();
         }
-        this.registryTable[category].add(dmClassName);
+        this.registryTable[category].push(dmName);
         return true;
     };
-    ANodeModelRegistry.prototype.createNode = function (name, category, flowView, x, y) {
+    ANodeModelRegistry.prototype.createNode = function (dmName, category, flowView, x, y) {
         if (x === void 0) { x = 0; }
         if (y === void 0) { y = 0; }
         var dm = null;
         this.registryTable[category].forEach(function (i) {
-            if (i === name) {
+            if (i === dmName) {
                 eval('dm = new DM.' + i + '()');
             }
         });
         if (!dm) {
-            console.log(category + '.' + name + ' 节点不存在！');
+            console.log(category + '.' + dmName + ' 节点不存在！');
             return null;
         }
         var node = new ANode(flowView, dm, x, y);
-        var rw = node.nodeTitle.innerText.realTextWidth($(node.nodeTitle).css('font'));
-        $(node).css('width', rw + 22 + 'px');
+        $(node).css('width', node.getImplicitWidth() + 22 + 'px');
         return node;
     };
     return ANodeModelRegistry;
 }());
-exports.default = ANodeModelRegistry;
+export default ANodeModelRegistry;

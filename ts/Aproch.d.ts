@@ -17,3 +17,24 @@ declare interface Point {
     x: number = 0;
     y: number = 0;
 }
+
+declare const enum EPosition {
+    LEFT = 0x0001,
+    TOP = 0x0002,
+    RIGHT = 0x0004,
+    BOTTOM = 0x0008,
+    HCENTER = 0x0010,
+    VCENTER = 0x0020,
+}
+
+declare type CategoryTable<T> = {
+    [key: string]: T[];
+};
+
+/**
+ * 全局数据模型注册表
+ * @note 默认内置一个`Other`分类
+ */
+declare var DMRegistryTable: CategoryTable<string> = {
+    Other: [],
+};
