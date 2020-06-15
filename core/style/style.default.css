@@ -1,6 +1,3 @@
-/*********/
-/** Node */
-/*********/
 * {
   margin: 0;
   padding: 0;
@@ -13,9 +10,13 @@ html,
 body {
   width: 100%;
   height: 100%;
+  background: #22252a;
 }
 svg {
-  fill: #cccccc;
+  fill: #dadfe7;
+}
+ul {
+  list-style-type: none;
 }
 [a-cloak] {
   display: none !important;
@@ -104,11 +105,11 @@ svg {
   height: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #454545;
+  background: #2d3035;
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #4d4d4d;
+  background: #34373c;
 }
 .tooltip-item {
   display: flex;
@@ -122,7 +123,7 @@ svg {
 }
 /** Utility */
 .bg-primary {
-  background: #006cbe !important;
+  background: #3d92f6 !important;
 }
 .bg-alert {
   background: red !important;
@@ -134,7 +135,7 @@ svg {
   background: #ccb805 !important;
 }
 .color-primary {
-  color: #006cbe !important;
+  color: #3d92f6 !important;
 }
 .color-alert {
   color: red !important;
@@ -148,11 +149,180 @@ svg {
 ::-webkit-scrollbar {
   width: 9px;
   height: 9px;
-  background-color: #2b2b2b;
+  background-color: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #454545;
+  border-radius: 10px;
+  background: #34373c;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #4d4d4d;
+  background: #3f4247;
+}
+.fill-w {
+  width: 100%;
+}
+.fill-h {
+  height: 100%;
+}
+.aproch-app-view {
+  width: 100%;
+  height: 100%;
+}
+.aproch-header {
+  height: 64px;
+  border-bottom: 1px solid #33363b;
+}
+.aproch-caption {
+  position: relative;
+  color: #86898e;
+  font-family: 'Dejavu Sans Mono';
+  font-size: 1.5rem;
+  letter-spacing: 1rem;
+  user-select: none;
+  text-align: center;
+  line-height: 34px;
+}
+.aproch-main-view {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.nav {
+  width: 80px;
+  height: 100%;
+  border-right: 1px solid #33363b;
+}
+.sidebar {
+  width: 220px;
+  height: 100%;
+}
+.sidebar-r {
+  width: 270px;
+  height: 100%;
+}
+.left {
+  float: left;
+}
+.right {
+  float: right;
+}
+.d-left {
+  position: absolute;
+  left: 0;
+}
+.d-right {
+  position: absolute;
+  right: 0;
+}
+.split-v {
+  cursor: col-resize;
+  position: absolute;
+  width: 6px;
+  height: 100%;
+}
+.split-h {
+  position: absolute;
+  height: 6px;
+  width: 100%;
+}
+.split-v:active {
+  transform: translateX(3px);
+  border-left: 2px dashed #86898e;
+}
+.split-h:active {
+  transform: translateY(3px);
+  border-top: 2px dashed #86898e;
+}
+.aproch-icon-a {
+  font-family: 'Graven';
+}
+.sub-text {
+  color: #86898e;
+}
+.nav-list-view {
+  width: 100%;
+  height: 100%;
+}
+.nav-list-view li {
+  width: 100%;
+  height: 64px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+.nav-list-view li:hover {
+  background-color: #34373c;
+}
+.nav-list-view li:active {
+  background-color: #3f4247;
+}
+.nav-list-view i,
+.nav-list-view .aproch-icon-a {
+  color: #86898e;
+  font-size: 1.5rem;
+}
+.nav-list-view .aproch-icon-a {
+  font-size: 1.9rem;
+}
+.nav-list-view .item-selected {
+  background-color: #3f4247 !important;
+}
+.nav-list-view .item-selected i,
+.nav-list-view .item-selected #aproch-icon-a {
+  color: #3d92f6 !important;
+}
+.content-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.no-padding {
+  padding: 0 !important;
+}
+.no-pr {
+  padding-right: 0 !important;
+}
+.std-padding {
+  padding: 15px;
+}
+.std-margin {
+  margin: 15px;
+}
+.no-pt {
+  padding-top: 0 !important;
+}
+.no-mt {
+  margin-bottom: 0 !important;
+}
+.prop-list-container {
+  padding: 15px;
+}
+.prop-list-container li {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+.prop-list-container li i {
+  color: #86898e;
+  font-size: 1.4rem;
+}
+.prop-list-container .list-item-text {
+  font-size: 1.1rem;
+  color: #86898e;
+  margin-left: 1.1rem;
+  letter-spacing: 0.1rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.badge-num {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 22px;
+  color: #86898e;
+  font-size: 1rem !important;
+  background: #4d5053;
 }

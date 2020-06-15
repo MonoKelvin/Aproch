@@ -1,6 +1,3 @@
-// 声明为jquery的$符号
-declare var $: any;
-
 // 节点ID生成器
 declare var NodeIDGenerator: number = 0;
 // 接口ID生成器
@@ -38,3 +35,11 @@ declare type CategoryTable<T> = {
 declare var DMRegistryTable: CategoryTable<string> = {
     Other: [],
 };
+
+declare interface String {
+    realTextWidth(font: string): number;
+}
+
+declare interface Array {
+    remove(element: any): boolean;
+}

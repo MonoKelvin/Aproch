@@ -1,4 +1,4 @@
-@import '../../style/variable.less';
+@import '../../Style/variable.less';
 
 * {
     padding: 0;
@@ -28,12 +28,16 @@ button,
 input,
 select,
 .option-list > * {
-    border-radius: 2px;
+    border-radius: @stdRadius;
 }
 button:disabled,
 input:disabled {
     cursor: not-allowed;
     filter: brightness(60%);
+}
+
+[type='stadium'] {
+    border-radius: 4096px;
 }
 
 // Normal Button
@@ -149,22 +153,50 @@ a:active {
     color: @primaryLightActiveColor;
 }
 
+.mono-icon-input {
+    position: relative;
+    width: 100%;
+
+    input {
+        width: 100%;
+    }
+
+    i {
+        color: @subTextColor;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: all 0.2s ease-in-out;
+    }
+
+    i[activity='true']:hover {
+        color: @textColor;
+    }
+
+    .d-left {
+        right: @controlHeight / 2;
+    }
+    .d-right {
+        right: @controlHeight / 2;
+    }
+}
+
 // Normal Input
 input {
-    height: 20px;
-    padding: 1px 2px;
-    background-color: transparent;
+    height: @controlHeight;
+    background-color: @controlBgDarkColor;
     box-sizing: border-box;
-    text-indent: 0px;
-    text-align: start;
-    border-image: initial;
-    text-rendering: auto;
-    letter-spacing: normal;
-    word-spacing: normal;
-    text-transform: none;
-    -moz-appearance: none;
-    -webkit-appearance: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     transition: all 0.2s ease-in-out;
+}
+
+input::-webkit-input-placeholder {
+    color: @disbledColor;
+}
+
+input[type='stadium'] {
+    padding: 0 @controlHeight / 2;
 }
 
 // Switcher
@@ -349,16 +381,25 @@ input[type='range']::-webkit-slider-thumb:hover {
 /**   List  */
 /************/
 
-.list {
+.mono-list {
     display: block;
-    list-style-type: none;
     overflow: auto;
     padding: 0 10px;
 }
 
-.list-widget {
+.mono-list-subtitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 0.12rem;
+    color: @disbledColor;
+    text-align: center;
+    margin: 20px 0 8px 0;
+    user-select: none;
+}
+
+.mono-list-widget {
     li,
-    .list-item {
+    .mono-list-item {
         cursor: pointer;
         padding: 10px;
         margin: 10px 0;
@@ -373,63 +414,64 @@ input[type='range']::-webkit-slider-thumb:hover {
     }
 
     li:hover,
-    .list-item:hover {
+    .mono-list-item:hover {
         box-shadow: @popItemShadow;
     }
 
     li:active,
-    .list-item:active {
+    .mono-list-item:active {
         background-color: @controlBgActiveColor;
     }
 
-    .list-item-selected {
+    .mono-list-item-selected {
         box-shadow: 0px 0px 0px 1.5px @primaryLightColor !important;
         background-color: @controlBgHoverColor !important;
     }
 }
 
-.list-view {
+.mono-list-view {
     padding: 0;
 
     li,
-    .list-item {
+    .mono-list-item {
+        position: relative;
         cursor: pointer;
-        border-radius: 2px;
+        border-radius: @stdRadius;
         padding: 10px 20px;
         transition: all 0.2s ease-in-out;
+        overflow: hidden;
     }
 
     li:hover,
-    .list-item:hover {
+    .mono-list-item:hover {
         background-color: @controlBgHoverColor;
     }
 
     li:active,
-    .list-item:active {
+    .mono-list-item:active {
         background-color: @controlBgActiveColor;
     }
 
-    .list-item-selected {
+    .mono-list-item-selected {
         position: relative;
-        box-shadow: none !important;
         background-color: @controlBgNormalColor !important;
     }
 
-    .list-item-selected::after {
-        content: '';
-        width: 3px;
-        height: 100%;
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: unset;
-        border-radius: 2px;
-        background: @primaryLightColor;
-    }
+    // .mono-list-item-selected::after {
+    //     content: '';
+    //     width: 3px;
+    //     height: 100%;
+    //     display: block;
+    //     position: absolute;
+    //     top: 0;
+    //     left: 0;
+    //     right: unset;
+    //     border-radius: 2px;
+    //     background: @primaryLightColor;
+    // }
 }
 
-.list-item-delegate {
+.mono-list-item-delegate {
     display: none;
 }
 
@@ -571,4 +613,16 @@ input {
         -moz-appearance: none;
         padding-left: 20px;
     }
+}
+
+.mono-flat-panel {
+    background-color: @controlBgNormalColor;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.mono-scroll-view {
+    width: 100%;
+    height: 100%;
+    overflow: scroll;
 }

@@ -1,7 +1,7 @@
 // import ANodeModelRegistry from './NodeEditor/ANodeModelRegistry.js';
 // import MonoLabel from './Component/MonoLabel.js';
 // import MonoInputWidget from './Component/MonoInputWidget.js';
-import { MonoList } from './Component/MonoList.js';
+import MonoList from './Component/MonoList';
 
 $(document).ready(function () {
     // 防止按下(F5、Ctrl+R、Ctrl+Shift+R)刷新
@@ -13,9 +13,9 @@ $(document).ready(function () {
         }
     };
 
-/** 初始化属性设置 */
+    /** 初始化属性设置 */
     new MonoList({
-        
+        ele: 'aproch.home.sidebar.proplist',
     });
 
     /** 初始化界面 */
@@ -41,22 +41,21 @@ $(document).ready(function () {
     /** 扩展方法 */
 
     // 获取文本实际像素宽度（返回结果不包含'px'）
-    String.prototype.realTextWidth = function (font) {
+    String.prototype.realTextWidth = function (font: string): number {
         let currentObj = $('<pre>').hide().appendTo(document.body);
         $(currentObj).html(this).css('font', font);
-        const width = currentObj.width();
+        const width = currentObj.width() != undefined ? currentObj.width() : 0;
         currentObj.remove();
         return width;
     };
 
     // 移除数组中的指定元素，移除失败返回false，否则返回true
-    Array.prototype.remove = function (element) {
+    Array.prototype.remove = function (element: any): boolean {
         const index = this.indexOf(element);
         if (index > -1) {
             this.splice(index, 1);
             return true;
         }
-
         return false;
     };
 

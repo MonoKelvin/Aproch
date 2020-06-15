@@ -120,7 +120,7 @@ export default class ANode extends AbstractFlowViewItem {
      * @return {number} 返回值为标题的实际像素宽度
      */
     public getImplicitWidth(): number {
-        return (this._nodeTitle.innerText as any).realTextWidth($(this._nodeTitle).css('font'));
+        return (this._nodeTitle.innerText as String).realTextWidth($(this._nodeTitle.style.font).css('font'));
     }
 
     /**

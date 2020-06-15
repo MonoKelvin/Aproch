@@ -13,10 +13,15 @@ html,
 body {
     width: 100%;
     height: 100%;
+    background: @controlBgDarkColor;
 }
 
 svg {
     fill: @textColor;
+}
+
+ul {
+    list-style-type: none;
 }
 
 [a-cloak] {
@@ -165,11 +170,212 @@ svg {
 ::-webkit-scrollbar {
     width: 9px;
     height: 9px;
-    background-color: @controlBgDarkColor;
+    background-color: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background: @controlBgNormalColor;
+    border-radius: 10px;
+    background: @controlBgHoverColor;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: @controlBgHoverColor;
+    background: @controlBgActiveColor;
+}
+
+.fill-w {
+    width: 100%;
+}
+
+.fill-h {
+    height: 100%;
+}
+
+.aproch-app-view {
+    width: 100%;
+    height: 100%;
+}
+
+.aproch-header {
+    height: 64px;
+    border-bottom: 1px solid @splitColor;
+}
+
+.aproch-caption {
+    position: relative;
+    color: @subTextColor;
+    font-family: 'Dejavu Sans Mono';
+    font-size: 1.5rem;
+    letter-spacing: 1rem;
+    user-select: none;
+    text-align: center;
+    line-height: 34px;
+}
+
+.aproch-main-view {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.nav {
+    width: 80px;
+    height: 100%;
+    border-right: 1px solid @splitColor;
+}
+.sidebar {
+    width: 220px;
+    height: 100%;
+}
+.sidebar-r {
+    width: 270px;
+    height: 100%;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.d-left {
+    position: absolute;
+    left: 0;
+}
+.d-right {
+    position: absolute;
+    right: 0;
+}
+
+.split-v {
+    cursor: col-resize;
+    position: absolute;
+    width: 6px;
+    height: 100%;
+}
+.split-h {
+    position: absolute;
+    height: 6px;
+    width: 100%;
+}
+.split-v:active {
+    transform: translateX(3px);
+    border-left: 2px dashed @subTextColor;
+}
+.split-h:active {
+    transform: translateY(3px);
+    border-top: 2px dashed @subTextColor;
+}
+
+.aproch-icon-a {
+    font-family: 'Graven';
+}
+
+.sub-text {
+    color: @subTextColor;
+}
+
+.nav-list-view {
+    width: 100%;
+    height: 100%;
+
+    li {
+        width: 100%;
+        height: 64px;
+        cursor: pointer;
+        transition: background 0.2s ease-in-out;
+    }
+
+    li:hover {
+        background-color: @controlBgHoverColor;
+    }
+
+    li:active {
+        background-color: @controlBgActiveColor;
+    }
+
+    i,
+    .aproch-icon-a {
+        color: @subTextColor;
+        font-size: 1.5rem;
+    }
+
+    .aproch-icon-a {
+        font-size: 1.9rem;
+    }
+
+    .item-selected {
+        background-color: @controlBgActiveColor !important;
+        i,
+        #aproch-icon-a {
+            color: @primaryColor !important;
+        }
+    }
+}
+
+.content-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.no-padding {
+    padding: 0 !important;
+}
+
+.no-pr {
+    padding-right: 0 !important;
+}
+
+.std-padding {
+    padding: 15px;
+}
+
+.std-margin {
+    margin: 15px;
+}
+
+.no-pt {
+    padding-top: 0 !important;
+}
+
+.no-mt {
+    margin-bottom: 0 !important;
+}
+
+.prop-list-container {
+    padding: 15px;
+
+    li {
+        display: flex;
+        justify-content: start;
+        align-items: center;
+    }
+
+    li i {
+        color: @subTextColor;
+        font-size: 1.4rem;
+    }
+
+    .list-item-text {
+        font-size: 1.1rem;
+        color: @subTextColor;
+        margin-left: 1.1rem;
+        letter-spacing: 0.1rem;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+}
+
+.badge-num {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 22px;
+    color: @subTextColor;
+    font-size: 1rem !important;
+    background: @controlBgLightColor;
 }
