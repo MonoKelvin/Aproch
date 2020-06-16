@@ -1,3 +1,4 @@
+import { setOverflowTooltip } from '../Utilities.js';
 /**
  * 取消选择的类型
  */
@@ -12,12 +13,8 @@ export const enum EDeselectType {
     NoDeselect,
 }
 
-export interface IMonoListItemEventFunc {
-    (event?: MouseEvent, item?: any): void;
-}
-
 export interface IMonoListOption {
-    ele: string;
+    readonly ele: string;
     selectable?: boolean;
     multiSelect?: boolean;
     draggable?: boolean;
@@ -32,16 +29,15 @@ export interface IMonoListOption {
     // forcedSelect | repeatClick | noFocus
     deselectType?: EDeselectType;
 
-    onContextMenu?: IMonoListItemEventFunc;
-    onItemClicked?: IMonoListItemEventFunc;
-    onItemDoubleClicked?: IMonoListItemEventFunc;
+    onContextMenu?: IItemEventFunc;
+    onItemClicked?: IItemEventFunc;
+    onItemDoubleClicked?: IItemEventFunc;
 }
 
-export default class MonoList implements IMonoListOption {
+export default class MonoList {
     /** jquery 元素 */
     private readonly _jqEle: JQuery;
 
-    public ele: string;
     public selectable?: boolean = true;
     public multiSelect?: boolean = false;
     public draggable?: boolean = false;
@@ -51,8 +47,7 @@ export default class MonoList implements IMonoListOption {
     public deselectType?: EDeselectType = EDeselectType.NoDeselect;
 
     constructor(option: IMonoListOption) {
-        this.ele = option.ele;
-        this._jqEle = $(this.ele);
+        this._jqEle = $(option.ele);
         if (!this._jqEle) {
             return;
         }
@@ -64,41 +59,76 @@ export default class MonoList implements IMonoListOption {
         option.itemCount != undefined && (this.itemCount = option.itemCount);
         option.delegate && (this.delegate = option.delegate);
 
-        this._jqEle.on('contextmenu', (e) => {
+        const jqEle = this._jqEle;
+        const THIS = this;
+
+        this._jqEle.on('contextmenu', function (e) {
             e.preventDefault();
-            this.onContextMenu(e);
+            option.onContextMenu?.call(THIS, e, THIS._getListItemFromElement(e.target));
         });
 
-        const THIS = this._jqEle;
-        const t = this;
         this.getAllJqueryItems().on('click', function (e) {
             var item = $(this);
 
             do {
-                if (t.multiSelect || t.deselectType == EDeselectType.RepeatClick) {
-                    if (item.hasClass('list-item-selected')) {
-                        item.removeClass('list-item-selected');
+                if (THIS.multiSelect || THIS.deselectType == EDeselectType.RepeatClick) {
+                    if (item.hasClass('mono-list-item-selected')) {
+                        item.removeClass('mono-list-item-selected');
                         break;
                     }
                 }
 
-                if (!t.multiSelect) {
-                    THIS.children('li, .list-item').removeClass('list-item-selected');
+                if (!THIS.multiSelect) {
+                    jqEle.children('li').removeClass('mono-list-item-selected');
                 }
 
-                if (t.selectable) {
-                    item.addClass('list-item-selected');
+                if (THIS.selectable) {
+                    item.addClass('mono-list-item-selected');
                 }
             } while (0);
 
-            t.onItemClicked(e, this);
+            option.onItemClicked?.call(THIS, e, THIS._getListItemFromElement(e.target));
         });
 
         this.getAllJqueryItems().on('dblclick', function (e) {
-            if (t.onItemDoubleClicked) {
-                t.onItemDoubleClicked(e, this);
+            option.onItemDoubleClicked?.call(THIS, e, THIS._getListItemFromElement(e.target));
+        });
+
+        this._updateItemsSize();
+
+        this.setCurrentIndex(this.currentIndex as number);
+    }
+
+    /**
+     * 更新item尺寸
+     */
+    private _updateItemsSize(): void {
+        const items = this._jqEle.children('li');
+        items.each((_, item) => {
+            const badge = item.querySelector('.badge-num');
+            if (badge) {
+                item.style.paddingRight = $(badge).outerWidth(true) + 'px';
+            }
+            const text = item.querySelector('.list-item-text');
+            if (text) {
+                setOverflowTooltip(item, text as HTMLElement);
             }
         });
+    }
+
+    private _updateIndexForView() {
+        this._jqEle.children('li, .mono-list-item').each((i) => {
+            this.getAllJqueryItems().html(this.delegate.innerHTML.replace(/\${index}/, i.toString()));
+        });
+    }
+
+    private _getListItemFromElement(target: Element) {
+        // 如果本身就是list-item就返回
+        if (target.tagName == 'li' || target.classList.contains('mono-list-item')) {
+            return target;
+        }
+
+        return (target as HTMLElement).offsetParent;
     }
 
     /** 获得所有列表元素 */
@@ -112,23 +142,16 @@ export default class MonoList implements IMonoListOption {
     }
 
     public setCurrentIndex(index: number) {
-        this.currentIndex = index;
-
-        const c = this._jqEle.children();
-        if (this.currentIndex >= 0 && this.currentIndex < c.length) {
-            this._jqEle.children().removeClass('mono-list-item-selected');
-            c[this.currentIndex]?.classList.add('mono-list-item-selected');
+        const c = this._jqEle.children('li, mono-list-item');
+        if (index >= 0 && index < c.length) {
+            this.currentIndex = index;
+            c.removeClass('mono-list-item-selected');
+            c[index]?.classList.add('mono-list-item-selected');
         }
     }
 
-    private _updateIndexForView() {
-        this._jqEle.children('li, .mono-list-item').each((i) => {
-            this.getAllJqueryItems().html(this.delegate.innerHTML.replace(/\${index}/, i.toString()));
-        });
-    }
-
     public getSelectedItems() {
-        return this._jqEle.children('.list-item-selected');
+        return this._jqEle.children('.mono-list-item-selected');
     }
 
     public setDelegate(delegate?: string) {
@@ -146,7 +169,10 @@ export default class MonoList implements IMonoListOption {
         }
     }
 
-    onContextMenu(event?: MouseEvent, item?: any): void {}
-    onItemClicked(event?: MouseEvent, item?: any): void {}
-    onItemDoubleClicked(event?: MouseEvent, item?: any): void {}
+    onContextMenu(event?: any, item?: any): void {}
+    onItemClicked(event?: any, item?: any): void {
+        console.log(event);
+        console.log(item);
+    }
+    onItemDoubleClicked(event?: any, item?: any): void {}
 }

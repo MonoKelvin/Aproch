@@ -43,3 +43,7 @@ declare interface String {
 declare interface Array {
     remove(element: any): boolean;
 }
+
+declare interface IItemEventFunc {
+    (event?: any, item?: any): void;
+}

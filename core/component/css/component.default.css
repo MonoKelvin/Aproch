@@ -329,11 +329,6 @@ input[type='range']::-webkit-slider-thumb:hover {
 /************/
 /**   List  */
 /************/
-.mono-list {
-  display: block;
-  overflow: auto;
-  padding: 0 10px;
-}
 .mono-list-subtitle {
   font-size: 1.5rem;
   font-weight: bold;
@@ -342,6 +337,10 @@ input[type='range']::-webkit-slider-thumb:hover {
   text-align: center;
   margin: 20px 0 8px 0;
   user-select: none;
+}
+.mono-list-widget {
+  overflow: auto;
+  padding: 0 10px;
 }
 .mono-list-widget li,
 .mono-list-widget .mono-list-item {
@@ -371,6 +370,7 @@ input[type='range']::-webkit-slider-thumb:hover {
 }
 .mono-list-view {
   padding: 0;
+  position: relative;
 }
 .mono-list-view li,
 .mono-list-view .mono-list-item {
@@ -389,9 +389,9 @@ input[type='range']::-webkit-slider-thumb:hover {
 .mono-list-view .mono-list-item:active {
   background-color: #3f4247;
 }
-.mono-list-view .mono-list-item-selected {
-  position: relative;
-  background-color: #2d3035 !important;
+.mono-list-item-selected {
+  color: #dadfe7;
+  background-color: #3f4247 !important;
 }
 .mono-list-item-delegate {
   display: none;

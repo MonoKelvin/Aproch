@@ -274,41 +274,35 @@ ul {
     color: @subTextColor;
 }
 
-.nav-list-view {
+#aproch-nav {
     width: 100%;
     height: 100%;
 
-    li {
-        width: 100%;
-        height: 64px;
-        cursor: pointer;
-        transition: background 0.2s ease-in-out;
+    .aproch-icon-a {
+        color: @subTextColor;
+        font-size: 1.9rem;
+        transition: all 0.16s ease-in-out;
     }
 
-    li:hover {
+    li,
+    .mono-list-item {
+        height: 64px;
+        transition: all 0.16s ease-in-out;
+
+        i {
+            color: @subTextColor;
+            font-size: 1.5rem;
+        }
+    }
+
+    li:hover,
+    .mono-list-item:hover {
         background-color: @controlBgHoverColor;
     }
 
-    li:active {
-        background-color: @controlBgActiveColor;
-    }
-
-    i,
-    .aproch-icon-a {
-        color: @subTextColor;
-        font-size: 1.5rem;
-    }
-
-    .aproch-icon-a {
-        font-size: 1.9rem;
-    }
-
-    .item-selected {
+    .mono-list-item-selected * {
+        color: @primaryColor !important;
         background-color: @controlBgActiveColor !important;
-        i,
-        #aproch-icon-a {
-            color: @primaryColor !important;
-        }
     }
 }
 
@@ -327,11 +321,11 @@ ul {
 }
 
 .std-padding {
-    padding: 15px;
+    padding: 10px;
 }
 
 .std-margin {
-    margin: 15px;
+    margin: 10px;
 }
 
 .no-pt {
@@ -343,39 +337,60 @@ ul {
 }
 
 .prop-list-container {
-    padding: 15px;
+    padding: 10px;
 
     li {
         display: flex;
         justify-content: start;
         align-items: center;
+        padding: 10px 15px;
+
+        i {
+            color: @subTextColor;
+            font-size: 1.4rem;
+            transition: all 0.16s ease-in-out;
+        }
     }
 
-    li i {
-        color: @subTextColor;
-        font-size: 1.4rem;
+    .badge-num {
+        position: absolute;
+        margin: 0 0.5rem;
+        right: 0;
     }
 
     .list-item-text {
         font-size: 1.1rem;
         color: @subTextColor;
-        margin-left: 1.1rem;
         letter-spacing: 0.1rem;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+        transition: all 0.16s ease-in-out;
+    }
+
+    .list-item-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 0.8rem;
+    }
+
+    .mono-list-item-selected {
+        i,
+        .list-item-text {
+            color: @textColor !important;
+        }
     }
 }
 
 .badge-num {
-    width: 22px;
-    height: 22px;
-    min-width: 22px;
-    min-height: 22px;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
     border-radius: 50%;
     text-align: center;
-    line-height: 22px;
-    color: @subTextColor;
-    font-size: 1rem !important;
+    line-height: 20px;
+    color: @textColor;
+    font-size: 0.8rem !important;
     background: @controlBgLightColor;
 }

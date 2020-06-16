@@ -78,7 +78,7 @@ var ANode = (function (_super) {
         this.updateConnectionPosition();
     };
     ANode.prototype.getImplicitWidth = function () {
-        return this._nodeTitle.innerText.realTextWidth($(this._nodeTitle).css('font'));
+        return this._nodeTitle.innerText.realTextWidth($(this._nodeTitle.style.font).css('font'));
     };
     ANode.prototype.updateConnectionPosition = function () {
         this.getInterfaces().forEach(function (i) {

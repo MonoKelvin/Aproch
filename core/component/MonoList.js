@@ -1,6 +1,6 @@
+import { setOverflowTooltip } from '../Utilities.js';
 var MonoList = (function () {
     function MonoList(option) {
-        var _this = this;
         this.selectable = true;
         this.multiSelect = false;
         this.draggable = false;
@@ -8,8 +8,7 @@ var MonoList = (function () {
         this.itemCount = 0;
         this.currentIndex = -1;
         this.deselectType = 2;
-        this.ele = option.ele;
-        this._jqEle = $(this.ele);
+        this._jqEle = $(option.ele);
         if (!this._jqEle) {
             return;
         }
@@ -19,36 +18,64 @@ var MonoList = (function () {
         option.currentIndex != undefined && (this.currentIndex = option.currentIndex);
         option.itemCount != undefined && (this.itemCount = option.itemCount);
         option.delegate && (this.delegate = option.delegate);
+        var jqEle = this._jqEle;
+        var THIS = this;
         this._jqEle.on('contextmenu', function (e) {
+            var _a;
             e.preventDefault();
-            _this.onContextMenu(e);
+            (_a = option.onContextMenu) === null || _a === void 0 ? void 0 : _a.call(THIS, e, THIS._getListItemFromElement(e.target));
         });
-        var THIS = this._jqEle;
-        var t = this;
         this.getAllJqueryItems().on('click', function (e) {
+            var _a;
             var item = $(this);
             do {
-                if (t.multiSelect || t.deselectType == 0) {
-                    if (item.hasClass('list-item-selected')) {
-                        item.removeClass('list-item-selected');
+                if (THIS.multiSelect || THIS.deselectType == 0) {
+                    if (item.hasClass('mono-list-item-selected')) {
+                        item.removeClass('mono-list-item-selected');
                         break;
                     }
                 }
-                if (!t.multiSelect) {
-                    THIS.children('li, .list-item').removeClass('list-item-selected');
+                if (!THIS.multiSelect) {
+                    jqEle.children('li').removeClass('mono-list-item-selected');
                 }
-                if (t.selectable) {
-                    item.addClass('list-item-selected');
+                if (THIS.selectable) {
+                    item.addClass('mono-list-item-selected');
                 }
             } while (0);
-            t.onItemClicked(e, this);
+            (_a = option.onItemClicked) === null || _a === void 0 ? void 0 : _a.call(THIS, e, THIS._getListItemFromElement(e.target));
         });
         this.getAllJqueryItems().on('dblclick', function (e) {
-            if (t.onItemDoubleClicked) {
-                t.onItemDoubleClicked(e, this);
+            var _a;
+            (_a = option.onItemDoubleClicked) === null || _a === void 0 ? void 0 : _a.call(THIS, e, THIS._getListItemFromElement(e.target));
+        });
+        this._updateItemsSize();
+        this.setCurrentIndex(this.currentIndex);
+    }
+    MonoList.prototype._updateItemsSize = function () {
+        var items = this._jqEle.children('li');
+        items.each(function (_, item) {
+            var badge = item.querySelector('.badge-num');
+            if (badge) {
+                item.style.paddingRight = $(badge).outerWidth(true) + 'px';
+            }
+            var text = item.querySelector('.list-item-text');
+            if (text) {
+                setOverflowTooltip(item, text);
             }
         });
-    }
+    };
+    MonoList.prototype._updateIndexForView = function () {
+        var _this = this;
+        this._jqEle.children('li, .mono-list-item').each(function (i) {
+            _this.getAllJqueryItems().html(_this.delegate.innerHTML.replace(/\${index}/, i.toString()));
+        });
+    };
+    MonoList.prototype._getListItemFromElement = function (target) {
+        if (target.tagName == 'li' || target.classList.contains('mono-list-item')) {
+            return target;
+        }
+        return target.offsetParent;
+    };
     MonoList.prototype.getAllItems = function () {
         return this._jqEle.children('li, .mono-list-item').toArray();
     };
@@ -57,21 +84,15 @@ var MonoList = (function () {
     };
     MonoList.prototype.setCurrentIndex = function (index) {
         var _a;
-        this.currentIndex = index;
-        var c = this._jqEle.children();
-        if (this.currentIndex >= 0 && this.currentIndex < c.length) {
-            this._jqEle.children().removeClass('mono-list-item-selected');
-            (_a = c[this.currentIndex]) === null || _a === void 0 ? void 0 : _a.classList.add('mono-list-item-selected');
+        var c = this._jqEle.children('li, mono-list-item');
+        if (index >= 0 && index < c.length) {
+            this.currentIndex = index;
+            c.removeClass('mono-list-item-selected');
+            (_a = c[index]) === null || _a === void 0 ? void 0 : _a.classList.add('mono-list-item-selected');
         }
     };
-    MonoList.prototype._updateIndexForView = function () {
-        var _this = this;
-        this._jqEle.children('li, .mono-list-item').each(function (i) {
-            _this.getAllJqueryItems().html(_this.delegate.innerHTML.replace(/\${index}/, i.toString()));
-        });
-    };
     MonoList.prototype.getSelectedItems = function () {
-        return this._jqEle.children('.list-item-selected');
+        return this._jqEle.children('.mono-list-item-selected');
     };
     MonoList.prototype.setDelegate = function (delegate) {
         if (!delegate) {
@@ -89,7 +110,10 @@ var MonoList = (function () {
         }
     };
     MonoList.prototype.onContextMenu = function (event, item) { };
-    MonoList.prototype.onItemClicked = function (event, item) { };
+    MonoList.prototype.onItemClicked = function (event, item) {
+        console.log(event);
+        console.log(item);
+    };
     MonoList.prototype.onItemDoubleClicked = function (event, item) { };
     return MonoList;
 }());

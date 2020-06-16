@@ -86,8 +86,8 @@ export function addMoveComponent(movableElement: Element, areaElement?: Element,
                 l = isNaN(l) ? 0 : l;
                 t = isNaN(t) ? 0 : t;
 
-                const bRL = newLeft + $mvEle.innerWidth() > l + $aEle.innerWidth(); // right limit
-                const bBL = newTop + $mvEle.innerHeight() > t + $aEle.innerHeight(); // bottom limit
+                const bRL = newLeft + ($mvEle.innerWidth() as number) > l + ($aEle.innerWidth() as number); // right limit
+                const bBL = newTop + ($mvEle.innerHeight() as number) > t + ($aEle.innerHeight() as number); // bottom limit
 
                 // 紧贴左右两侧，可以上下移动
                 if (newLeft < l || bRL) {
@@ -145,8 +145,8 @@ export function addResizeComponent(ele: Element, onResize?: Function, wEffect = 
     const rs = $('<span class="resize-indicator"></span>');
     t.append(rs);
     rs.on('mousedown', function (e: MouseEvent) {
-        const old_width = t.width();
-        const old_height = t.height();
+        const old_width = t.width() as number;
+        const old_height = t.height() as number;
         const old_x = e.clientX;
         const old_y = e.clientY;
         $(document).on('mousemove', function (e: MouseEvent) {
@@ -199,4 +199,18 @@ export function getElementsByClassName<T>(parentElement: Element, className: str
         result.push((s[i] as any) as T);
     }
     return result;
+}
+
+/**
+ * 设置文本溢出时的提示内容
+ * @param container 外层容器
+ * @param text 文本
+ * @note 当未溢出时就不会设置外层容器的title属性。
+ */
+export function setOverflowTooltip(container: HTMLElement, text: HTMLElement): void {
+    // 容器真实可用宽度
+    const ctWidth = container.offsetWidth - text.offsetLeft - parseInt(container.style.paddingRight);
+
+    // 如果溢出
+    text.offsetWidth >= ctWidth && container.setAttribute('title', text.innerText);
 }

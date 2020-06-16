@@ -133,7 +133,6 @@ $(document).ready(function () {
         Array.from(this.getElementsByTagName('i')).forEach((i) => {
             const input = $(this).children('input');
             const icon = $(i);
-            console.log(icon.css('right'), icon.outerWidth());
             if (icon.hasClass('d-left')) {
                 input.css('padding-left', 6 + parseInt(icon.css('left')) + icon.outerWidth() + 'px');
             }

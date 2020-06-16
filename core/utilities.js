@@ -155,3 +155,7 @@ export function getElementsByClassName(parentElement, className) {
     }
     return result;
 }
+export function setOverflowTooltip(container, text) {
+    var ctWidth = container.offsetWidth - text.offsetLeft - parseInt(container.style.paddingRight);
+    text.offsetWidth >= ctWidth && container.setAttribute('title', text.innerText);
+}

@@ -239,36 +239,32 @@ ul {
 .sub-text {
   color: #86898e;
 }
-.nav-list-view {
+#aproch-nav {
   width: 100%;
   height: 100%;
 }
-.nav-list-view li {
-  width: 100%;
+#aproch-nav .aproch-icon-a {
+  color: #86898e;
+  font-size: 1.9rem;
+  transition: all 0.16s ease-in-out;
+}
+#aproch-nav li,
+#aproch-nav .mono-list-item {
   height: 64px;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out;
+  transition: all 0.16s ease-in-out;
 }
-.nav-list-view li:hover {
-  background-color: #34373c;
-}
-.nav-list-view li:active {
-  background-color: #3f4247;
-}
-.nav-list-view i,
-.nav-list-view .aproch-icon-a {
+#aproch-nav li i,
+#aproch-nav .mono-list-item i {
   color: #86898e;
   font-size: 1.5rem;
 }
-.nav-list-view .aproch-icon-a {
-  font-size: 1.9rem;
+#aproch-nav li:hover,
+#aproch-nav .mono-list-item:hover {
+  background-color: #34373c;
 }
-.nav-list-view .item-selected {
-  background-color: #3f4247 !important;
-}
-.nav-list-view .item-selected i,
-.nav-list-view .item-selected #aproch-icon-a {
+#aproch-nav .mono-list-item-selected * {
   color: #3d92f6 !important;
+  background-color: #3f4247 !important;
 }
 .content-center {
   display: flex;
@@ -282,10 +278,10 @@ ul {
   padding-right: 0 !important;
 }
 .std-padding {
-  padding: 15px;
+  padding: 10px;
 }
 .std-margin {
-  margin: 15px;
+  margin: 10px;
 }
 .no-pt {
   padding-top: 0 !important;
@@ -294,35 +290,51 @@ ul {
   margin-bottom: 0 !important;
 }
 .prop-list-container {
-  padding: 15px;
+  padding: 10px;
 }
 .prop-list-container li {
   display: flex;
   justify-content: start;
   align-items: center;
+  padding: 10px 15px;
 }
 .prop-list-container li i {
   color: #86898e;
   font-size: 1.4rem;
+  transition: all 0.16s ease-in-out;
+}
+.prop-list-container .badge-num {
+  position: absolute;
+  margin: 0 0.5rem;
+  right: 0;
 }
 .prop-list-container .list-item-text {
   font-size: 1.1rem;
   color: #86898e;
-  margin-left: 1.1rem;
   letter-spacing: 0.1rem;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  transition: all 0.16s ease-in-out;
+}
+.prop-list-container .list-item-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.8rem;
+}
+.prop-list-container .mono-list-item-selected i,
+.prop-list-container .mono-list-item-selected .list-item-text {
+  color: #dadfe7 !important;
 }
 .badge-num {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
-  min-height: 22px;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
   border-radius: 50%;
   text-align: center;
-  line-height: 22px;
-  color: #86898e;
-  font-size: 1rem !important;
+  line-height: 20px;
+  color: #dadfe7;
+  font-size: 0.8rem !important;
   background: #4d5053;
 }
