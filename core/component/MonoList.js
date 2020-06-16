@@ -27,22 +27,26 @@ var MonoList = (function () {
         });
         this.getAllJqueryItems().on('click', function (e) {
             var _a;
-            var item = $(this);
+            var jqItem = $(this);
             do {
                 if (THIS.multiSelect || THIS.deselectType == 0) {
-                    if (item.hasClass('mono-list-item-selected')) {
-                        item.removeClass('mono-list-item-selected');
+                    if (jqItem.hasClass('mono-list-item-selected')) {
+                        jqItem.removeClass('mono-list-item-selected');
                         break;
                     }
                 }
                 if (!THIS.multiSelect) {
-                    jqEle.children('li').removeClass('mono-list-item-selected');
+                    jqEle.children('li, mono-list-item').removeClass('mono-list-item-selected');
                 }
                 if (THIS.selectable) {
-                    item.addClass('mono-list-item-selected');
+                    jqItem.addClass('mono-list-item-selected');
                 }
             } while (0);
-            (_a = option.onItemClicked) === null || _a === void 0 ? void 0 : _a.call(THIS, e, THIS._getListItemFromElement(e.target));
+            var item = THIS._getListItemFromElement(e.target);
+            if (item) {
+                THIS.currentIndex = jqEle.children('li, mono-list-item').index(item);
+                (_a = option.onItemClicked) === null || _a === void 0 ? void 0 : _a.call(THIS, e, item);
+            }
         });
         this.getAllJqueryItems().on('dblclick', function (e) {
             var _a;
@@ -52,7 +56,7 @@ var MonoList = (function () {
         this.setCurrentIndex(this.currentIndex);
     }
     MonoList.prototype._updateItemsSize = function () {
-        var items = this._jqEle.children('li');
+        var items = this._jqEle.children('li, .mono-list-item');
         items.each(function (_, item) {
             var badge = item.querySelector('.badge-num');
             if (badge) {
@@ -64,14 +68,8 @@ var MonoList = (function () {
             }
         });
     };
-    MonoList.prototype._updateIndexForView = function () {
-        var _this = this;
-        this._jqEle.children('li, .mono-list-item').each(function (i) {
-            _this.getAllJqueryItems().html(_this.delegate.innerHTML.replace(/\${index}/, i.toString()));
-        });
-    };
     MonoList.prototype._getListItemFromElement = function (target) {
-        if (target.tagName == 'li' || target.classList.contains('mono-list-item')) {
+        if (target.tagName.compareWith('li', false) || target.classList.contains('mono-list-item')) {
             return target;
         }
         return target.offsetParent;

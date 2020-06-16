@@ -38,6 +38,13 @@ declare var DMRegistryTable: CategoryTable<string> = {
 
 declare interface String {
     realTextWidth(font: string): number;
+
+    /**
+     * 比较字符串是否相等
+     * @param target 目标字符串
+     * @param caseSensitive 是否大小写敏感
+     */
+    compareWith(target: string, caseSensitive = true): boolean;
 }
 
 declare interface Array {

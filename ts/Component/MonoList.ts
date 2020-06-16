@@ -68,26 +68,30 @@ export default class MonoList {
         });
 
         this.getAllJqueryItems().on('click', function (e) {
-            var item = $(this);
+            var jqItem = $(this);
 
             do {
                 if (THIS.multiSelect || THIS.deselectType == EDeselectType.RepeatClick) {
-                    if (item.hasClass('mono-list-item-selected')) {
-                        item.removeClass('mono-list-item-selected');
+                    if (jqItem.hasClass('mono-list-item-selected')) {
+                        jqItem.removeClass('mono-list-item-selected');
                         break;
                     }
                 }
 
                 if (!THIS.multiSelect) {
-                    jqEle.children('li').removeClass('mono-list-item-selected');
+                    jqEle.children('li, mono-list-item').removeClass('mono-list-item-selected');
                 }
 
                 if (THIS.selectable) {
-                    item.addClass('mono-list-item-selected');
+                    jqItem.addClass('mono-list-item-selected');
                 }
             } while (0);
 
-            option.onItemClicked?.call(THIS, e, THIS._getListItemFromElement(e.target));
+            const item = THIS._getListItemFromElement(e.target);
+            if (item) {
+                THIS.currentIndex = jqEle.children('li, mono-list-item').index(item);
+                option.onItemClicked?.call(THIS, e, item);
+            }
         });
 
         this.getAllJqueryItems().on('dblclick', function (e) {
@@ -103,7 +107,7 @@ export default class MonoList {
      * 更新item尺寸
      */
     private _updateItemsSize(): void {
-        const items = this._jqEle.children('li');
+        const items = this._jqEle.children('li, .mono-list-item');
         items.each((_, item) => {
             const badge = item.querySelector('.badge-num');
             if (badge) {
@@ -116,18 +120,17 @@ export default class MonoList {
         });
     }
 
-    private _updateIndexForView() {
-        this._jqEle.children('li, .mono-list-item').each((i) => {
-            this.getAllJqueryItems().html(this.delegate.innerHTML.replace(/\${index}/, i.toString()));
-        });
-    }
+    // private _updateIndexForView() {
+    //     this._jqEle.children('li, .mono-list-item').each((i) => {
+    //         this.getAllJqueryItems().html(this.delegate.innerHTML.replace(/\${index}/, i.toString()));
+    //     });
+    // }
 
     private _getListItemFromElement(target: Element) {
         // 如果本身就是list-item就返回
-        if (target.tagName == 'li' || target.classList.contains('mono-list-item')) {
+        if (target.tagName.compareWith('li', false) || target.classList.contains('mono-list-item')) {
             return target;
         }
-
         return (target as HTMLElement).offsetParent;
     }
 

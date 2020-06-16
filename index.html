@@ -14,150 +14,175 @@
 
 <body>
     <div class="theme-aproch-flat-dark fill-w fill-h">
-        <div class="aproch-app-view" style="padding: 64px 0 0;">
+        <div id="aproch-app-view" class="aproch-app-view">
             <!-- 标题 -->
-            <div class="aproch-header mono-flat-panel std-padding" style="margin: -64px 0 0;">
+            <div class="aproch-header mono-flat-panel">
                 <div class="aproch-caption">APROCH</div>
             </div>
             <!-- 主视图 -->
             <div class="split-view aproch-main-view">
                 <!-- 导航栏 -->
-                <div class="split-obj fill-h left">
-                    <nav class="nav mono-flat-panel">
-                        <ul id="aproch-nav" class="mono-list-view">
-                            <li class="mono-list-item content-center" title="欢迎">
-                                <span class="aproch-icon-a" class="text-select-none">A</span>
+                <nav class="nav split-obj mono-flat-panel fill-h">
+                    <ul id="aproch-nav" class="mono-list-view fill-h">
+                        <li class="mono-list-item content-center" title="欢迎">
+                            <span class="aproch-icon-a" class="text-select-none">A</span>
+                        </li>
+                        <li class="mono-list-item content-center" title="模板">
+                            <i class="fa fa-cube" aria-hidden="true"></i>
+                        </li>
+                        <li class="mono-list-item content-center" title="模板">
+                            <i class="fa fa-dot-circle-o" aria-hidden="true"></i>
+                        </li>
+                        <li class="mono-list-item content-center" title="模板">
+                            <i class="fa fa-sliders" aria-hidden="true"></i>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- 创建项目模板 -->
+                <div id="aproch-home-sidebar" class="split-obj mono-flat-panel fill-h">
+                    <div class="std-margin">
+                        <div id="aproch-home-sidebar-searchbox" class="mono-icon-input ">
+                            <input type="stadium" placeholder="查找模板...">
+                            <i activity="false" class="d-right fa fa-search" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                    <div class="mono-scroll-view prop-list-container no-pt" data-direction="v">
+                        <ul id="aproch-home-sidebar-proplist" class="mono-list-view text-select-none">
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">最近项目</span>
+                                <span class="badge-num">3</span>
                             </li>
-                            <li class="mono-list-item content-center" title="模板">
-                                <i class="fa fa-cube" aria-hidden="true"></i>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">最近使用的模板</span>
+                                <span class="badge-num">3</span>
                             </li>
-                            <li class="mono-list-item content-center" title="模板">
-                                <i class="fa fa-dot-circle-o" aria-hidden="true"></i>
+                            <h3 class="mono-list-subtitle">模板</h3>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-list-ul" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">全部</span>
                             </li>
-                            <li class="mono-list-item content-center" title="模板">
-                                <i class="fa fa-sliders" aria-hidden="true"></i>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-codepen" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">Aproch</span>
+                            </li>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-desktop" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">控制台</span>
+                            </li>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-internet-explorer" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">Web</span>
+                            </li>
+                            <h3 class="mono-list-subtitle">用户模板</h3>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-window-maximize" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">C++控制台程序</span>
+                                <span class="badge-num">3</span>
+                            </li>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-dot-circle-o" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">单例模板</span>
+                            </li>
+                            <h3 class="mono-list-subtitle">插件</h3>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-html5" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">Javascript</span>
+                            </li>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-eercast" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text" title="C++控制台程序">C++</span>
+                            </li>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-vimeo" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">Lua</span>
+                            </li>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-github-alt" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">Python</span>
+                            </li>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-bitcoin" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">Json</span>
+                            </li>
+                            <li class="mono-list-item">
+                                <div class="list-item-icon content-center">
+                                    <i class="fa fa-yelp" aria-hidden="true"></i>
+                                </div>
+                                <span class="list-item-text">XML</span>
                             </li>
                         </ul>
-                    </nav>
-                </div>
-                <!-- 创建项目模板 -->
-                <div class="split-obj fill-h left">
-                    <div id="aproch-home-sidebar" class="sidebar mono-flat-panel">
-                        <div class="std-margin">
-                            <div id="aproch-home-sidebar-searchbox" class="mono-icon-input">
-                                <input type="stadium" placeholder="查找模板...">
-                                <i activity="false" class="d-right fa fa-search" aria-hidden="true"></i>
-                            </div>
-                        </div>
-                        <div class="fill-w fill-h" style="padding-right: 4px;">
-                            <div class="mono-scroll-view prop-list-container no-pt" data-direction="v">
-                                <ul id="aproch-home-sidebar-proplist" class="mono-list-view">
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">最近项目</span>
-                                        <span class="badge-num">3</span>
-                                    </li>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">最近使用的模板</span>
-                                        <span class="badge-num">3</span>
-                                    </li>
-                                    <h3 class="mono-list-subtitle">模板</h3>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-list-ul" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">全部</span>
-                                    </li>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-codepen" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">Aproch</span>
-                                    </li>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-desktop" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">控制台</span>
-                                    </li>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-internet-explorer" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">Web</span>
-                                    </li>
-                                    <h3 class="mono-list-subtitle">用户模板</h3>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-window-maximize" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">C++控制台程序</span>
-                                        <span class="badge-num">3</span>
-                                    </li>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-dot-circle-o" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">单例模板</span>
-                                    </li>
-                                    <h3 class="mono-list-subtitle">插件</h3>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-html5" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">Javascript</span>
-                                    </li>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-eercast" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text" title="C++控制台程序">C++</span>
-                                    </li>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-vimeo" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">Lua</span>
-                                    </li>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-github-alt" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">Python</span>
-                                    </li>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-bitcoin" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">Json</span>
-                                    </li>
-                                    <li class="mono-list-item">
-                                        <div class="list-item-icon content-center">
-                                            <i class="fa fa-yelp" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="list-item-text">XML</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="split-v" style="left: 297px;"></div>
                 <!-- 模板项目 -->
-                <div class="split-obj fill-h left">
-                    <div id="aproch-home-template" class="aproch-template mono-grid-view">
+                <div class="split-obj fill-h fill-w">
+                    <div class="mono-scroll-view">
+                        <ul id="aproch-home-template" class="mono-grid-view text-select-none">
+                            <li class="content-center flex-column mono-flat-panel mono-active-control">
+                                <i class="fa fa-cube" aria-hidden="true"></i>
+                                <div class="content-center flex-column">
+                                    <h4 class="std-text">类</h4>
+                                    <span class="sub-text">(Class)</span>
+                                </div>
+                            </li>
+                            <li class="content-center flex-column mono-flat-panel mono-active-control">
+                                <i class="fa fa-cube" aria-hidden="true"></i>
+                                <div class="content-center flex-column">
+                                    <h4 class="std-text">函数</h4>
+                                    <span class="sub-text">(Function)</span>
+                                </div>
+                            </li>
+                            <li class="content-center flex-column mono-flat-panel mono-active-control">
+                                <i class="fa fa-cube" aria-hidden="true"></i>
+                                <div class="content-center flex-column">
+                                    <h4 class="std-text">枚举</h4>
+                                    <span class="sub-text">(Enumeration)</span>
+                                </div>
+                            </li>
+                            <li class="content-center flex-column mono-flat-panel mono-active-control">
+                                <i class="fa fa-cube" aria-hidden="true"></i>
+                                <div class="content-center flex-column">
+                                    <h4 class="std-text">接口</h4>
+                                    <span class="sub-text">(Interface)</span>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-                <div class="split-v"></div>
+                <div class="split-v" style="right: 270px;"></div>
                 <!-- 模板属性 -->
-                <div class="split-obj fill-h right">
-                    <div id="aproch-home-attr" class="sidebar-r mono-flat-panel">
-
+                <div id="aproch-home-attr" class="split-obj mono-flat-panel fill-h">
+                    <div class="d-flex justify-content-around">
+                        <button class="btn">打开项目</button>
+                        <button class="btn">创建项目</button>
                     </div>
                 </div>
             </div>

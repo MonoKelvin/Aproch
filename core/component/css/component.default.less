@@ -55,7 +55,7 @@ button {
     white-space: nowrap;
     text-overflow: ellipsis;
     box-sizing: border-box;
-    transition: all 0.1s ease-in-out;
+    transition: @stdTransition;
 }
 button:hover {
     background: @controlBgHoverColor;
@@ -142,7 +142,7 @@ a {
     text-decoration: none;
     border-bottom: 1px solid @primaryLightColor;
     color: @primaryLightColor;
-    transition: all 0.2s ease-in-out, border 0.03s ease-in-out;
+    transition: @stdTransition, border 0.03s ease-in-out;
 }
 a:hover {
     border-bottom: 1px solid @primaryLightHoverColor;
@@ -166,7 +166,7 @@ a:active {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        transition: all 0.2s ease-in-out;
+        transition: @stdTransition;
     }
 
     i[activity='true']:hover {
@@ -188,7 +188,7 @@ input {
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
-    transition: all 0.2s ease-in-out;
+    transition: @stdTransition;
 }
 
 input::-webkit-input-placeholder {
@@ -216,7 +216,7 @@ input[type='stadium'] {
     border-radius: 50%;
     background: @textColor;
     pointer-events: none;
-    transition: all 0.1s ease;
+    transition: all 0.16s ease;
 }
 .switcher:checked {
     background: @primaryColor;
@@ -247,7 +247,7 @@ input[type='range']::-webkit-slider-thumb {
     width: 12px;
     border-radius: 50%;
     background: @controlBgLightColor;
-    transition: all 0.2s ease-in-out;
+    transition: @stdTransition;
 }
 input[type='range']::-webkit-slider-thumb:hover {
     background: @textColor;
@@ -259,7 +259,7 @@ input[type='range']::-webkit-slider-thumb:hover {
     border-radius: 4px;
     background: @panelBackground;
     box-shadow: @panelShadow;
-    transition: all 0.2s ease-in-out;
+    transition: @stdTransition;
 }
 
 // Menu
@@ -288,7 +288,7 @@ input[type='range']::-webkit-slider-thumb:hover {
     justify-items: center;
     list-style-type: none;
     grid-template-rows: auto;
-    transition: all 0.2s ease-in-out;
+    transition: @stdTransition;
 
     i {
         font-size: 16px;
@@ -331,7 +331,7 @@ input[type='range']::-webkit-slider-thumb:hover {
 .select {
     position: relative;
     display: inline-block;
-    transition: all 0.2s ease-in-out;
+    transition: @stdTransition;
 
     .arrow-down {
         cursor: pointer;
@@ -382,9 +382,6 @@ input[type='range']::-webkit-slider-thumb:hover {
 /************/
 
 .mono-list-subtitle {
-    font-size: 1.5rem;
-    font-weight: bold;
-    letter-spacing: 0.12rem;
     color: @disbledColor;
     text-align: center;
     margin: 20px 0 8px 0;
@@ -407,7 +404,7 @@ input[type='range']::-webkit-slider-thumb:hover {
         box-sizing: border-box;
         background: @panelBackground;
         box-shadow: @panelShadow;
-        transition: background 0.2s ease-in-out;
+        transition: background 0.16s ease-in-out;
     }
 
     li:hover,
@@ -436,7 +433,7 @@ input[type='range']::-webkit-slider-thumb:hover {
         cursor: pointer;
         border-radius: @stdRadius;
         padding: 10px 20px;
-        transition: all 0.2s ease-in-out;
+        transition: @stdTransition;
         overflow: hidden;
     }
 
@@ -619,8 +616,27 @@ input {
     overflow: hidden;
 }
 
+.mono-active-control {
+    cursor: pointer;
+    transition: @stdTransition;
+}
+.mono-active-control:hover {
+    background: @controlBgHoverColor;
+}
+.mono-active-control:active {
+    background: @controlBgActiveColor;
+}
+
 .mono-scroll-view {
     width: 100%;
     height: 100%;
-    overflow: scroll;
+    overflow: auto;
+}
+
+/** Grid View */
+.mono-grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 50px);
+    grid-template-rows: repeat(auto-fill, 50px);
+    grid-gap: 10px;
 }

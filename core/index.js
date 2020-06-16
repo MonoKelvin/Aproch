@@ -18,6 +18,9 @@ $(document).ready(function () {
         ele: '#aproch-home-sidebar-proplist',
         currentIndex: 0,
     });
+    new MonoList({
+        ele: '#aproch-home-template',
+    });
 
     /** 初始化特殊属性的元素 */
     $('[a-cloak]').removeAttr('a-cloak');
@@ -27,11 +30,6 @@ $(document).ready(function () {
         t.css({ 'min-width': t.css('width'), 'min-height': t.css('height') });
     });
 
-    // (function () {
-    //     $('#aproch-nav');
-
-    // })();
-
     /** 扩展方法 */
     String.prototype.realTextWidth = function (font) {
         var currentObj = $('<pre>').hide().appendTo(document.body);
@@ -39,6 +37,12 @@ $(document).ready(function () {
         var width = currentObj.width();
         currentObj.remove();
         return width;
+    };
+    String.prototype.compareWith = function (other, caseSensitive = true) {
+        if (caseSensitive) {
+            return this == other;
+        }
+        return this.toLowerCase() == other.toLowerCase();
     };
     Array.prototype.remove = function (element) {
         var index = this.indexOf(element);
