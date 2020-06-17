@@ -10,9 +10,12 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1080,
         height: 720,
+        minWidth: 640,
+        minHeight: 480,
+        frame: false,
         webPreferences: {
-            nodeIntegration: true
-        }
+            nodeIntegration: true,
+        },
     });
 
     // and load the index.html of the app.
@@ -20,6 +23,7 @@ function createWindow() {
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools();
+    mainWindow.menuBarVisible = false;
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {
@@ -27,6 +31,10 @@ function createWindow() {
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
         mainWindow = null;
+    });
+
+    mainWindow.on('resize', function () {
+        console.log('object');
     });
 }
 

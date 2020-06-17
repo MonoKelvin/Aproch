@@ -22,6 +22,17 @@ $(document).ready(function () {
         ele: '#aproch-home-template',
     });
 
+    $('.window-minimize').on('onclick', () => {
+        console.log('window-minimize');
+    });
+    $('.window-restore').on('onclick', () => {
+        console.log('window-restore');
+    });
+    $('.window-maximize').on('onclick', () => {
+        console.log('window-maximize');
+        window.close();
+    });
+
     /** 初始化特殊属性的元素 */
     $('[a-cloak]').removeAttr('a-cloak');
     $('[a-invisible]').removeAttr('a-invisible');

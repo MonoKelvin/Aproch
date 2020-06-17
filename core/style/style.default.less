@@ -185,7 +185,7 @@ ul {
 ::-webkit-scrollbar {
     width: 9px;
     height: 9px;
-    background-color: transparent;
+    background-color: @controlBgDarkColor;
 }
 ::-webkit-scrollbar-thumb {
     border-radius: 10px;
@@ -207,15 +207,28 @@ ul {
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-rows: 64px auto;
+    grid-template-rows: 40px auto;
 }
 
-.aproch-header {
-    height: 64px;
+.aproch-titlebar {
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     border-bottom: 1px solid @splitColor;
 }
 
-.aproch-caption {
+.titlebar-drag-region {
+    top: 0;
+    left: 0;
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-app-region: drag;
+}
+
+.window-title {
     position: relative;
     color: @subTextColor;
     font-family: 'Dejavu Sans Mono';
@@ -225,6 +238,30 @@ ul {
     text-align: center;
     line-height: 44px;
     margin: 10px;
+}
+
+.window-controls-container {
+    display: flex;
+    flex-grow: 0;
+    flex-shrink: 0;
+    text-align: center;
+    position: relative;
+    z-index: 3000;
+    -webkit-app-region: no-drag;
+    height: 100%;
+    margin-left: auto;
+
+    .window-icon {
+        width: 32px;
+        color: @subTextColor;
+    }
+    .window-icon:hover {
+        background: @controlBgHoverColor;
+    }
+    .window-icon:active {
+        color: @textColor;
+        background: @controlBgDarkColor;
+    }
 }
 
 .aproch-main-view {

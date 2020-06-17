@@ -4,7 +4,8 @@
     "description": "A visual programming application developed with electron",
     "main": "main.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "electron ./main.js"
     },
     "repository": {
         "type": "git",
@@ -17,6 +18,7 @@
     },
     "homepage": "https://github.com/MonoKelvin/Aproch#readme",
     "devDependencies": {
-        "@types/jquery": "^3.3.38"
+        "@types/jquery": "^3.3.38",
+        "electron": "^9.0.4"
     }
 }
