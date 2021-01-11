@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Plugin">
+      <UniqueIdentifier>{61fe5f78-930b-44b0-8f33-6c11fb39735d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{67f51d62-a602-4967-87d2-01be855accf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Toolkit">
+      <UniqueIdentifier>{3a7ae2c9-96b3-4221-aded-2a575a378049}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application">
+      <UniqueIdentifier>{35bae624-3ca4-4981-aacc-b588d88758c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Action">
+      <UniqueIdentifier>{29c1ff07-2c30-49c1-b451-e3ac91d868de}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="APluginManager.h">
+      <Filter>Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="ASingleton.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameworkAPI.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="AConfigManager.h">
+      <Filter>Toolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="IMainWindow.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="IFileLoader.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="AActionManager.h">
+      <Filter>Action</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="APluginManager.cpp">
+      <Filter>Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="ASingleton.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="AConfigManager.cpp">
+      <Filter>Toolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="AActionManager.cpp">
+      <Filter>Action</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

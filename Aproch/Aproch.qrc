@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/Aproch">
+        <file>MainWindow.ui</file>
+    </qresource>
+</RCC>
