@@ -28,5 +28,5 @@
  *****************************************************************************/
 #include <QtWidgets>
 
-#include "../Framework/FrameworkAPI.h"
-#include "../Widgets/WidgetsAPI.h"
+#include "Framework/FrameworkAPI.h"
+#include "Widgets/WidgetsAPI.h"

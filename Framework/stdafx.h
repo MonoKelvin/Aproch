@@ -30,5 +30,6 @@
 
 #include <qvector.h>
 #include <qlist.h>
+#include <qmap.h>
 
-#include "ASingleton.h"
+#include "FrameworkAPI.h"

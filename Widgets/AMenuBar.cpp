@@ -33,5 +33,15 @@ namespace aproch
 {
     namespace widgets
     {
+        AMenuBar::AMenuBar(QWidget* parent /*= nullptr*/)
+            : QMenuBar(parent)
+        {
+
+        }
+
+        AMenuBar::~AMenuBar(void)
+        {
+
+        }
     }
 }

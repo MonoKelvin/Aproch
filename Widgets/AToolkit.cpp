@@ -35,10 +35,6 @@ namespace aproch
     {
         namespace toolkit
         {
-            QList<QKeySequence> AToolkit::ParseKeySequence(const QString& keyString)
-            {
-                keyString.split(AStr(","), Qt::SkipEmptyParts);
-            }
         }
     }
 }

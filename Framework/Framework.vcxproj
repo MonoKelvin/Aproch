@@ -112,7 +112,7 @@
     <ClInclude Include="IJsonSerializable.h" />
     <ClInclude Include="IMainWindow.h" />
     <ClInclude Include="IStringSerializable.h" />
-    <ClInclude Include="Macros.h" />
+    <ClInclude Include="FrameworkGlobal.h" />
     <ClInclude Include="stdafx.h" />
     <ClCompile Include="ACommand.cpp" />
     <ClCompile Include="AConfigManager.cpp" />

@@ -28,8 +28,9 @@
  *****************************************************************************/
 #pragma once
 
-#include "Framework/FrameworkAPI.h"
-#include "WidgetsAPI.h"
-
 #include <qlist.h>
 #include <qvector.h>
+#include <qmap.h>
+
+#include "Framework/FrameworkAPI.h"
+#include "WidgetsAPI.h"

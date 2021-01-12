@@ -31,18 +31,31 @@
     </ClInclude>
     <ClInclude Include="FrameworkAPI.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="AConfigManager.h">
-      <Filter>Toolkit</Filter>
-    </ClInclude>
     <ClInclude Include="IMainWindow.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="IFileLoader.h">
+    <ClInclude Include="AContextKeyExprFactory.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="ACommandManager.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="AContextKeyExpression.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="IFileLoadable.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="AActionManager.h">
-      <Filter>Action</Filter>
+    <ClInclude Include="IJsonSerializable.h">
+      <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="IStringSerializable.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="AConfigManager.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameworkGlobal.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="APluginManager.cpp">
@@ -52,11 +65,25 @@
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="ACommand.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="ACommandManager.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="AContextKeyExpression.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="AContextKeyExprFactory.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
     <ClCompile Include="AConfigManager.cpp">
-      <Filter>Toolkit</Filter>
+      <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="AActionManager.cpp">
-      <Filter>Action</Filter>
-    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="ACommand.h">
+      <Filter>Application</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>

@@ -30,10 +30,8 @@
 
 #include <mutex>
 
-#include "FrameworkAPI.h"
-
 /** 继承自ASingleton的单例类，需要将ASingleton声明为友元 */
-#define APROCH_DECLARE_SINGLETON(_ClassName_) private: friend class ASingleton<_ClassName_>
+#define APROCH_DECLARE_SINGLETON(_ClassName_) private: friend class aproch::framework::ASingleton<_ClassName_>
 
 namespace aproch
 {

@@ -28,19 +28,7 @@
  *****************************************************************************/
 #pragma once
 
-#include <QtCore/qglobal.h>
-
-#ifndef BUILD_STATIC
-# if defined(FRAMEWORK_LIB)
-#  define FRAMEWORK_API Q_DECL_EXPORT
-# else
-#  define FRAMEWORK_API Q_DECL_IMPORT
-# endif
-#else
-# define FRAMEWORK_API
-#endif
-
-#include "Macros.h"
+#include "FrameworkGlobal.h"
 #include "IMainWindow.h"
 #include "IFileLoadable.h"
 #include "IJsonSerializable.h"

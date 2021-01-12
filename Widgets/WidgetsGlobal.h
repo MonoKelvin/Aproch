@@ -1,6 +1,6 @@
 /****************************************************************************
- * @file    AMenuBar.h
- * @date    2021-1-9
+ * @file    WidgetsGlobal.h
+ * @date    2021-1-12
  * @author  MonoKelvin
  * @email   15007083506@qq.com
  * @github  https://github.com/MonoKelvin
@@ -28,23 +28,14 @@
  *****************************************************************************/
 #pragma once
 
-#include <qmenubar.h>
+#include <QtCore/qglobal.h>
 
-namespace aproch
-{
-    namespace widgets
-    {
-        /**
-         * 工具栏，支持通过配置文件加载、保存等
-         */
-        class WIDGETS_API AMenuBar : public QMenuBar
-        {
-            Q_OBJECT
-        public:
-            explicit AMenuBar(QWidget* parent = nullptr);
-            ~AMenuBar(void);
-
-        protected:
-        };
-    }
-}
+#ifndef BUILD_STATIC
+# if defined(WIDGETS_LIB)
+#  define WIDGETS_API Q_DECL_EXPORT
+# else
+#  define WIDGETS_API Q_DECL_IMPORT
+# endif
+#else
+# define WIDGETS_API
+#endif

@@ -36,7 +36,7 @@
 #define APROCH_MAX_SCALE_BOUNDARY 10
 
 AMainWindow::AMainWindow(QWidget *parent)
-    : QWidget(parent)
+    : QMainWindow(parent)
     , mScaleBoundary(8)
 {
     ui.setupUi(this);
@@ -44,6 +44,19 @@ AMainWindow::AMainWindow(QWidget *parent)
     setWindowFlags(Qt::FramelessWindowHint);
     setMinimumSize(200, 200);
     setStyleSheet("background:white");
+
+    // 设置菜单栏
+    mMenuBar = new aproch::widgets::AMenuBar(this);
+    setMenuBar(mMenuBar);
+
+    // 设置工具栏
+    mToolBar = new aproch::widgets::AToolBar(this);
+    addToolBar(Qt::TopToolBarArea, mToolBar);
+
+    QAction* a = new QAction("Test1", this);
+    QAction* a2 = new QAction("Test2", this);
+    addAction(a);
+    addAction(a2);
 }
 
 bool AMainWindow::nativeEventFilter(const QByteArray& eventType, void* message, long* result)

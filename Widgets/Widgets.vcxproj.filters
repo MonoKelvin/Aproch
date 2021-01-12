@@ -21,6 +21,11 @@
     <Filter Include="Action">
       <UniqueIdentifier>{f42641ce-24ff-48e5-8627-69f098d6eb95}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WidgetsAPI.h" />
@@ -28,6 +33,10 @@
     <ClInclude Include="AActionManager.h">
       <Filter>Action</Filter>
     </ClInclude>
+    <ClInclude Include="AToolkit.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="WidgetsGlobal.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AToolBar.cpp">
@@ -40,6 +49,12 @@
     <ClCompile Include="AActionManager.cpp">
       <Filter>Action</Filter>
     </ClCompile>
+    <ClCompile Include="AAction.cpp">
+      <Filter>Action</Filter>
+    </ClCompile>
+    <ClCompile Include="AToolkit.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="AToolBar.h">
@@ -47,6 +62,9 @@
     </QtMoc>
     <QtMoc Include="AMenuBar.h">
       <Filter>MenuBar</Filter>
+    </QtMoc>
+    <QtMoc Include="AAction.h">
+      <Filter>Action</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

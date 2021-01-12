@@ -34,8 +34,6 @@ namespace aproch
 {
     namespace framework
     {
-        class AContextKeyExpression;
-
         /**
          * 上下文键值工厂
          */

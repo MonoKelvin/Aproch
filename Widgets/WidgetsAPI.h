@@ -28,20 +28,9 @@
  *****************************************************************************/
 #pragma once
 
-#include <QtCore/qglobal.h>
-
-#ifndef BUILD_STATIC
-# if defined(WIDGETS_LIB)
-#  define WIDGETS_API Q_DECL_EXPORT
-# else
-#  define WIDGETS_API Q_DECL_IMPORT
-# endif
-#else
-# define WIDGETS_API
-#endif
+#include "WidgetsGlobal.h"
 
 #include "AAction.h"
-
 #include "AMenuBar.h"
 #include "AToolBar.h"
 

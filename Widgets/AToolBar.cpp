@@ -33,5 +33,15 @@ namespace aproch
 {
     namespace widgets
     {
+        AToolBar::AToolBar(QWidget *parent /*= nullptr*/)
+            : QToolBar(parent)
+        {
+
+        }
+
+        AToolBar::~AToolBar(void)
+        {
+
+        }
     }
 }

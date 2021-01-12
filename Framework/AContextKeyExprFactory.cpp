@@ -29,11 +29,16 @@
 #include "stdafx.h"
 #include "AContextKeyExprFactory.h"
 
-AContextKeyExprFactory::AContextKeyExprFactory(QObject *parent)
-    : (parent)
+namespace aproch
 {
-}
+    namespace framework
+    {
+        AContextKeyExprFactory::AContextKeyExprFactory()
+        {
+        }
 
-AContextKeyExprFactory::~AContextKeyExprFactory()
-{
+        AContextKeyExprFactory::~AContextKeyExprFactory()
+        {
+        }
+    }
 }

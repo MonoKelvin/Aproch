@@ -28,6 +28,18 @@
  *****************************************************************************/
 #pragma once
 
+#include <QtCore/qglobal.h>
+
+#ifndef BUILD_STATIC
+# if defined(FRAMEWORK_LIB)
+#  define FRAMEWORK_API Q_DECL_EXPORT
+# else
+#  define FRAMEWORK_API Q_DECL_IMPORT
+# endif
+#else
+# define FRAMEWORK_API
+#endif
+
 /**
  * @brief 常量字符串转换为编译器构造的QString，用以降低运行时构造QString的代价
  * @param _ConstString_ 常量字符串，如: "String"

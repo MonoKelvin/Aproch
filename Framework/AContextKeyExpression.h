@@ -72,8 +72,8 @@ namespace aproch
         {
         public:
             AContextKeyExpression();
-            AContextKeyExpression(const QString& exprString);
-            virtual ~AContextKeyExpression() = default;
+            explicit AContextKeyExpression(const QString& exprString);
+            virtual ~AContextKeyExpression();
 
             virtual QString serialize(void) const override;
             virtual bool deserialize(const QString& stringValue) override;

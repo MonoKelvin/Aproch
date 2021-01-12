@@ -35,6 +35,13 @@ namespace aproch
 {
     namespace widgets
     {
+
+        AAction::AAction(QObject* parent /*= nullptr*/)
+            : QAction(parent)
+        {
+
+        }
+
         QJsonObject AAction::toJson(void) const
         {
             QJsonObject jsonObj;
@@ -48,7 +55,7 @@ namespace aproch
             setText(jsonObject.value(AStr("name")).toString());
             setShortcut(QKeySequence(jsonObject.value(AStr("key")).toString()));
             setCommandId(jsonObject.value(AStr("command")).toString());
-            setEnableExpression(jsonObject.value(AStr("when")).toString());
+            //setEnableExpression(jsonObject.value(AStr("when")).toString());
 
             return false;
         }
@@ -74,11 +81,11 @@ namespace aproch
         void AAction::setEnableExpression(const aproch::framework::AContextKeyExpression& expr)
         {
             // TODO
-            if (mEnableExpression != expr)
-            {
-                mEnableExpression = expr;
-                emit enableExpressionChanged();
-            }
+            //if (mEnableExpression != expr)
+            //{
+            //    mEnableExpression = expr;
+            //    emit enableExpressionChanged();
+            //}
         }
     }
 }

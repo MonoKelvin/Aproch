@@ -28,12 +28,12 @@
  *****************************************************************************/
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <QtWidgets/QMainWindow>
 #include "ui_MainWindow.h"
 
 #define APROCH_MAX_SCALE_BOUNDARY 10
 
-class AMainWindow : public QWidget, public QAbstractNativeEventFilter, public aproch::framework::IMainWindow
+class AMainWindow : public QMainWindow, public QAbstractNativeEventFilter
 {
     Q_OBJECT
 
@@ -60,7 +60,7 @@ public:
      */
     inline aproch::widgets::AToolBar* getToolBar(void) const noexcept
     {
-        return mToolBar;
+        return mToolBar; 
     }
 
 protected:

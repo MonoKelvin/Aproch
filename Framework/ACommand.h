@@ -48,7 +48,7 @@ namespace aproch
             Q_OBJECT
         public:
             explicit ACommand(QObject* parent = nullptr);
-            virtual ~ACommand() = default;
+            virtual ~ACommand();
 
             /**
              * 处理命令的函数

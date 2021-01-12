@@ -37,15 +37,6 @@ namespace aproch
             class WIDGETS_API AToolkit
             {
             public:
-                /**
-                 * 从字符串解析快捷键
-                 * @param keyString 快捷键字符串，每个快捷键用逗号隔开
-                 * @return QList<QKeySequence> 解析后的快捷键列表
-                 * @example
-                 *  ParseKeySequence("Ctrl+A")      // Ctrl + A
-                 *  ParseKeySequence("Ctrl+A, Shift + B")      // Ctrl + A, Shift + B
-                 */
-                static QList<QKeySequence> ParseKeySequence(const QString& keyString);
             };
         }
     }

@@ -1,0 +1,15 @@
+**/debug/*
+**/release/*
+**/Debug/*
+**/Release/*
+**/x64/*
+**/.vs/*
+*.Debug
+*.Release
+*.user
+**/Test/*
+**/.vscode/*
+**/bin/*
+Makefile
+/Backup/*
+/Output/*

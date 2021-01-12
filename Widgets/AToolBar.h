@@ -37,12 +37,12 @@ namespace aproch
         /**
          * 工具栏，支持通过配置文件加载、保存等
          */
-        class WIDGETS_API AToolBar : QToolBar
+        class WIDGETS_API AToolBar : public QToolBar
         {
             Q_OBJECT
         public:
-            AToolBar(void);
-            virtual ~AToolBar(void);
+            AToolBar(QWidget *parent = nullptr);
+            ~AToolBar(void);
 
         protected:
         };
