@@ -105,6 +105,7 @@
     <ClInclude Include="AContextKeyExpression.h" />
     <ClInclude Include="ACommandManager.h" />
     <ClInclude Include="AContextKeyExprFactory.h" />
+    <ClInclude Include="AFileToolkit.h" />
     <ClInclude Include="APluginManager.h" />
     <ClInclude Include="FrameworkAPI.h" />
     <ClInclude Include="IFileLoadable.h" />
@@ -118,6 +119,7 @@
     <ClCompile Include="AContextKeyExpression.cpp" />
     <ClCompile Include="ACommandManager.cpp" />
     <ClCompile Include="AContextKeyExprFactory.cpp" />
+    <ClCompile Include="AFileToolkit.cpp" />
     <ClCompile Include="APluginManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">Create</PrecompiledHeader>

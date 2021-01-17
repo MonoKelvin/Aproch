@@ -114,7 +114,7 @@
     <QtMoc Include="AToolBar.h" />
     <QtMoc Include="AMenuBar.h" />
     <QtMoc Include="AAction.h" />
-    <ClInclude Include="AActionManager.h" />
+    <QtMoc Include="AActionManager.h" />
     <ClInclude Include="AToolkit.h" />
     <ClInclude Include="WidgetsAPI.h" />
     <ClInclude Include="stdafx.h" />

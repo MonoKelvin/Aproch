@@ -21,6 +21,16 @@
     <Filter Include="Action">
       <UniqueIdentifier>{29c1ff07-2c30-49c1-b451-e3ac91d868de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APluginManager.h">
@@ -53,6 +63,9 @@
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="FrameworkGlobal.h" />
+    <ClInclude Include="AFileToolkit.h">
+      <Filter>Toolkit</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="APluginManager.cpp">
@@ -73,6 +86,9 @@
     </ClCompile>
     <ClCompile Include="AConfigManager.cpp">
       <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="AFileToolkit.cpp">
+      <Filter>Toolkit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
