@@ -35,7 +35,7 @@ namespace aproch
     namespace widgets
     {
         /**
-         * 工具栏，支持通过配置文件加载、保存等
+         * 菜单栏
          */
         class WIDGETS_API AMenuBar : public QMenuBar
         {

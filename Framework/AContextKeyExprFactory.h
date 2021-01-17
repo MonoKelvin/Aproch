@@ -28,8 +28,6 @@
  *****************************************************************************/
 #pragma once
 
-#include "ASingleton.h"
-
 namespace aproch
 {
     namespace framework
@@ -37,11 +35,10 @@ namespace aproch
         /**
          * 上下文键值工厂
          */
-        class FRAMEWORK_API AContextKeyExprFactory : public ASingleton<AContextKeyExprFactory>
+        class FRAMEWORK_API AContextKeyExprFactory
         {
-            APROCH_DECLARE_SINGLETON(AContextKeyExprFactory);
-        private:
-            AContextKeyExprFactory();
+            APROCH_SINGLETON(AContextKeyExprFactory);
+        public:
             ~AContextKeyExprFactory();
 
             /**
@@ -52,6 +49,9 @@ namespace aproch
             {
 
             }
+
+        private:
+            AContextKeyExprFactory();
 
         private:
             /** 上下文键值列表 */

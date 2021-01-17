@@ -28,9 +28,14 @@
  *****************************************************************************/
 #pragma once
 
-#include <qlist.h>
-#include <qvector.h>
-#include <qmap.h>
+#include <QList>
+#include <QVector>
+#include <QMap>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QPointer>
+#include <QDebug>
 
 #include "Framework/FrameworkAPI.h"
 #include "WidgetsAPI.h"

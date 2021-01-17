@@ -106,7 +106,6 @@
     <ClInclude Include="ACommandManager.h" />
     <ClInclude Include="AContextKeyExprFactory.h" />
     <ClInclude Include="APluginManager.h" />
-    <ClInclude Include="ASingleton.h" />
     <ClInclude Include="FrameworkAPI.h" />
     <ClInclude Include="IFileLoadable.h" />
     <ClInclude Include="IJsonSerializable.h" />
@@ -120,7 +119,6 @@
     <ClCompile Include="ACommandManager.cpp" />
     <ClCompile Include="AContextKeyExprFactory.cpp" />
     <ClCompile Include="APluginManager.cpp" />
-    <ClCompile Include="ASingleton.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">Create</PrecompiledHeader>

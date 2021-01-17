@@ -28,6 +28,8 @@
  *****************************************************************************/
 #pragma once
 
+#include <mutex>
+
 #include <QtCore/qglobal.h>
 
 #ifndef BUILD_STATIC
@@ -39,6 +41,24 @@
 #else
 # define FRAMEWORK_API
 #endif
+
+/** 定义接口类型宏 */
+#ifdef interface
+#undef interface
+#endif
+#define interface struct
+
+/** 定义实现接口宏 */
+#ifdef implement
+#undef implement
+#endif
+#define implement public
+
+/** 定义抽象类类型关键字 */
+#ifdef abstract
+#undef abstract
+#endif
+#define abstract
 
 /**
  * @brief 常量字符串转换为编译器构造的QString，用以降低运行时构造QString的代价
@@ -63,3 +83,27 @@
  * @see QByteArrayLiteral
  */
 #define AByteArr(_ConstString_) QByteArrayLiteral(_ConstString_)
+
+ /** 使用该宏来声明单例类，注意声明的单例类的析构函数必须修饰为public */
+#define APROCH_SINGLETON(_ClassName_)                  \
+public:                                                \
+    static _ClassName_* getInstance(void) noexcept;    \
+private:                                               \
+    static QSharedPointer<_ClassName_> mInstance;     \
+    static std::mutex mMutex
+
+/** 使用该宏来初始化单例和互斥锁 */
+#define APROCH_INIT_SINGLETON(_ClassName_)                              \
+QSharedPointer<_ClassName_> _ClassName_::mInstance(nullptr);            \
+std::mutex _ClassName_::mMutex;                                         \
+_ClassName_* _ClassName_::getInstance(void) noexcept                    \
+{                                                                       \
+    std::lock_guard<std::mutex> guard1(mMutex);                         \
+    if (nullptr == mInstance){                                          \
+        std::lock_guard<std::mutex> guard2(mMutex);                     \
+        if (nullptr == mInstance) {                                     \
+            mInstance = QSharedPointer<_ClassName_>(new _ClassName_()); \
+        }                                                               \
+    }                                                                   \
+    return mInstance.get();                                             \
+}

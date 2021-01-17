@@ -29,12 +29,14 @@
 #include "stdafx.h"
 #include "AActionManager.h"
 
-#include <QDebug>
+#include <QFile>
 
 namespace aproch
 {
     namespace widgets
     {
+        APROCH_INIT_SINGLETON(AActionManager);
+
         AActionManager::AActionManager()
         {
         }
@@ -61,6 +63,33 @@ namespace aproch
             }
         }
        
+        bool AActionManager::loadFile(const QString& jsonFilePath)
+        {
+            QFile jsonFile(jsonFilePath);
+            if (!jsonFile.open(QFile::ReadOnly | QFile::Text))
+            {
+                return false;
+            }
+
+            const QByteArray& data = jsonFile.readAll();
+            jsonFile.close();
+
+            QJsonParseError error;
+            const QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &error);
+            if (error.error != QJsonParseError::NoError)
+            {
+                qDebug() << error.errorString();
+                return false;
+            }
+
+            if (jsonDoc.isObject())
+            {
+                const QJsonObject jsonObj = jsonDoc.object();
+            }
+
+            return true;
+        }
+
         AAction* AActionManager::getActionById(const ActionId& actionId)
         {
             for (const auto& action : mActions)
@@ -73,5 +102,21 @@ namespace aproch
 
             return nullptr;
         }
+
+        void AActionManager::createActionFromJsonObject(const QJsonObject& jsonObj)
+        {
+            QPointer<AAction> newAction = QPointer<AAction>(new AAction(this));
+            if (newAction->fromJson(jsonObj))
+            {
+                for (const auto& action : mActions)
+                {
+                    if (newAction->getActionId() == action->getActionId())
+                    {
+                        // TODO
+                    }
+                }
+            }
+        }
+
     }
 }

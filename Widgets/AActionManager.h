@@ -28,8 +28,6 @@
  *****************************************************************************/
 #pragma once
 
-#include "Framework/ASingleton.h"
-
 namespace aproch
 {
     namespace widgets
@@ -37,16 +35,25 @@ namespace aproch
         /**
          * 动作管理器，用于存储软件所有动作
          */
-        class WIDGETS_API AActionManager : public aproch::framework::ASingleton<AActionManager>
+        class WIDGETS_API AActionManager : public QObject
         {
-            APROCH_DECLARE_SINGLETON(AActionManager);
+            Q_OBJECT
+            APROCH_SINGLETON(AActionManager);
         public:
+            ~AActionManager();
 
             /** 
              * 添加动作
              * @param action 动作
              */
             void addAction(AAction* action);
+
+            /**
+             * 从文件中加载动作。如果文件中存在动作ID相等的动作，则默认将只读取最后一个动作
+             * @param jsonFilePath json文件路径
+             * @return bool 是否加载成功
+             */
+            bool loadFile(const QString& jsonFilePath);
 
             /** 
              * 通过Id获取动作
@@ -57,10 +64,16 @@ namespace aproch
 
         private:
             AActionManager();
-            ~AActionManager();
+
+            /**
+             * @brief 从json对象加载动作
+             * @param jsonObj json对象
+             * @return 是否加载成功
+             */
+            void createActionFromJsonObject(const QJsonObject& jsonObj);
 
         private:
-            QList<AAction*> mActions;
+            QList<QPointer<AAction>> mActions;
         };
     }
 }

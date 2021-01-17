@@ -33,6 +33,8 @@ namespace aproch
 {
     namespace framework
     {
+        APROCH_INIT_SINGLETON(AContextKeyExprFactory);
+
         AContextKeyExprFactory::AContextKeyExprFactory()
         {
         }

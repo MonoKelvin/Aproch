@@ -21,6 +21,8 @@
     </QtMoc>
     <Link>
       <ProgramDatabaseFile>$(OutDir)pdb\$(TargetName).pdb</ProgramDatabaseFile>
+      <AdditionalLibraryDirectories>$(OutDir);$(OutDir)Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(OutDir)Lib\$(TargetName).lib</ImportLibrary>
     </Link>
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>

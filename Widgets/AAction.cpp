@@ -57,7 +57,7 @@ namespace aproch
             setCommandId(jsonObject.value(AStr("command")).toString());
             //setEnableExpression(jsonObject.value(AStr("when")).toString());
 
-            return false;
+            return true;
         }
 
         void AAction::setActionId(const ActionId& actionId)

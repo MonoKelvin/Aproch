@@ -28,8 +28,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <qvector.h>
-#include <qlist.h>
-#include <qmap.h>
+#include <QVector>
+#include <QList>
+#include <QMap>
+#include <QPointer>
+#include <QDebug>
 
 #include "FrameworkAPI.h"

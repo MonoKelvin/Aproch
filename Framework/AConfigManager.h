@@ -29,7 +29,6 @@
 #pragma once
 
 #include "FrameworkAPI.h"
-#include "ASingleton.h"
 
 namespace aproch
 {
@@ -38,11 +37,10 @@ namespace aproch
         /**
          * ≈‰÷√π‹¿Ì∆˜
          */
-		class FRAMEWORK_API AConfigManager : public ASingleton<AConfigManager>
+		class FRAMEWORK_API AConfigManager
 		{
-            APROCH_DECLARE_SINGLETON(AConfigManager);
-        private:
-            AConfigManager();
+            APROCH_SINGLETON(AConfigManager);
+        public:
             ~AConfigManager();
 
             /**
@@ -51,6 +49,7 @@ namespace aproch
             bool loadFile(const QString& fileName);
 
         private:
+            AConfigManager();
 		};
     }
 }

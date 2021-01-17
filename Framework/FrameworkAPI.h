@@ -34,7 +34,8 @@
 #include "IJsonSerializable.h"
 #include "IStringSerializable.h"
 
-#include "ASingleton.h"
+#include "AFileToolkit.h"
+
 #include "ACommand.h"
 
 #include "ACommandManager.h"

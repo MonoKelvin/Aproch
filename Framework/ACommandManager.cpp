@@ -35,6 +35,8 @@ namespace aproch
 {
     namespace framework
     {
+        APROCH_INIT_SINGLETON(ACommandManager);
+
         ACommandManager::ACommandManager()
         {
 
@@ -43,6 +45,17 @@ namespace aproch
         ACommandManager::~ACommandManager()
         {
 
+        }
+
+        void ACommandManager::executeCommand(const CommandId& commandId)
+        {
+            for (const auto& cmd : mCommandList)
+            {
+                if (nullptr != cmd && cmd->getCommandId() == commandId)
+                {
+                    cmd->handle();
+                }
+            }
         }
 
         void ACommandManager::registerCommand(ACommand* command)

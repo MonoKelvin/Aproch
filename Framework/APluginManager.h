@@ -29,7 +29,6 @@
 #pragma once
 
 #include "FrameworkAPI.h"
-#include "ASingleton.h"
 
 namespace aproch
 {
@@ -58,14 +57,16 @@ namespace aproch
         /**
          * 插件管理器
          */
-		class FRAMEWORK_API APluginManager : public ASingleton<APluginManager>
+		class FRAMEWORK_API APluginManager
 		{
-            APROCH_DECLARE_SINGLETON(APluginManager);
-        private:
-            APluginManager();
+            APROCH_SINGLETON(APluginManager);
+        public:
             ~APluginManager();
 
             static SPluginsLoadedInfo LoadPlugins(void);
+
+        private:
+            APluginManager();
 
         private:
             /** 加载成功的插件列表 */

@@ -27,7 +27,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 #pragma once
-#include "ASingleton.h"
 
 namespace aproch
 {
@@ -36,12 +35,20 @@ namespace aproch
         /**
          * 命令管理器
          */
-        class FRAMEWORK_API ACommandManager : public ASingleton<ACommandManager>
+        class FRAMEWORK_API ACommandManager
         {
-            APROCH_DECLARE_SINGLETON(ACommandManager);
+            APROCH_SINGLETON(ACommandManager);
         public:
+            ~ACommandManager();
+
             /**
-             * 注册一个命令
+             * @brief 执行命令
+             * @param commandId 要执行的命令ID 
+             */
+            void executeCommand(const CommandId& commandId);
+
+            /**
+             * 注册一个命令，如果命令存在则覆盖
              * @param command 命令
              * @note 命令注册成功会发送 commandRegisted 信号
              * @see commandRegisted
@@ -66,7 +73,6 @@ namespace aproch
 
         private:
             ACommandManager();
-            ~ACommandManager();
 
         private:
             QList<ACommand*> mCommandList;

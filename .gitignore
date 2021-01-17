@@ -2,6 +2,7 @@
 **/release/*
 **/Debug/*
 **/Release/*
+**/Designer/*
 **/x64/*
 **/.vs/*
 *.Debug

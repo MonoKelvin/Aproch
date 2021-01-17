@@ -53,7 +53,7 @@ namespace aproch
             /**
              * 处理命令的函数
              */
-            virtual void handler(const CommandArgs& args) = 0;
+            virtual void handle(const CommandArgs& args) = 0;
 
             /**
              * 获取命令ID（常量）
