@@ -49,11 +49,18 @@ namespace aproch
 
         void ACommandManager::executeCommand(const CommandId& commandId)
         {
+            CommandArgs args;
+            executeCommand(commandId, args);
+        }
+
+        void ACommandManager::executeCommand(const CommandId& commandId, const CommandArgs& args)
+        {
             for (const auto& cmd : mCommandList)
             {
                 if (nullptr != cmd && cmd->getCommandId() == commandId)
                 {
-                    cmd->handle();
+                    cmd->handle(args);
+                    break;
                 }
             }
         }

@@ -111,8 +111,10 @@
     <QtRcc Include="Aproch.qrc" />
     <QtUic Include="MainWindow.ui" />
     <QtMoc Include="AMainWindow.h" />
+    <ClCompile Include="AAprochWidget.cpp" />
     <ClCompile Include="AMainWindow.cpp" />
     <ClCompile Include="main.cpp" />
+    <QtMoc Include="AAprochWidget.h" />
     <ClInclude Include="stdafx.h" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">Create</PrecompiledHeader>

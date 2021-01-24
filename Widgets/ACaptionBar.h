@@ -1,6 +1,6 @@
 /****************************************************************************
- * @file    ACommand.h
- * @date    2021-1-10
+ * @file    ACaptionBar.h
+ * @date    2021-1-9
  * @author  MonoKelvin
  * @email   15007083506@qq.com
  * @github  https://github.com/MonoKelvin
@@ -28,65 +28,90 @@
  *****************************************************************************/
 #pragma once
 
-#include <qobject.h>
+#include <QFrame>
+
+class QPushButton;
 
 namespace aproch
 {
-    namespace framework
+    namespace widgets
     {
-        /** 命令参数 */
-        using CommandArgs = QVariantMap;
-
-        /** 命令ID */
-        using CommandId = QString;
+        class AFlowLayout;
 
         /**
-         * 简单命令抽象类
+         * 标题栏
          */
-        class FRAMEWORK_API ACommand : public QObject
+        class WIDGETS_API ACaptionBar : public QWidget
         {
             Q_OBJECT
         public:
-            explicit ACommand(QObject* parent = nullptr);
-            virtual ~ACommand();
+            explicit ACaptionBar(QWidget* parent = nullptr);
+            ~ACaptionBar(void);
 
             /**
-             * 处理命令的函数
+             * @brief 获取菜单栏
+             * @return 菜单栏
              */
-            virtual void handle(const CommandArgs& args) = 0;
-
-            /**
-             * 获取命令ID（常量）
-             * @return const QString& 命令ID（常量）
-             */
-            inline const CommandId& getCommandId()
+            inline QMenuBar* getMenuBar() const noexcept
             {
-                return mCommandId;
+                return mMenuBar;
             }
 
             /**
-             * 获取命令ID
-             * @return const QString& 命令ID
+             * @brief 获取附件区域的水平布局容器
+             * @note 附件区域的布局是标题栏预留的控件区域，开发者可以向里面添加自定义的各种控件
+             * @return 附件区域的布局
              */
-            inline CommandId getCommandId() const
+            inline QHBoxLayout* getAppendixLayout() const noexcept
             {
-                return mCommandId;
+                return mAppendixLayout;
             }
 
-        Q_SIGNALS:
             /**
-             * 信号 - 当命令执行成功
+             * @brief 获取最小化按钮
+             * @return 最小化按钮
              */
-            void resolved();
+            inline QPushButton* getMinimizeButton() const noexcept
+            {
+                return mBtnMinimize;
+            }
 
             /**
-             * 信号 - 当命令执行失败
+             * @brief 获取最大化-还原按钮
+             * @return 最大化-还原按钮
              */
-            void rejected();
+            inline QPushButton* getMaxRestoreButton() const noexcept
+            {
+                return mBtnMaxRestore;
+            }
+
+            /**
+             * @brief 获取关闭窗口按钮
+             * @return 关闭窗口按钮
+             */
+            inline QPushButton* getCloseButton() const noexcept
+            {
+                return mBtnClose;
+            }
 
         protected:
-            /** 命令ID */
-            CommandId mCommandId;
+            virtual void paintEvent(QPaintEvent* event) override;
+
+        protected:
+            /** 菜单栏 */
+            QMenuBar* mMenuBar;
+
+            /** 附件区域的水平布局容器 */
+            QHBoxLayout* mAppendixLayout;
+
+            /** 最小化按钮 */
+            QPushButton* mBtnMinimize;
+
+            /** 最大化、还原按钮 */
+            QPushButton* mBtnMaxRestore;
+
+            /** 关闭按钮 */
+            QPushButton* mBtnClose;
         };
     }
 }

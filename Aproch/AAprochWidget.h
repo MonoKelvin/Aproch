@@ -1,6 +1,6 @@
 /****************************************************************************
- * @file    AMenuBar.cpp
- * @date    2021-1-9
+ * @file    AAprochWidget.h
+ * @date    2021-1-24
  * @author  MonoKelvin
  * @email   15007083506@qq.com
  * @github  https://github.com/MonoKelvin
@@ -26,22 +26,25 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
-#include "stdafx.h"
-#include "AMenuBar.h"
+#pragma once
+#include "Widgets/AAprochWindow.h"
 
 namespace aproch
 {
-    namespace widgets
-    {
-        AMenuBar::AMenuBar(QWidget* parent /*= nullptr*/)
-            : QMenuBar(parent)
-        {
+    class AMainWindow;
 
-        }
+	/**
+	 * @brief 软件主窗口控件
+	 */
+	class AAprochWidget : public aproch::widgets::AAprochWindow
+	{
+		Q_OBJECT
+	public:
+		explicit AAprochWidget(QWidget* parent = nullptr);
+		~AAprochWidget();
 
-        AMenuBar::~AMenuBar(void)
-        {
-
-        }
-    }
+	private:
+		// 主窗口
+		AMainWindow* mMainWindow;
+	};
 }

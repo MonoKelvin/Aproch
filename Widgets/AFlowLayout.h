@@ -1,6 +1,6 @@
 /****************************************************************************
- * @file    ACommand.h
- * @date    2021-1-10
+ * @file    AFlowLayout.h
+ * @date    2021-1-23
  * @author  MonoKelvin
  * @email   15007083506@qq.com
  * @github  https://github.com/MonoKelvin
@@ -28,65 +28,57 @@
  *****************************************************************************/
 #pragma once
 
-#include <qobject.h>
+#include <QLayout>
+#include <QStyle>
 
 namespace aproch
 {
-    namespace framework
+    namespace widgets
     {
-        /** 命令参数 */
-        using CommandArgs = QVariantMap;
-
-        /** 命令ID */
-        using CommandId = QString;
-
-        /**
-         * 简单命令抽象类
+        /** 
+         * 流式布局
          */
-        class FRAMEWORK_API ACommand : public QObject
+        class WIDGETS_API AFlowLayout : public QLayout
         {
-            Q_OBJECT
         public:
-            explicit ACommand(QObject* parent = nullptr);
-            virtual ~ACommand();
+            explicit AFlowLayout(QWidget* parent);
+            ~AFlowLayout();
 
-            /**
-             * 处理命令的函数
-             */
-            virtual void handle(const CommandArgs& args) = 0;
+            void addItem(QLayoutItem* item) override;
 
-            /**
-             * 获取命令ID（常量）
-             * @return const QString& 命令ID（常量）
-             */
-            inline const CommandId& getCommandId()
-            {
-                return mCommandId;
-            }
+            int horizontalSpacing() const;
+            int verticalSpacing() const;
 
-            /**
-             * 获取命令ID
-             * @return const QString& 命令ID
-             */
-            inline CommandId getCommandId() const
-            {
-                return mCommandId;
-            }
+            void setHorizontalSpacing(int value);
+            void setVerticalSpacing(int value);
 
-        Q_SIGNALS:
-            /**
-             * 信号 - 当命令执行成功
-             */
-            void resolved();
+            Qt::Orientations expandingDirections() const override;
 
-            /**
-             * 信号 - 当命令执行失败
-             */
-            void rejected();
+            bool hasHeightForWidth() const override;
+            int heightForWidth(int width) const override;
 
-        protected:
-            /** 命令ID */
-            CommandId mCommandId;
+            int count() const override;
+            QLayoutItem* itemAt(int index) const override;
+
+            QSize minimumSize() const override;
+            void setGeometry(const QRect& rect) override;
+            QSize sizeHint() const override;
+
+            QLayoutItem* takeAt(int index) override;
+
+        private:
+            int doLayout(const QRect& rect, bool testOnly) const;
+            int smartSpacing(QStyle::PixelMetric pm) const;
+
+        private:
+            /** item列表 */
+            QList<QLayoutItem*> mItemList;
+
+            /** 水平间隔 */
+            int mHorizontalSpacing;
+
+            /** 垂直间隔 */
+            int mVerticalSpacing;
         };
     }
 }

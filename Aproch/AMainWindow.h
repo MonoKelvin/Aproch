@@ -31,47 +31,43 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_MainWindow.h"
 
-#define APROCH_MAX_SCALE_BOUNDARY 10
-
-class AMainWindow : public QMainWindow, public QAbstractNativeEventFilter
+namespace aproch
 {
-    Q_OBJECT
-
-public:
-    explicit AMainWindow(QWidget *parent = nullptr);
-
     /**
-     * 拦截系统原生事件，主要用于处理标题栏、窗口拉伸的事件
+     * @brief 软件主窗口
      */
-    bool nativeEventFilter(const QByteArray& eventType, void* message, long* result) override;
-
-    /**
-     * 获取菜单栏
-     * @return AMenuBar* 菜单栏控件
-     */
-    inline aproch::widgets::AMenuBar* getMenuBar(void) const noexcept
+    class AMainWindow : public QMainWindow
     {
-        return mMenuBar;
-    }
+        Q_OBJECT
 
-    /**
-     * 获取工具栏控件
-     * @return AToolBar* 工具栏控件
-     */
-    inline aproch::widgets::AToolBar* getToolBar(void) const noexcept
-    {
-        return mToolBar; 
-    }
+    public:
+        explicit AMainWindow(QWidget* parent = nullptr);
 
-protected:
-    Ui::AprochClass ui;
+        /**
+         * 获取标题栏
+         * @return AMenuBar* 标题栏控件
+         */
+        inline aproch::widgets::ACaptionBar* getCaptionBar(void) const noexcept
+        {
+            return mCaptionBar;
+        }
 
-    /** 控件缩放边界 */
-    int mScaleBoundary;
+        /**
+         * 获取工具栏控件
+         * @return AToolBar* 工具栏控件
+         */
+        inline aproch::widgets::AToolBar* getToolBar(void) const noexcept
+        {
+            return mToolBar;
+        }
 
-    /** 菜单栏 */
-    aproch::widgets::AMenuBar* mMenuBar;
+    protected:
+        Ui::AprochClass ui;
 
-    /** 工具栏 */
-    aproch::widgets::AToolBar* mToolBar;
-};
+        /** 菜单栏 */
+        aproch::widgets::ACaptionBar* mCaptionBar;
+
+        /** 工具栏 */
+        aproch::widgets::AToolBar* mToolBar;
+    };
+}

@@ -6,9 +6,6 @@
       <Extensions>qrc;*</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
-    <Filter Include="RibbonBar">
-      <UniqueIdentifier>{98173978-58d8-4628-a7be-db9b67a96210}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ToolBar">
       <UniqueIdentifier>{725229e3-7a59-4f9d-8cd7-17cd9dc3639f}</UniqueIdentifier>
     </Filter>
@@ -26,6 +23,17 @@
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
       <ParseFiles>true</ParseFiles>
     </Filter>
+    <Filter Include="Layout">
+      <UniqueIdentifier>{316a8fda-1289-46e8-95b7-0e161e6051a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
+    <Filter Include="Widget">
+      <UniqueIdentifier>{98173978-58d8-4628-a7be-db9b67a96210}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WidgetsAPI.h" />
@@ -34,15 +42,18 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="WidgetsGlobal.h" />
+    <ClInclude Include="AFlowLayout.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="AUIStyle.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AToolBar.cpp">
       <Filter>ToolBar</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="AMenuBar.cpp">
-      <Filter>MenuBar</Filter>
-    </ClCompile>
     <ClCompile Include="AActionManager.cpp">
       <Filter>Action</Filter>
     </ClCompile>
@@ -52,19 +63,34 @@
     <ClCompile Include="AToolkit.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="AFlowLayout.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="AUIStyle.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ACaptionBar.cpp">
+      <Filter>MenuBar</Filter>
+    </ClCompile>
+    <ClCompile Include="AAprochWindow.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="AToolBar.h">
       <Filter>ToolBar</Filter>
-    </QtMoc>
-    <QtMoc Include="AMenuBar.h">
-      <Filter>MenuBar</Filter>
     </QtMoc>
     <QtMoc Include="AAction.h">
       <Filter>Action</Filter>
     </QtMoc>
     <QtMoc Include="AActionManager.h">
       <Filter>Action</Filter>
+    </QtMoc>
+    <QtMoc Include="ACaptionBar.h">
+      <Filter>MenuBar</Filter>
+    </QtMoc>
+    <QtMoc Include="AAprochWindow.h">
+      <Filter>Widget</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

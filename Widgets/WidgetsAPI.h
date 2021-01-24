@@ -30,8 +30,10 @@
 
 #include "WidgetsGlobal.h"
 
+#include "AFlowLayout.h"
+#include "AUIStyle.h"
+#include "AAprochWindow.h"
 #include "AAction.h"
-#include "AMenuBar.h"
+#include "ACaptionBar.h"
 #include "AToolBar.h"
-
 #include "AActionManager.h"

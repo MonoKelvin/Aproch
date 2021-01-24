@@ -48,6 +48,13 @@ namespace aproch
             void executeCommand(const CommandId& commandId);
 
             /**
+             * @brief 执行命令
+             * @param commandId 要执行的命令ID
+             * @param args 执行命令所使用的参数
+             */
+            void executeCommand(const CommandId& commandId, const CommandArgs& args);
+
+            /**
              * 注册一个命令，如果命令存在则覆盖
              * @param command 命令
              * @note 命令注册成功会发送 commandRegisted 信号

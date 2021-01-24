@@ -110,9 +110,12 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <QtMoc Include="AAprochWindow.h" />
+    <ClInclude Include="AFlowLayout.h" />
+    <ClInclude Include="AUIStyle.h" />
     <ClInclude Include="WidgetsGlobal.h" />
     <QtMoc Include="AToolBar.h" />
-    <QtMoc Include="AMenuBar.h" />
+    <QtMoc Include="ACaptionBar.h" />
     <QtMoc Include="AAction.h" />
     <QtMoc Include="AActionManager.h" />
     <ClInclude Include="AToolkit.h" />
@@ -120,9 +123,12 @@
     <ClInclude Include="stdafx.h" />
     <ClCompile Include="AAction.cpp" />
     <ClCompile Include="AActionManager.cpp" />
-    <ClCompile Include="AMenuBar.cpp" />
+    <ClCompile Include="AAprochWindow.cpp" />
+    <ClCompile Include="AFlowLayout.cpp" />
+    <ClCompile Include="ACaptionBar.cpp" />
     <ClCompile Include="AToolBar.cpp" />
     <ClCompile Include="AToolkit.cpp" />
+    <ClCompile Include="AUIStyle.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">Create</PrecompiledHeader>
